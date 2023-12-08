@@ -39,4 +39,5 @@ out/
 # 애플리케이션 구성 파일 무시
 application-**.yml
 application-**.properties
-
+application.properties
+application.yml;
