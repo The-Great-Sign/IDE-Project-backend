@@ -6,11 +6,20 @@ import software.amazon.awssdk.services.ecs.model.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * IDE 컨테이너를 생성하기 위한 TaskDefinition을 생성하는 클래스입니다.
+ */
 @Component
 public class TaskDefinitionHelper {
 
     @Value("${aws.efs.fileSystemId}")
     private String fileSystemId;
+
+    @Value("${aws.ecs.taskRole}")
+    private String taskRole;
+
+    @Value("${aws.ecs.executionRole}")
+    private String executionRole;
 
     private final LogConfiguration LOG_CONFIGURATION = getLogConfiguration();
     private final List<MountPoint> MOUNT_POINT = getMountPoint();
@@ -24,8 +33,8 @@ public class TaskDefinitionHelper {
         return RegisterTaskDefinitionRequest.builder()
                 .containerDefinitions(createContainerDefinition(programmingLanguage))
                 .volumes(createVolume(accessPointId, fileSystemId))
-                .taskRoleArn("arn:aws:iam::092624380570:role/taskRole")
-                .executionRoleArn("arn:aws:iam::092624380570:role/taskExecutionRole")
+                .taskRoleArn(taskRole)
+                .executionRoleArn(executionRole)
                 .requiresCompatibilities(Compatibility.FARGATE)
                 .networkMode(NetworkMode.AWSVPC)
                 .cpu("512")
