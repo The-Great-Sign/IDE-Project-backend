@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.container;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ class ContainerUtilTest {
     private ContainerUtil containerUtil;
 
     @Test
+    @Disabled
     void createContainerImage() {
 
         String containerImage = containerUtil.createContainerImage(ProgrammingLanguage.PYTHON, "fsap-04fbb958d168856f3");
@@ -37,6 +39,7 @@ class ContainerUtilTest {
      * 에러 발생 시 팀장에게 빠른 전달 부탁합니다. (과금과 관계 있음)
      */
     @Test
+    @Disabled
     void runContainer() {
 
         String containerImageId = containerUtil.createContainerImage(ProgrammingLanguage.PYTHON, "fsap-04fbb958d168856f3");

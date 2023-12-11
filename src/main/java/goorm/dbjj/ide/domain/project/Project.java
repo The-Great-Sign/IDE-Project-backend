@@ -1,4 +1,4 @@
-package goorm.dbjj.ide.domain;
+package goorm.dbjj.ide.domain.project;
 
 import goorm.dbjj.ide.container.ProgrammingLanguage;
 import jakarta.persistence.*;
@@ -21,7 +21,7 @@ public class Project {
 
     private String description;
 
-    private String taskDefinition;
+    private String containerImageId;
 
     @Enumerated(EnumType.STRING)
     private ProgrammingLanguage programmingLanguage;
@@ -32,8 +32,8 @@ public class Project {
     private LocalDateTime createdAt;
 
     // === 세터 == //
-    public void setTaskDefinition(String taskDefinition) {
-        this.taskDefinition = taskDefinition;
+    public void setContainerImageId(String containerImageId) {
+        this.containerImageId = containerImageId;
     }
 
 }
