@@ -1,6 +1,5 @@
 package goorm.dbjj.ide.container;
 
-import goorm.dbjj.ide.domain.Project;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import software.amazon.awssdk.services.ecs.EcsClient;
 import software.amazon.awssdk.services.ecs.model.DeregisterTaskDefinitionRequest;
 import software.amazon.awssdk.services.ecs.model.StopTaskRequest;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -22,25 +20,15 @@ class ContainerUtilTest {
     private ContainerUtil containerUtil;
 
     @Test
-    void createProjectImage() {
+    void createContainerImage() {
 
-        Project project = new Project(
-                UUID.randomUUID().toString(),
-                "test",
-                "test",
-                null, // taskDefinition
-                ProgrammingLanguage.PYTHON,
-                "test",
-                null
-        );
+        String containerImage = containerUtil.createContainerImage(ProgrammingLanguage.PYTHON, "fsap-04fbb958d168856f3");
 
-        containerUtil.createProjectImage(project, "fsap-04fbb958d168856f3");
-
-        assertThat(project.getTaskDefinition()).isNotNull();
+        assertThat(containerImage).isNotNull();
 
         //after
         ecsClient.deregisterTaskDefinition(DeregisterTaskDefinitionRequest.builder()
-                .taskDefinition(project.getTaskDefinition())
+                .taskDefinition(containerImage)
                 .build());
     }
 
@@ -49,21 +37,12 @@ class ContainerUtilTest {
      * 에러 발생 시 팀장에게 빠른 전달 부탁합니다. (과금과 관계 있음)
      */
     @Test
-    void runProjectContainer() {
-        Project project = new Project(
-                UUID.randomUUID().toString(),
-                "test",
-                "test",
-                null, // taskDefinition
-                ProgrammingLanguage.PYTHON,
-                "test",
-                null
-        );
+    void runContainer() {
 
-        containerUtil.createProjectImage(project, "fsap-04fbb958d168856f3");
+        String containerImageId = containerUtil.createContainerImage(ProgrammingLanguage.PYTHON, "fsap-04fbb958d168856f3");
 
         Assertions.assertDoesNotThrow(() -> {
-            String taskArn = containerUtil.runProjectContainer(project);
+            String taskArn = containerUtil.runContainer(containerImageId);
 
             StopTaskRequest stopTaskRequest = StopTaskRequest.builder()
                     .cluster("IDE_CONTAINER")
@@ -73,7 +52,7 @@ class ContainerUtilTest {
             ecsClient.stopTask(stopTaskRequest);
 
             ecsClient.deregisterTaskDefinition(DeregisterTaskDefinitionRequest.builder()
-                    .taskDefinition(project.getTaskDefinition())
+                    .taskDefinition(containerImageId)
                     .build());
         });
     }
