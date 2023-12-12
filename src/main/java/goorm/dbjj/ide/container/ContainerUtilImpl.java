@@ -15,11 +15,20 @@ public class ContainerUtilImpl implements ContainerUtil {
     private final TaskDefinitionHelper taskDefinitionHelper;
     private final RunTaskRequestHelper runTaskRequestHelper;
 
-    /**
-     * Todo: 컨테이너에 명령어를 수행시키는 메서드
-     */
     @Override
-    public void executeCommand(String containerId, String command) {
+    public String executeCommand(String containerId, String command) {
+        ExecuteCommandRequest request = ExecuteCommandRequest.builder()
+                .cluster("IDE_CONTAINER")
+                .task(containerId)
+                .command(command)
+                .interactive(true)
+                .build();
+
+        ExecuteCommandResponse response = ecsClient.executeCommand(request);
+        log.debug("executeCommandResponse: {}", response);
+
+        //응답값을 식별할 수 있는 세션 ID 반환
+        return response.session().sessionId();
     }
 
     @Override

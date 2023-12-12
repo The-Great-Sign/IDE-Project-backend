@@ -14,7 +14,8 @@ class ContainerServiceTest {
     static class DummyContainerUtil implements ContainerUtil {
 
         @Override
-        public void executeCommand(String containerId, String command) {
+        public String executeCommand(String containerId, String command) {
+            return "sessionId";
         }
 
         @Override
