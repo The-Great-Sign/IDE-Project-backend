@@ -2,6 +2,7 @@ package goorm.dbjj.ide.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -40,10 +41,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
                 .withSockJS();
 //				.setInterceptors((ChatStompInterceptor) this.chatInterceptor);
 
-        /*todo : 고민되는 부분 정리하기
-         *	1. 핸드쉐이크 과정에서 필터링을 어떻게할건지 =>
-         *	2. 인터셉터를 도입하거나 http통신이니까 해결이 되는지 => 범석님 자료 읽기
-         * */
+        /*todo : endpoint로 connect 연결 시 인터셉터 등록하기 */
 
     }
+    // todo : 채널 구독 인터셉터 등록하기
 }

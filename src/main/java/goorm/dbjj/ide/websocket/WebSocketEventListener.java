@@ -22,25 +22,25 @@ public class WebSocketEventListener {
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         // TODO: 여기서 연결 관련 로직을 구현합니다.
-        System.out.println("Received a new web socket connection");
+        log.trace("WebSocketEventListener.handleWebSocketConnectListener execute");
     }
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         // TODO: 여기서 연결 해제 관련 로직을 구현합니다.
-        System.out.println("Disconnected web socket connection");
+        log.trace("WebSocketEventListener.handleWebSocketDisconnectListener execute");
     }
 
     @EventListener
     public void handleSubscribeEvent(SessionSubscribeEvent event) {
-        log.info("handleSubscribeEvent execute");
+        log.trace("handleSubscribeEvent execute");
 
         String destinationURI = (String) event.getMessage().getHeaders().get("simpDestination");
         //TODO : 구독 시 현재 동작 과정 정리하기
         int num = Integer.parseInt(destinationURI.split("/")[3]);
-        log.info("{}",destinationURI.split("/")[3]);
-        log.info("{}",destinationURI.split("/")[4]);
+        log.debug("{}",destinationURI.split("/")[3]);
+        log.debug("{}",destinationURI.split("/")[4]);
 
         //TODO : 현재 프로젝트에 접근하고자하는 USERID 받아오기!
         Long userId = 0L;

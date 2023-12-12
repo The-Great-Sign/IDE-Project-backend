@@ -7,6 +7,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class ChatsDto {
+public class ChattingContentRequestDto {
     private String content;
 }

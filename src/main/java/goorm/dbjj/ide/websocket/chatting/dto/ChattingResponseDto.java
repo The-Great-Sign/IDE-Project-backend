@@ -10,7 +10,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChatsResponse {
+public class ChattingResponseDto {
     private ChatType messageType;
     private Long projectUserId;
     private String content;
