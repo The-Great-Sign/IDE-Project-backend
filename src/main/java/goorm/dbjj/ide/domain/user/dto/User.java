@@ -3,6 +3,8 @@ package goorm.dbjj.ide.domain.user.dto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -30,10 +32,10 @@ public class User {
     private String socialId; // 소셜로그인한 id
     private String refreshToken; // 리프레시 토큰
 
-    @ColumnDefault("NOW()")
+    @CreationTimestamp // INSERT 시 자동으로 값을 채워줌
     private LocalDateTime createdAt;
 
-    @ColumnDefault("NOW()")
+    @UpdateTimestamp // UPDATE 시 자동으로 값을 채워줌.
     private LocalDateTime updatedAt;
 
     // 유저 권한 설정 메서드
