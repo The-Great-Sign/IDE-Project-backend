@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,7 +28,7 @@ public class Project {
 
     private String password;
 
-    @CreationTimestamp
+    @ColumnDefault("NOW()")
     private LocalDateTime createdAt;
 
     // === 세터 == //
