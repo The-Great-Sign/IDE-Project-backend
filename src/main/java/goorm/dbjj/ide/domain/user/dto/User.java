@@ -46,16 +46,9 @@ public class User {
     // 유저 필드 업데이트
     public void updateNickname(String updateNickname){
         this.nickname = updateNickname;
-        updateTime();
     }
 
     public void updateRefreshToken(String updateRefreshToken){
         this.refreshToken = updateRefreshToken;
-        updateTime();
     }
-
-    public void updateTime(){
-        this.updatedAt = LocalDateTime.now();
-    }
-
 }
