@@ -20,6 +20,15 @@ public class ContainerUtilImpl implements ContainerUtil {
      */
     @Override
     public void executeCommand(String containerId, String command) {
+        ExecuteCommandRequest request = ExecuteCommandRequest.builder()
+                .cluster("IDE_CONTAINER")
+                .task(containerId)
+                .command(command)
+                .interactive(true)
+                .build();
+
+        ExecuteCommandResponse response = ecsClient.executeCommand(request);
+        log.debug("executeCommandResponse: {}", response);
     }
 
     @Override

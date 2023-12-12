@@ -59,4 +59,16 @@ class ContainerUtilTest {
                     .build());
         });
     }
+
+    @Test
+//    @Disabled
+    void executeCommand() {
+
+        //given
+        String containerId = "arn:aws:ecs:ap-northeast-2:092624380570:task/IDE_CONTAINER/6a37cddd4b4947c294f409b6abefbaf5";
+        String command = "python ./app/hello.py";
+
+        //when
+        containerUtil.executeCommand(containerId, command);
+    }
 }
