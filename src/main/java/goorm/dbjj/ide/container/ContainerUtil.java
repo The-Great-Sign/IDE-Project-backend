@@ -1,7 +1,14 @@
 package goorm.dbjj.ide.container;
 
 public interface ContainerUtil {
-    void executeCommand(String containerId, String command);
+    /**
+     * 컨테이너에 명령어를 수행시키는 메서드
+     *
+     * @param containerId
+     * @param command
+         * @return 결과값과 매칭되는 sessionId를 제공한다.
+     */
+    String executeCommand(String containerId, String command);
 
     /**
      * 컨테이너 이미지를 생성하는 메서드
