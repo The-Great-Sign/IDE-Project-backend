@@ -1,9 +1,11 @@
 package goorm.dbjj.ide.websocket.chatting.model;
 
+import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,4 +20,8 @@ public class Chats {
     private String content;
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public Chats(ChattingContentRequestDto chatsDto) {
+        this.content = chatsDto.getContent();
+    }
 }
