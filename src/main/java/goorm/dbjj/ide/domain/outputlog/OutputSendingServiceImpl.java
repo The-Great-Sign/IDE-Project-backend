@@ -41,14 +41,13 @@ public class OutputSendingServiceImpl implements OutputSendingService {
 
         String[] splitedMessage = message.split("\n");
 
-        if (splitedMessage.length != 5) {
-            log.error("응답 메시지의 형식이 맞지 않습니다. Message : {}", message);
-            return new ExecutionOutputDto(false,"", "알 수 없는 오류가 발생했습니다.");
+        if(splitedMessage.length == 4) {
+            return new ExecutionOutputDto(true, "", splitedMessage[1]);
+        } else if (splitedMessage.length == 5) {
+            return new ExecutionOutputDto(true, splitedMessage[1], splitedMessage[2]);
+        } else {
+            log.error("응답 메시지의 형식이 맞지 않습니다. message : {}", message);
+            return new ExecutionOutputDto(false,"알 수 없는 오류가 발생했습니다.", "");
         }
-
-        String path = splitedMessage[1];
-        String content = splitedMessage[2];
-
-        return new ExecutionOutputDto(true, path, content);
     }
 }
