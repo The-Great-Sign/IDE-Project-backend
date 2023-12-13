@@ -12,6 +12,9 @@ import java.security.Principal;
 public class UserController {
     private final UserService userService;
 
+    /**
+     * 테스트용 메서드 입니다!
+     */
     @GetMapping("/user/main")
     public String main(){
         return "로그인 되었습니다!";

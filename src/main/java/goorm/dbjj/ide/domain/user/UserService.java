@@ -15,6 +15,6 @@ public class UserService {
 
     public User getUser(String email){
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BaseException(email+"에 해당하는 정보가 없습니다."));
+                .orElseThrow(() -> new BaseException(email+"의 이메일을 가진 사용자가 없습니다."));
     }
 }
