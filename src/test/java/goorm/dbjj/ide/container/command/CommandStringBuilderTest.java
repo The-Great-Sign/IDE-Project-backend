@@ -17,7 +17,6 @@ class CommandStringBuilderTest {
         String result = commandStringBuilder.createCommand(path, command);
 
         // then
-        assertThat(result).isEqualTo("cd /home/goorm ; ls -al");
+        assertThat(result).isEqualTo("bash -c 'cd /home/goorm && pwd && ls -al'");
     }
-
 }
