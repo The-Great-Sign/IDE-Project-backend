@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +25,14 @@ public class ContainerService {
 
     private final ContainerUtil containerUtil;
     private final MemoryContainerRepository memoryContainerRepository;
+    private final CommandStringBuilder commandStringBuilder;
 
     /**
      * 컨테이너에 명령을 실행시킵니다.
      * 명령어로 나온 결과를 읽어 사용자에게 전달합니다.
      * - 어떤 사용자에게 결과를 보내야하는지 알아야 하므로 유저 정보를 가져와야 합니다.
      */
-    public void executeCommand(Project project, String command, String userId) {
+    public void executeCommand(Project project, String path, String command, String userId) {
         log.trace("ContainerService.executeCommand called");
 
         String containerId = memoryContainerRepository.find(project.getId());
@@ -38,7 +40,10 @@ public class ContainerService {
             throw new BaseException("컨테이너가 실행중이지 않습니다.");
         }
 
-        String sessionId = containerUtil.executeCommand(containerId, command);
+        String sessionId = containerUtil.executeCommand(
+                containerId,
+                commandStringBuilder.createCommand(path,command)
+        );
 
         /**
          * todo : sessionId를 이용해 들어오는 결과와 매칭시켜서 사용자에게 전달

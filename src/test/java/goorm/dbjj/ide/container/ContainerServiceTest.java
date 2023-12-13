@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.container;
 
+import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.Project;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +35,11 @@ class ContainerServiceTest {
     }
 
     private MemoryContainerRepository memoryContainerRepository = new MemoryContainerRepository();
-    private ContainerService containerService = new ContainerService(new DummyContainerUtil(), memoryContainerRepository);
+    private ContainerService containerService = new ContainerService(
+            new DummyContainerUtil(),
+            memoryContainerRepository,
+            new CommandStringBuilder()
+            );
 
     private Project createProject() {
         return new Project(
