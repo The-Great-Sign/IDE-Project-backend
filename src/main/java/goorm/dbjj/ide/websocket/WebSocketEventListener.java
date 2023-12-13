@@ -35,18 +35,5 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSubscribeEvent(SessionSubscribeEvent event) {
         log.trace("handleSubscribeEvent execute");
-
-        String destinationURI = (String) event.getMessage().getHeaders().get("simpDestination");
-        //TODO : 구독 시 현재 동작 과정 정리하기
-        int num = Integer.parseInt(destinationURI.split("/")[3]);
-        log.debug("{}",destinationURI.split("/")[3]);
-        log.debug("{}",destinationURI.split("/")[4]);
-
-        //TODO : 현재 프로젝트에 접근하고자하는 USERID 받아오기!
-        Long userId = 0L;
-
-        if(destinationURI.split("/")[4].equals("chat")) {
-            template.convertAndSend(destinationURI, chatsService.enter(userId));
-        }
     }
 }
