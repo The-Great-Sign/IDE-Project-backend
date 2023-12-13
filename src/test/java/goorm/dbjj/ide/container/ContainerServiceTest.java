@@ -1,7 +1,7 @@
 package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
-import goorm.dbjj.ide.domain.project.Project;
+import goorm.dbjj.ide.domain.project.model.Project;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,14 +43,11 @@ class ContainerServiceTest {
             );
 
     private Project createProject() {
-        return new Project(
-                "id",
+        return Project.createProject(
                 "name",
                 "description",
-                null,
                 ProgrammingLanguage.PYTHON,
-                "password",
-                LocalDateTime.now()
+                "password"
         );
     }
     @AfterEach

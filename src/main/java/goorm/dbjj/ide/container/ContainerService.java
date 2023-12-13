@@ -2,7 +2,7 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
-import goorm.dbjj.ide.domain.project.Project;
+import goorm.dbjj.ide.domain.project.model.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,19 +1,19 @@
-package goorm.dbjj.ide.domain.project;
+package goorm.dbjj.ide.domain.project.model;
 
 import goorm.dbjj.ide.container.ProgrammingLanguage;
+import goorm.dbjj.ide.domain.user.dto.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Project {
 
     @Id
@@ -36,9 +36,23 @@ public class Project {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // === 생성 팩토리 메서드 === //
+    public static Project createProject(String name, String description, ProgrammingLanguage programmingLanguage, String password) {
+        Project project = new Project();
+        project.id = UUID.randomUUID().toString();
+        project.name = name;
+        project.description = description;
+        project.programmingLanguage = programmingLanguage;
+        project.password = password;
+        return project;
+    }
+
     // === 세터 == //
     public void setContainerImageId(String containerImageId) {
         this.containerImageId = containerImageId;
     }
-
 }
