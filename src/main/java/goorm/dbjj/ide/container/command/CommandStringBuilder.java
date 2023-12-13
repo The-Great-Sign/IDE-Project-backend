@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommandStringBuilder {
 
-    private final String template = "bash -c 'cd %s && pwd && %s'";
+    private final String template = "bash -c 'cd %s ; %s ; pwd'";
 
     public String createCommand(String path, String command){
         return String.format(template, path, command);
