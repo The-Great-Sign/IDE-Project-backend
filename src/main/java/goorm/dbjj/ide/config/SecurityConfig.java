@@ -3,8 +3,6 @@ package goorm.dbjj.ide.config;
 import goorm.dbjj.ide.auth.oauth2.CustomOAuth2UserService;
 import goorm.dbjj.ide.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import goorm.dbjj.ide.auth.oauth2.handler.OAuth2LoginSuccessHandler;
-import goorm.dbjj.ide.domain.user.UserRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
