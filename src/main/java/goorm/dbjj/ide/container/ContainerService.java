@@ -26,6 +26,7 @@ public class ContainerService {
     private final ContainerUtil containerUtil;
     private final MemoryContainerRepository memoryContainerRepository;
     private final CommandStringBuilder commandStringBuilder;
+    private final ExecutionSessionIdMapper executionSessionIdMapper;
 
     /**
      * 컨테이너에 명령을 실행시킵니다.
@@ -45,10 +46,7 @@ public class ContainerService {
                 commandStringBuilder.createCommand(path,command)
         );
 
-        /**
-         * todo : sessionId를 이용해 들어오는 결과와 매칭시켜서 사용자에게 전달
-         * - 이는 비동기적으로 작업해야함
-         */
+        executionSessionIdMapper.put(sessionId, project.getId(), userId);
     }
 
     /**
