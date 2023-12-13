@@ -1,5 +1,7 @@
 package goorm.dbjj.ide.container;
 
+import goorm.dbjj.ide.container.command.CommandStringBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import software.amazon.awssdk.services.ecs.model.StopTaskRequest;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 class ContainerUtilTest {
 
@@ -61,14 +64,15 @@ class ContainerUtilTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void executeCommand() {
 
         //given
         String containerId = "arn:aws:ecs:ap-northeast-2:092624380570:task/IDE_CONTAINER/6a37cddd4b4947c294f409b6abefbaf5";
-        String command = "python ./app/hello.py";
-
+        String command = "python hello.py";
+        String path = "/app";
+        String createdCommand = new CommandStringBuilder().createCommand(path, command);
         //when
-        containerUtil.executeCommand(containerId, command);
+        containerUtil.executeCommand(containerId, createdCommand);
     }
 }
