@@ -9,9 +9,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // 상속받는 자식 클래스까지만 인스턴스 생성 가능.
 @Builder
+@Entity
 @Table(name = "Users") // 예약어 충돌
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 상속받는 자식 클래스까지만 인스턴스 생성 가능.
 @AllArgsConstructor
 public class User {
 
