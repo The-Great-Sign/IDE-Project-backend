@@ -6,14 +6,13 @@ import lombok.*;
 import java.util.List;
 
 @Getter
-//@ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Resource {
     protected String name;
     protected String fullPath;
     private String content;
     protected ResourceType resourceType;
-    private List<Resource> child; // 평소에 유지될 필요 x file은 null, dir ->하위file, 하위 dir
+    private List<Resource> child;
 
     private Resource(String name, String fullPath, ResourceType resourceType) {
         this.name = name;

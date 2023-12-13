@@ -1,17 +1,11 @@
 package goorm.dbjj.ide.storageManager;
-
 import goorm.dbjj.ide.api.exception.ResourceNotFoundException;
 import goorm.dbjj.ide.model.type.ResourceType;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import org.springframework.stereotype.Component;
-
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import static goorm.dbjj.ide.model.type.ResourceType.*;
 
 @Component
@@ -34,7 +28,7 @@ public class FileIoStorageManager implements StorageManager {
 
 
     @Override
-    public Resource loadFile(String path) { // 재귀로 해야할 거 같음
+    public Resource loadFile(String path) {
         File file = new File(path);
 
         String fileName = file.getName();
@@ -77,20 +71,6 @@ public class FileIoStorageManager implements StorageManager {
         }
     }
 
-//    @Override
-//    public List<Resource> loadDirectory(String path) {
-//        File file = new File(path);
-//
-//        if (!file.exists() || file.isFile()) {
-//            /**
-//             * TODO : throw 에뤌
-//             */
-//        }
-//
-//        return Arrays.stream(Objects.requireNonNull(file.listFiles())).map(resource -> Resource.resource(resource.getName(), resource.getParent(), resource.isFile() ? FILE : DIRECTORY)).collect(Collectors.toList());
-//    }
-
-
     @Override
     public void createDirectory(String path) {
         File file = new File(path);
@@ -118,11 +98,7 @@ public class FileIoStorageManager implements StorageManager {
         if (!file.isDirectory()) {
             throw new ResourceNotFoundException("디렉토리 경로가 아닙니다 : " + path);
         }
-//        if (!file.exists() || file.isFile()) {
-//            /**
-//             * TODO : throw 에뤌
-//             */
-//        }
+
         Resource resource = Resource.directory(file.getName(), file.getAbsolutePath());
         resource.setChild(loadDirectoryRecursive(file));
         return resource;

@@ -1,16 +1,9 @@
 package goorm.dbjj.ide.storageManager;
 
-import goorm.dbjj.ide.model.type.ResourceType;
 import goorm.dbjj.ide.storageManager.model.Resource;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
