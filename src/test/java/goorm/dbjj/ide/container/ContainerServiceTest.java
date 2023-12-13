@@ -39,7 +39,7 @@ class ContainerServiceTest {
             new DummyContainerUtil(),
             memoryContainerRepository,
             new CommandStringBuilder(),
-            new ExecutionSessionIdMapper()
+            new ExecutionIdMapper()
             );
 
     private Project createProject() {

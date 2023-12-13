@@ -1,6 +1,6 @@
 package goorm.dbjj.ide.domain.outputlog;
 
-import goorm.dbjj.ide.container.ExecutionSessionIdMapper;
+import goorm.dbjj.ide.container.ExecutionIdMapper;
 import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
 import goorm.dbjj.ide.domain.outputlog.dto.response.ExecutionOutputDto;
 import lombok.RequiredArgsConstructor;
@@ -13,23 +13,29 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OutputSendingServiceImpl implements OutputSendingService {
 
-    private final ExecutionSessionIdMapper executionSessionIdMapper;
+    private final ExecutionIdMapper executionIdMapper;
 
     @Override
     public void sendTo(LogEntry logEntry) {
-        String sessionId = logEntry.getLogStream();
+        /**
+         * 로그로부터 executionId를 획득합니다.
+         */
+        String executionId = logEntry.getLogStream();
         String message = logEntry.getLogEvents().get(0).getMessage();
         ExecutionOutputDto executionOutputDto = parseMessage(message);
         log.debug("output : {}", executionOutputDto);
 
-        ExecutionSessionIdMapper.MappedInfo mappedInfo = executionSessionIdMapper.get(sessionId);
+        /**
+         * executionId를 누가 어떤 프로젝트에서 수행했는지 가져옵니다.
+         */
+        ExecutionIdMapper.MappedInfo mappedInfo = executionIdMapper.get(executionId);
 
         if (mappedInfo == null) {
-            log.error("해당 세션에 매핑된 정보가 없습니다. sessionId : {}", sessionId);
+            log.error("실행 정보와 매칭되는 유저 정보가 없습니다. executionId : {}", executionId);
             return;
         }
 
-        executionSessionIdMapper.remove(sessionId);
+        executionIdMapper.remove(executionId);
 
         /**
          * todo: 웹소켓으로 전송하는 로직을 구현합니다.

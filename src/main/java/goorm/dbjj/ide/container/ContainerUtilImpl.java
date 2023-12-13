@@ -27,7 +27,7 @@ public class ContainerUtilImpl implements ContainerUtil {
         ExecuteCommandResponse response = ecsClient.executeCommand(request);
         log.debug("executeCommandResponse: {}", response);
 
-        //응답값을 식별할 수 있는 세션 ID 반환
+        //응답값을 식별할 수 있는 executionId 반환
         return response.session().sessionId();
     }
 

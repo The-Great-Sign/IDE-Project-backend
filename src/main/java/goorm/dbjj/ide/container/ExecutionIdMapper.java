@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * sessionId와 { projectId, userId }를 매핑하는 클래스입니다.
+ * executionId와 { projectId, userId }를 매핑하는 클래스입니다.
  */
 @Component
-public class ExecutionSessionIdMapper {
+public class ExecutionIdMapper {
 
     @Data
     public static class MappedInfo {
@@ -19,11 +19,11 @@ public class ExecutionSessionIdMapper {
     }
     private Map<String, MappedInfo> map = new ConcurrentHashMap<>();
 
-    public void put(String sessionId, String projectId, String userId) {
+    public void put(String executionId, String projectId, String userId) {
         MappedInfo mappedInfo = new MappedInfo();
         mappedInfo.setProjectId(projectId);
         mappedInfo.setUserId(userId);
-        map.put(sessionId, mappedInfo);
+        map.put(executionId, mappedInfo);
     }
 
     public MappedInfo get(String sessionId) {

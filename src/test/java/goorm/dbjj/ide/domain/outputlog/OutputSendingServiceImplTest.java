@@ -1,6 +1,6 @@
 package goorm.dbjj.ide.domain.outputlog;
 
-import goorm.dbjj.ide.container.ExecutionSessionIdMapper;
+import goorm.dbjj.ide.container.ExecutionIdMapper;
 import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
 import goorm.dbjj.ide.domain.outputlog.dto.request.LogEvent;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 
 
 class OutputSendingServiceImplTest {
-    ExecutionSessionIdMapper executionSessionIdMapper = new ExecutionSessionIdMapper();
+    ExecutionIdMapper executionSessionIdMapper = new ExecutionIdMapper();
     OutputSendingService outputSendingService = new OutputSendingServiceImpl(executionSessionIdMapper);
     @Test
     void outputSendingServiceTest() {

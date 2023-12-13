@@ -26,7 +26,7 @@ public class ContainerService {
     private final ContainerUtil containerUtil;
     private final MemoryContainerRepository memoryContainerRepository;
     private final CommandStringBuilder commandStringBuilder;
-    private final ExecutionSessionIdMapper executionSessionIdMapper;
+    private final ExecutionIdMapper executionIdMapper;
 
     /**
      * 컨테이너에 명령을 실행시킵니다.
@@ -46,7 +46,7 @@ public class ContainerService {
                 commandStringBuilder.createCommand(path,command)
         );
 
-        executionSessionIdMapper.put(sessionId, project.getId(), userId);
+        executionIdMapper.put(sessionId, project.getId(), userId);
     }
 
     /**
