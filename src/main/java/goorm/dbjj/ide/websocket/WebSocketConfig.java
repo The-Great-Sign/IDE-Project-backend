@@ -2,7 +2,6 @@ package goorm.dbjj.ide.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -22,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic/project"); // 메시지 브로커를 설정
-        config.setApplicationDestinationPrefixes("/app"); // 서버에 접속하는 접두사 설정
+        config.setApplicationDestinationPrefixes("/app","/topic"); // 서버에 접속하는 접두사 설정
     }
 
     /**
