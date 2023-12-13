@@ -39,11 +39,6 @@ public class User {
     @UpdateTimestamp // UPDATE 시 자동으로 값을 채워줌.
     private LocalDateTime updatedAt;
 
-    // 유저 권한 설정 메서드
-    public void authorizedUser(){
-        this.role = Role.USER;
-    }
-
     // 유저 필드 업데이트
     public void updateNickname(String updateNickname){
         this.nickname = updateNickname;
