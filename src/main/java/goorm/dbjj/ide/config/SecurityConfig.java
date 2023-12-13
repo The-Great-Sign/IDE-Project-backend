@@ -32,10 +32,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(corsConfigurationSource()) // CORS 설정
+                .cors(configurerCustomizer()) // CORS 설정
                 .csrf((csrf) -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(reqs -> reqs
-                        // 인증이 되면 들어갈 수 잇는 주소.
+                        // 인증이 되면 들어갈 수 있는 주소.
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
@@ -48,23 +48,21 @@ public class SecurityConfig {
                 .getOrBuild(); // 마지막으로 getOrBuild()를 호출하여 SecurityFilterChain 객체 생성
     }
 
+    /**
+     * todo: 나중에 Cors 다시 설정
+     * 개발 중에는 Cors 열어두기.
+     */
     @Bean
-    Customizer<CorsConfigurer<HttpSecurity>> corsConfigurationSource() {
+    Customizer<CorsConfigurer<HttpSecurity>> configurerCustomizer() {
 
         return cors -> {
             CorsConfiguration configuration = new CorsConfiguration();
-            // 허용된 출처, 메소드, 헤더를 설정.
-            configuration.addAllowedOrigin("http://localhost:8080");
-            configuration.addAllowedMethod("GET");
-            configuration.addAllowedMethod("POST");
-            configuration.addAllowedMethod("OPTIONS");
-            configuration.addAllowedMethod("PUT");
-            configuration.addAllowedMethod("DELETE");
-            configuration.addAllowedHeader("*");
+            configuration.addAllowedOrigin("*"); // 모든 웹사이트 요청 가능
+            configuration.addAllowedMethod("*"); // GET, PUT, POST 다 가능
+            configuration.addAllowedHeader("*"); // 모든 헤더 허용
 
             // 구성된 Cors를 적용.
             cors.configurationSource(request -> configuration);
-
         };
     }
 }
