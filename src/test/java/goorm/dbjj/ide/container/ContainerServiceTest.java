@@ -28,6 +28,11 @@ class ContainerServiceTest {
         }
 
         @Override
+        public void deleteContainerImage(String containerImageId) {
+
+        }
+
+        @Override
         public String runContainer(String containerImageId) {
             return "containerId";
         }
@@ -156,5 +161,36 @@ class ContainerServiceTest {
         assertThatThrownBy(
                 () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
         ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
+
+    void deleteContainerImage() {
+        // given
+        Project project = createProject();
+        containerService.createProjectImage(project);
+
+        //Project에는 ContainerImage가 있어야 한다.
+        assertThat(project.getContainerImageId()).isNotNull();
+
+        // when
+        containerService.deleteProjectImage(project);
+
+        // then
+        //삭제 후에는 Project에 ContainerImage가 없어야 한다.
+        assertThat(project.getContainerImageId()).isNull();
+    }
+
+    @Test
+    void deleteContainerImageEx1() {
+        // given
+        Project project = createProject();
+
+        // when
+        //Project에는 ContainerImage가 없다.
+        assertThat(project.getContainerImageId()).isNull();
+
+        // then
+        //삭제 후에는 Project에 ContainerImage가 없어야 한다.
+        assertThatThrownBy(() -> containerService.deleteProjectImage(project))
+                .isInstanceOf(BaseException.class)
+                .hasMessage("컨테이너 이미지가 존재하지 않습니다.");
     }
 }

@@ -23,6 +23,12 @@ public interface ContainerUtil {
     String createContainerImage(ProgrammingLanguage programmingLanguage, String accessPointId);
 
     /**
+     * 컨테이너 이미지를 삭제합니다.
+     * @param containerImageId
+     */
+    void deleteContainerImage(String containerImageId);
+
+    /**
      * 프로젝트의 컨테이너를 실행시킵니다.
      *
      * 실행 설정 정보 생성 -> 실행 -> 컨테이너 ID 반환
