@@ -6,6 +6,7 @@ import goorm.dbjj.ide.domain.project.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * IDE 컨테이너를 관리하는 서비스입니다.
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ContainerService {
 
     private final ContainerUtil containerUtil;
@@ -55,6 +57,7 @@ public class ContainerService {
      *
      * @param project
      */
+    @Transactional(readOnly = true)
     public void createProjectImage(Project project) {
         log.trace("ContainerService.createProjectImage called");
         /**
@@ -70,6 +73,22 @@ public class ContainerService {
         );
 
         project.setContainerImageId(containerImageId);
+    }
+
+    /**
+     * 프로젝트 컨테이너 이미지를 삭제합니다.
+     * 삭제 권한은 이 메서드를 사용하는 측에서 검증해야합니다.
+     * @param project
+     */
+    public void deleteProjectImage(Project project) {
+        log.trace("ContainerService.deleteProjectImage called");
+
+        if (project.getContainerImageId() == null) {
+            throw new BaseException("컨테이너 이미지가 존재하지 않습니다.");
+        }
+
+        containerUtil.deleteContainerImage(project.getContainerImageId());
+        project.setContainerImageId(null);
     }
 
     /**
