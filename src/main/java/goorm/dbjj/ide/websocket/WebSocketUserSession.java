@@ -9,8 +9,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class WebSocketUserSession {
-    private String sessionId;
     private Long userId;
     private Long projectId;
-    private SubscribeType subscribeType;
 }
