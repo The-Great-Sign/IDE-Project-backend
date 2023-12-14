@@ -34,6 +34,7 @@ public class Resource {
     public static Resource directory(String name, String path) {
         return new Resource(name, path,null, ResourceType.DIRECTORY);
     }
+
     public static Resource resource(String name, String path, ResourceType resourceType) {
         return new Resource(name, path, resourceType);
     }

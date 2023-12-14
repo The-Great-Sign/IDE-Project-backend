@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.storageManager;
-import goorm.dbjj.ide.api.exception.ResourceNotFoundException;
+import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.storageManager.exception.ResourceNotFoundException;
 import goorm.dbjj.ide.model.type.ResourceType;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import org.springframework.stereotype.Component;
@@ -11,21 +12,17 @@ import static goorm.dbjj.ide.model.type.ResourceType.*;
 @Component
 public class FileIoStorageManager implements StorageManager {
 
-
     @Override
     public void saveFile(String path, String fileName, String content) { // saveFile + CreateFile 병합함 -> 덮어씌우기 형식으로 변환
         File file = new File(path, fileName); // 파일 경로, 이름 합침
-
-
         try (FileWriter fileWriter = new FileWriter(file)) { // 알아서 덮어쓰기함.
             fileWriter.write(content); // 파일에 content 작성
 //                fileWriter.flush();
 
         } catch (IOException e) {
-            throw new RuntimeException("파일 처리중 오류 발생", e);
+            throw new BaseException("파일 처리중 오류 발생");
         }
     }
-
 
     @Override
     public Resource loadFile(String path) {
@@ -48,10 +45,8 @@ public class FileIoStorageManager implements StorageManager {
              * TODO : throw 에뤌
              */
         }
-
         return Resource.file(fileName, filePath, content);
     }
-
 
     @Override
     public void deleteFile(String path) { // delete -> 파일 디렉토리 동일 처리(병합)
@@ -64,10 +59,8 @@ public class FileIoStorageManager implements StorageManager {
                 deleteFile(path + File.separator + sub);
             }
         }
-
-
         if (!file.delete()) {
-            throw new RuntimeException("파일 삭제 실패 :  " + path + "에 폴더나 파일이 존재하지 않습니다.");
+            throw new BaseException("파일 삭제 실패 :  " + path + "에 폴더나 파일이 존재하지 않습니다.");
         }
     }
 
@@ -77,11 +70,10 @@ public class FileIoStorageManager implements StorageManager {
 
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
-            throw new ResourceNotFoundException("상위 디렉터리가 존재하지 않습니다. : " + parentDir.getAbsolutePath());
+            throw new BaseException("상위 디렉터리가 존재하지 않습니다. : " + parentDir.getAbsolutePath());
         }
-
         if (!file.mkdir()) { // .mkdir() => 필요한 상위폴더 생성 X -> exception , .mkdirs() => 필요한 상위폴더 생성
-            throw new RuntimeException("Directory 생성 실패 : " + path);
+            throw new BaseException("Directory 생성 실패 : " + path);
             /**
              * TODO : throw 에뤌
              */
@@ -89,7 +81,7 @@ public class FileIoStorageManager implements StorageManager {
     }
 
     @Override
-    public Resource loadDirectory(String path) throws ResourceNotFoundException{ // 경로, resourceType + fileName,
+    public Resource loadDirectory(String path) { // 경로, resourceType + fileName,
         File file = new File(path);
 
         if (!file.exists()) {
@@ -121,6 +113,4 @@ public class FileIoStorageManager implements StorageManager {
         }
         return res;
     }
-
-
 }
