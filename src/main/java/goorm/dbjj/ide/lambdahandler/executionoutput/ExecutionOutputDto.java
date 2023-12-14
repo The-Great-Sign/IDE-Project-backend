@@ -1,6 +1,5 @@
-package goorm.dbjj.ide.domain.outputlog.dto.response;
+package goorm.dbjj.ide.lambdahandler.executionoutput;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 

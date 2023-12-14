@@ -1,6 +1,5 @@
-package goorm.dbjj.ide.domain.outputlog;
+package goorm.dbjj.ide.lambdahandler.executionoutput;
 
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
