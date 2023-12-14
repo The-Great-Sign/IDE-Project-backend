@@ -1,6 +1,5 @@
 package goorm.dbjj.ide.storageManager.model;
 
-import goorm.dbjj.ide.model.type.ResourceType;
 import lombok.*;
 
 import java.util.List;

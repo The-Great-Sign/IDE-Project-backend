@@ -1,13 +1,13 @@
 package goorm.dbjj.ide.storageManager;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.storageManager.exception.ResourceNotFoundException;
-import goorm.dbjj.ide.model.type.ResourceType;
+import goorm.dbjj.ide.storageManager.model.ResourceType;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import org.springframework.stereotype.Component;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import static goorm.dbjj.ide.model.type.ResourceType.*;
+import static goorm.dbjj.ide.storageManager.model.ResourceType.*;
 
 @Component
 public class FileIoStorageManager implements StorageManager {
@@ -41,9 +41,7 @@ public class FileIoStorageManager implements StorageManager {
             }
             content = sb.toString();
         } catch (IOException e) {
-            /**
-             * TODO : throw 에뤌
-             */
+            throw new BaseException("파일 load 실패 : " + filePath);
         }
         return Resource.file(fileName, filePath, content);
     }
