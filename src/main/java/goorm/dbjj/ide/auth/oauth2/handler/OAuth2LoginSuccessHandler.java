@@ -1,12 +1,16 @@
 package goorm.dbjj.ide.auth.oauth2.handler;
 
+import goorm.dbjj.ide.auth.jwt.JwtIssuer;
+import goorm.dbjj.ide.auth.jwt.TokenInfo;
+import goorm.dbjj.ide.auth.oauth2.CustomOAuth2User;
+import goorm.dbjj.ide.domain.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +18,26 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Value("${app.authorization-redirect-url}")
-    private String redirectUrl;
+    private final JwtIssuer jwtIssuer;
+    private final UserRepository userRepository;
+
+    private static final String BEARER = "Bearer ";
+
+    @Value("${jwt.access.header}")
+    private String accessHeader;
+
+    @Value("${jwt.refresh.header}")
+    private String refreshHeader;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         try{
-            DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+            CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
             log.trace("OAuth2 Login 성공! social PK 확인 {}",oAuth2User.getName());
 
             // 로그인에 성공해서 access, refresh 토큰 생성.
@@ -37,12 +50,49 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     /**
-     * TODO: 로그인 완료 시, access, refresh 토큰 발행.
-     * 지금은 임시 리디렉션 걸어 놓음. 회원이면 들어갈 수 있는 페이지로 이동.
+     *  로그인 성공 시 access, refresh 토큰 생성
       */
-    private void loginSuccess(HttpServletResponse response, DefaultOAuth2User oAuth2User) throws IOException {
-        // 임시로 리디렉션 추가. 회원이면 들어갈 수 있는 페이지로 이동.
-        response.setStatus(HttpServletResponse.SC_FOUND); // 302 상태코드
-        response.setHeader("Location", redirectUrl);
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
+
+        TokenInfo tokenInfo = jwtIssuer.createToken(oAuth2User.getEmail(),"ROLE_USER");
+
+
+        log.trace("액세스 토큰 발행 : {}",tokenInfo.getAccessToken());
+        log.trace("리프레시 토큰 발행 : {}", tokenInfo.getRefreshToken());
+
+        // 리프레시 토큰 저장.
+        sendAccessAndRefreshToken(response, tokenInfo.getAccessToken(), tokenInfo.getRefreshToken());
+        updateRefreshToken(oAuth2User.getEmail(), tokenInfo.getRefreshToken());
+
+        // HTTP 상태 코드 설정
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        // 콘텐츠 타입 설정
+        response.setContentType("application/json");
+
+        // JSON 응답 본문 생성 (예시)
+        String responseBody = "{\"message\": \"Login successful\"}";
+
+        // 응답 본문 전송
+        response.getWriter().write(responseBody);
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
+
+    private void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        response.setHeader(accessHeader, BEARER + accessToken);
+        response.setHeader(refreshHeader, BEARER+refreshToken);
+        log.trace("Access Token, Refresh Token 헤더 설정 완료");
+    }
+
+    public void updateRefreshToken(String email, String refreshToken) {
+        log.trace("리프레시 토큰 정보 : {}",refreshToken);
+        userRepository.findByEmail(email)
+                .ifPresentOrElse(
+                        user -> user.updateRefreshToken(refreshToken),
+                        () -> new Exception("일치하는 회원이 없습니다.")
+                );
     }
 }
