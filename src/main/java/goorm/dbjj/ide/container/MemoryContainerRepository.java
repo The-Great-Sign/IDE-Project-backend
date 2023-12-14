@@ -29,6 +29,15 @@ public class MemoryContainerRepository {
         return containerMap.get(projectId);
     }
 
+    public String findProjectId(String containerId) {
+        return containerMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(containerId))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
     /**
      * 컨테이너가 종료되었을 때 호출하는 메서드입니다.
      * @param projectId
