@@ -2,8 +2,8 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
-import goorm.dbjj.ide.container.status.ContainerInfo;
-import goorm.dbjj.ide.container.status.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
 import goorm.dbjj.ide.domain.project.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

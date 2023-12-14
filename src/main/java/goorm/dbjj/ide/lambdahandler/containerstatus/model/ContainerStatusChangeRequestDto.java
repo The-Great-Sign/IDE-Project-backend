@@ -1,4 +1,4 @@
-package goorm.dbjj.ide.lambdahandler.loadcontainer;
+package goorm.dbjj.ide.lambdahandler.containerstatus.model;
 
 import lombok.Getter;
 import lombok.Setter;

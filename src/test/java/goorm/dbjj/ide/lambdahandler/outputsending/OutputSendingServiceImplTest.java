@@ -1,4 +1,4 @@
-package goorm.dbjj.ide.domain.lambdahandler;
+package goorm.dbjj.ide.lambdahandler.outputsending;
 
 import goorm.dbjj.ide.container.ExecutionIdMapper;
 import goorm.dbjj.ide.lambdahandler.executionoutput.OutputSendingService;
