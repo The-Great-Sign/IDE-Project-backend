@@ -9,9 +9,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // 상속받는 자식 클래스까지만 인스턴스 생성 가능.
 @Builder
+@Entity
 @Table(name = "Users") // 예약어 충돌
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 상속받는 자식 클래스까지만 인스턴스 생성 가능.
 @AllArgsConstructor
 public class User {
 
@@ -37,11 +38,6 @@ public class User {
 
     @UpdateTimestamp // UPDATE 시 자동으로 값을 채워줌.
     private LocalDateTime updatedAt;
-
-    // 유저 권한 설정 메서드
-    public void authorizedUser(){
-        this.role = Role.USER;
-    }
 
     // 유저 필드 업데이트
     public void updateNickname(String updateNickname){
