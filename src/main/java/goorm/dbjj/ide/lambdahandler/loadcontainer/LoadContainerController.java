@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.lambdahandler.loadcontainer;
 
-import goorm.dbjj.ide.container.MemoryContainerRepository;
+import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.container.status.MemoryContainerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,14 +40,28 @@ public class LoadContainerController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if(containerStatusChangeRequestDto.getContainerStatus().equals("RUNNING")) {
+        String changeStatus = containerStatusChangeRequestDto.getContainerStatus();
+
+        // 컨테이너 ID를 통해 프로젝트 ID를 획득합니다.
+        String projectId = memoryContainerRepository.findProjectId(containerStatusChangeRequestDto.getTaskArn());
+
+        // projectId가 없다면, 실행된 적이 없는 프로젝트로부터 변경사항이 전달된 것으로 에러를 발생시켜야합니다.
+        if(projectId == null) {
+            log.error("존재하지 않는 프로젝트입니다.");
+            throw new BaseException("실행중이지 않은 프로젝트로부터 변경사항이 전달되었습니다. 빠른 확인 부탁드립니다.");
+        }
+
+        // 전달된 Status에 대해서 각기 다른 처리를 해줍니다.
+        if(changeStatus.equals("RUNNING")) {
             /**
              * TODO: 해당 컨테이너 ID를 통해 Project를 식별한 뒤, 해당 프로젝트의 로딩 상태를 구독한 사용자들에게 전달한다.
              */
-            String projectId = memoryContainerRepository.findProjectId(containerStatusChangeRequestDto.getTaskArn());
             log.debug("projectId : {}", projectId);
+            memoryContainerRepository.find(projectId).setRunning();
 
             // 이후 projectId를 통해 해당 프로젝트의 로딩 상태를 구독한 사용자들에게 전달한다.
+        } else if (changeStatus.equals("PENDING")) {
+            memoryContainerRepository.find(projectId).setPending();
         }
 
         return ResponseEntity.ok().build();
