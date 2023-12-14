@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
+import goorm.dbjj.ide.container.status.MemoryContainerRepository;
 import goorm.dbjj.ide.domain.project.Project;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +54,7 @@ class ContainerServiceTest {
                 LocalDateTime.now()
         );
     }
+
     @AfterEach
     void afterEach() {
         memoryContainerRepository = new MemoryContainerRepository();
@@ -81,7 +83,7 @@ class ContainerServiceTest {
 
         //then
         assertThat(memoryContainerRepository.find(project.getId())).isNotNull();
-        assertThat(memoryContainerRepository.find(project.getId())).isEqualTo("containerId");
+        assertThat(memoryContainerRepository.find(project.getId()).getContainerId()).isEqualTo("containerId");
         assertThat(memoryContainerRepository.size()).isEqualTo(1);
     }
 
