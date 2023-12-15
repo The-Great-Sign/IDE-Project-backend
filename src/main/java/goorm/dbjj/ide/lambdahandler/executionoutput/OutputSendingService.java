@@ -1,6 +1,4 @@
-package goorm.dbjj.ide.domain.outputlog;
-
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
+package goorm.dbjj.ide.lambdahandler.executionoutput;
 
 /**
  * 사용자가 수행한 결과를 제공하는 서비스입니다.

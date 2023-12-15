@@ -2,6 +2,8 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
 import goorm.dbjj.ide.domain.project.Project;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +40,16 @@ public class ContainerService {
     public void executeCommand(Project project, String path, String command, String userId) {
         log.trace("ContainerService.executeCommand called");
 
-        String containerId = memoryContainerRepository.find(project.getId());
-        if (containerId == null) {
+        ContainerInfo containerStatus = memoryContainerRepository.find(project.getId());
+
+        //containerStatus가 null이거나 (컨테이너가 실행중이지 않거나)
+        //containerStatus가 RUNNING이 아니라면 명령어를 보낼 수 없음!
+        if (containerStatus == null || !containerStatus.isRunning()) {
             throw new BaseException("컨테이너가 실행중이지 않습니다.");
         }
 
         String sessionId = containerUtil.executeCommand(
-                containerId,
+                containerStatus.getContainerId(),
                 commandStringBuilder.createCommand(path,command)
         );
 
@@ -64,7 +69,7 @@ public class ContainerService {
          * todo: EFS에 AccessPoint를 생성하고 그 ID를 파라미터로 전달받아야합니다.
          */
         if (project.getContainerImageId() != null) {
-            throw new BaseException("컨테이너 이미지가 존재합니다.");
+            throw new BaseException("컨테이너 이미지가 이미 존재합니다.");
         }
 
         String containerImageId = containerUtil.createContainerImage(
@@ -123,9 +128,9 @@ public class ContainerService {
     public void stopContainer(Project project) {
         log.trace("ContainerService.stopContainer called");
 
-        String containerId = memoryContainerRepository.find(project.getId());
-        if (containerId != null) {
-            containerUtil.stopContainer(containerId);
+        ContainerInfo status = memoryContainerRepository.find(project.getId());
+        if (status != null) {
+            containerUtil.stopContainer(status.getContainerId());
             memoryContainerRepository.remove(project.getId());
         } else {
             throw new BaseException("실행중인 컨테이너가 없습니다.");

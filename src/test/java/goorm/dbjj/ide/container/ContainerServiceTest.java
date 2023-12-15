@@ -2,10 +2,12 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
 import goorm.dbjj.ide.domain.project.Project;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
@@ -46,7 +48,7 @@ class ContainerServiceTest {
             memoryContainerRepository,
             new CommandStringBuilder(),
             new ExecutionIdMapper()
-            );
+    );
 
     private Project createProject() {
         return new Project(
@@ -59,6 +61,7 @@ class ContainerServiceTest {
                 LocalDateTime.now()
         );
     }
+
     @AfterEach
     void afterEach() {
         memoryContainerRepository = new MemoryContainerRepository();
@@ -87,7 +90,7 @@ class ContainerServiceTest {
 
         //then
         assertThat(memoryContainerRepository.find(project.getId())).isNotNull();
-        assertThat(memoryContainerRepository.find(project.getId())).isEqualTo("containerId");
+        assertThat(memoryContainerRepository.find(project.getId()).getContainerId()).isEqualTo("containerId");
         assertThat(memoryContainerRepository.size()).isEqualTo(1);
     }
 
@@ -126,6 +129,41 @@ class ContainerServiceTest {
     }
 
     @Test
+    void executeSuccess() {
+        Project project = createProject();
+        memoryContainerRepository.save(project.getId(), "containerId");
+
+        //Running 상태로 변경
+        memoryContainerRepository.find(project.getId()).setRunning();
+
+        containerService.executeCommand(project, "/app", "python hello.py", "userId");
+    }
+
+    @Test
+    void executeFailNotRunning() {
+        Project project = createProject();
+
+        //Running 상태로 변경
+        assertThatThrownBy(
+                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+        ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
+    }
+
+    @Test
+    void executeFailPending() {
+        Project project = createProject();
+        containerService.createProjectImage(project);
+        memoryContainerRepository.save(project.getId(), "containerId");
+
+        //Pending 상태로 변경
+        memoryContainerRepository.find(project.getId()).setPending();
+
+        assertThatThrownBy(
+                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+        ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
+
+    }
+
     void deleteContainerImage() {
         // given
         Project project = createProject();

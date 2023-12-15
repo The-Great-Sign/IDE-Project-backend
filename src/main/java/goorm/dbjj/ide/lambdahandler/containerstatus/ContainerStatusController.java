@@ -1,6 +1,6 @@
-package goorm.dbjj.ide.domain.outputlog;
+package goorm.dbjj.ide.lambdahandler.containerstatus;
 
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatusChangeRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,32 +14,33 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class OutputSendingController {
+public class ContainerStatusController {
 
     @Value("${aws.lambda.secretKey}")
     private String secretKey;
 
-    private final OutputSendingService outputSendingService;
+    private final ContainerStatusService containerStatusService;
 
     /**
-     * Lambda로부터 로그를 전송받습니다.
-     * 이후 로그를 사용자에게 전달합니다.
-     * @param logEntry 로그 정보가 담겨있습니다.
+     * 컨테이너 로딩이 완료되었음을 알리는 요청을 받는 API입니다.
+     * @param containerStatusChangeRequestDto 컨테이너 상태 변경 요청 정보가 담겨있습니다.
      * @param requestSecretKey lambda에서 보내는 secretKey로, 이 값이 일치해야만 로그를 전송합니다.
-     *                        외부에서 API를 악성 호출하는 것을 방지합니다.
+     * @return
      */
-    @PostMapping("/api/execution/output")
-    public ResponseEntity<Void> sendOutput(
-            @RequestBody LogEntry logEntry,
+    @PostMapping("/api/container/load")
+    public ResponseEntity<Void> getContainerStatus(
+            @RequestBody ContainerStatusChangeRequestDto containerStatusChangeRequestDto,
             @RequestParam("secretKey") String requestSecretKey
     ) {
-        log.debug("logEntry : {}", logEntry);
+        log.trace("getContainerStatus called");
+        log.debug("containerStatusChangeRequestDto : {}", containerStatusChangeRequestDto);
 
         if(requestSecretKey == null || !requestSecretKey.equals(secretKey)) {
             log.warn("secretKey가 일치하지 않습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        outputSendingService.sendTo(logEntry);
+
+        containerStatusService.changeContainerStatus(containerStatusChangeRequestDto);
 
         return ResponseEntity.ok().build();
     }

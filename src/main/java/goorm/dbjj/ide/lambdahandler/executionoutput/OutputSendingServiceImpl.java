@@ -1,12 +1,9 @@
-package goorm.dbjj.ide.domain.outputlog;
+package goorm.dbjj.ide.lambdahandler.executionoutput;
 
 import goorm.dbjj.ide.container.ExecutionIdMapper;
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
-import goorm.dbjj.ide.domain.outputlog.dto.response.ExecutionOutputDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 
 @Slf4j
 @Service
