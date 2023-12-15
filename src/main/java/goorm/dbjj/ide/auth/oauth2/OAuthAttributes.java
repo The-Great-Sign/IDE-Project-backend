@@ -46,11 +46,10 @@ public class OAuthAttributes {
     }
 
     public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes){
-        OAuthAttributes oAuthAttributes = new OAuthAttributes(
-                userNameAttributeName, new GoogleOAuth2UserInfo(attributes)
-        );
-
-        return oAuthAttributes;
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
+                .build();
     }
 
     /**
@@ -64,6 +63,7 @@ public class OAuthAttributes {
                 .socialId(oauth2UserInfo.getId())
                 .nickname(oauth2UserInfo.getNickname())
                 .imageUrl(oauth2UserInfo.getImageUrl())
+                .email(oauth2UserInfo.getEmail())
                 .role(Role.USER)
                 .build();
     }
