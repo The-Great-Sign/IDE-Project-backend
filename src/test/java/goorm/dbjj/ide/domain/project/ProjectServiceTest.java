@@ -143,7 +143,7 @@ class ProjectServiceTest {
         em.clear();
 
         // when
-        projectService.deleteProject(projectDto.getId(), user.getId());
+        projectService.deleteProject(projectDto.getId(), user);
 
         em.flush();
         em.clear();

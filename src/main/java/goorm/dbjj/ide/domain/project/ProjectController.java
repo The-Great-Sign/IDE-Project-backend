@@ -30,4 +30,13 @@ public class ProjectController {
     ) {
         return ApiResponse.ok(projectService.createProject(projectCreateRequestDto, user));
     }
+
+    @DeleteMapping("/{projectId}")
+    public ApiResponse<Void> deleteProject(
+            @PathVariable String projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        projectService.deleteProject(projectId, user);
+        return ApiResponse.ok();
+    }
 }

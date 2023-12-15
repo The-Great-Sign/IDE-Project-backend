@@ -91,12 +91,12 @@ public class ProjectService {
 
 
     @Transactional
-    public void deleteProject(String projectId, Long userId) {
+    public void deleteProject(String projectId, User user) {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
-        if(!project.getCreator().getId().equals(userId)) {
+        if(!project.getCreator().equals(user)) {
             throw new BaseException("프로젝트 삭제 권한이 없습니다.");
         }
 
