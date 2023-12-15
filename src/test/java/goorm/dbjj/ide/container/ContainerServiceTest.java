@@ -3,7 +3,6 @@ package goorm.dbjj.ide.container;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
-import goorm.dbjj.ide.domain.project.Project;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.user.dto.Role;
 import goorm.dbjj.ide.domain.user.dto.SocialType;
@@ -36,6 +35,7 @@ class ContainerServiceTest {
                 new User(1L,
                         "email",
                         "nickname",
+                        "imageUrl",
                         "password",
                         Role.USER,
                         SocialType.GOOGLE,

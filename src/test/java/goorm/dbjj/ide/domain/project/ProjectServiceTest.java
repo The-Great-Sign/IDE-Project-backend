@@ -63,6 +63,7 @@ class ProjectServiceTest {
                 "name",
                 "email",
                 "imageUrl",
+                "password",
                 Role.USER,
                 SocialType.GOOGLE,
                 "accessToken",

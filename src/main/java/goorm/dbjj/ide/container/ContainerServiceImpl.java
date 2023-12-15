@@ -3,6 +3,8 @@ package goorm.dbjj.ide.container;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.model.Project;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,13 +41,14 @@ public class ContainerServiceImpl implements ContainerService {
     public void executeCommand(Project project, String path, String command, String userId) {
         log.trace("ContainerService.executeCommand called");
 
-        String containerId = memoryContainerRepository.find(project.getId());
-        if (containerId == null) {
+        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+
+        if (containerInfo == null || !containerInfo.isRunning()) {
             throw new BaseException("컨테이너가 실행중이지 않습니다.");
         }
 
         String sessionId = containerUtil.executeCommand(
-                containerId,
+                containerInfo.getContainerId(),
                 commandStringBuilder.createCommand(path,command)
         );
 
@@ -128,9 +131,9 @@ public class ContainerServiceImpl implements ContainerService {
     public void stopContainer(Project project) {
         log.trace("ContainerService.stopContainer called");
 
-        String containerId = memoryContainerRepository.find(project.getId());
-        if (containerId != null) {
-            containerUtil.stopContainer(containerId);
+        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        if (containerInfo != null) {
+            containerUtil.stopContainer(containerInfo.getContainerId());
             memoryContainerRepository.remove(project.getId());
         } else {
             throw new BaseException("실행중인 컨테이너가 없습니다.");
