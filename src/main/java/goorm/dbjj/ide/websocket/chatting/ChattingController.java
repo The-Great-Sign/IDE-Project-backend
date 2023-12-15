@@ -53,14 +53,14 @@ public class ChattingController {
     public ChattingResponseDto talk(
             SimpMessageHeaderAccessor headerAccessor,
             @DestinationVariable("projectId") Long projectId,
-            @Payload ChattingContentRequestDto chatsDto
+            @Payload ChattingContentRequestDto chatsDtoChattingContentRequestDto
     ) {
         log.trace("ChattingController.chatting execute");
 
         // 세션 방식을 이용해서 유저 아이디 가져오기
         Long userId = getUserId(headerAccessor);
 
-        return chatsService.talk(chatsDto, userId);
+        return chatsService.talk(chatsDtoChattingContentRequestDto, userId);
     }
 
     /**
