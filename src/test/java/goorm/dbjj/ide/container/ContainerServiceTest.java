@@ -162,6 +162,8 @@ class ContainerServiceTest {
                 () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
         ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
 
+    }
+
     void deleteContainerImage() {
         // given
         Project project = createProject();
