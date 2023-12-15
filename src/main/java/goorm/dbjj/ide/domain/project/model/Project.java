@@ -42,6 +42,9 @@ public class Project {
     @JoinColumn(name = "creator_id")
     private User creator;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<ProjectUser> projectUsers;
+
     // === 생성 팩토리 메서드 === //
     public static Project createProject(String name, String description, ProgrammingLanguage programmingLanguage, String password, User creator) {
         Project project = new Project();
