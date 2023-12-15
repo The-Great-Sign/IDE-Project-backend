@@ -47,6 +47,18 @@ public class ContainerUtilImpl implements ContainerUtil {
     }
 
     @Override
+    public void deleteContainerImage(String containerImageId) {
+        log.trace("ContainerUtil.deleteProjectImage called");
+
+        DeregisterTaskDefinitionRequest request = DeregisterTaskDefinitionRequest.builder()
+                .taskDefinition(containerImageId)
+                .build();
+
+        DeregisterTaskDefinitionResponse deregisterTaskDefinitionResponse = ecsClient.deregisterTaskDefinition(request);
+        log.debug("deregisterTaskDefinitionResponse: {}", deregisterTaskDefinitionResponse);
+    }
+
+    @Override
     public String runContainer(String containerImageId) {
         log.trace("ContainerUtil.runProjectContainer called");
 

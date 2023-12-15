@@ -1,20 +1,27 @@
-//package goorm.dbjj.ide.domain.user;
-//
-//import goorm.dbjj.ide.api.exception.BaseException;
-//import goorm.dbjj.ide.domain.user.dto.User;
-//import lombok.RequiredArgsConstructor;
-//import org.hibernate.engine.jdbc.batch.internal.BasicBatchKey;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.Optional;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class UserService {
-//    private final UserRepository userRepository;
-//
-//    public User getUser(String email){
-//        return userRepository.findByEmail(email)
-//                .orElseThrow(() -> new BaseException(email+"에 해당하는 정보가 없습니다."));
-//    }
-//}
+package goorm.dbjj.ide.domain.user;
+
+import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.domain.user.dto.User;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class UserService implements UserDetailsService {
+    private final UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return getUserByEmail(email);
+    }
+
+    private User getUserByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("일치하는 정보가 없습니다."));
+    }
+}
