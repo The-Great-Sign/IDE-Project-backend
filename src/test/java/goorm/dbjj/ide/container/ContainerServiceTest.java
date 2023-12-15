@@ -103,13 +103,25 @@ class ContainerServiceTest {
         containerService.runContainer(project);
 
         // when
+
+        //컨테이너를 시작한 즉시에는 PENDING 상태로, 실행중이 아니다.
         boolean isRunning1 = containerService.isContainerRunning(project);
-        containerService.stopContainer(project);
+
+        // RUNNING 상태가 되면 실행중 상태로 바꾼다. 이 이벤트는 외부에서 전송됨
+        memoryContainerRepository.find(project.getId()).setRunning();
+
+        // RUNNING 상태에는 isContainerRunning이 true를 반환한다.
         boolean isRunning2 = containerService.isContainerRunning(project);
 
+        containerService.stopContainer(project);
+
+        // 컨테이너를 종료한 즉시 메모리에서 삭제되며 isRunning은 false를 반환한다.
+        boolean isRunning3 = containerService.isContainerRunning(project);
+
         // then
-        assertThat(isRunning1).isTrue();
-        assertThat(isRunning2).isFalse();
+        assertThat(isRunning1).isFalse();
+        assertThat(isRunning2).isTrue();
+        assertThat(isRunning3).isFalse();
     }
 
     @Test
