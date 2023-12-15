@@ -42,7 +42,8 @@ public class Project {
     @JoinColumn(name = "creator_id")
     private User creator;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    //User가 삭제될 때 Project도 삭제되도록 설정
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     private List<ProjectUser> projectUsers;
 
     // === 생성 팩토리 메서드 === //
