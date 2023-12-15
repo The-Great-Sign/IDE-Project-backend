@@ -2,6 +2,8 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.domain.project.Project;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.user.dto.Role;
 import goorm.dbjj.ide.domain.user.dto.SocialType;
@@ -72,7 +74,7 @@ class ContainerServiceTest {
 
         //then
         assertThat(memoryContainerRepository.find(project.getId())).isNotNull();
-        assertThat(memoryContainerRepository.find(project.getId())).isEqualTo("containerId");
+        assertThat(memoryContainerRepository.find(project.getId()).getContainerId()).isEqualTo("containerId");
         assertThat(memoryContainerRepository.size()).isEqualTo(1);
     }
 
@@ -111,6 +113,41 @@ class ContainerServiceTest {
     }
 
     @Test
+    void executeSuccess() {
+        Project project = createProject();
+        memoryContainerRepository.save(project.getId(), "containerId");
+
+        //Running 상태로 변경
+        memoryContainerRepository.find(project.getId()).setRunning();
+
+        containerService.executeCommand(project, "/app", "python hello.py", "userId");
+    }
+
+    @Test
+    void executeFailNotRunning() {
+        Project project = createProject();
+
+        //Running 상태로 변경
+        assertThatThrownBy(
+                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+        ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
+    }
+
+    @Test
+    void executeFailPending() {
+        Project project = createProject();
+        containerService.createProjectImage(project);
+        memoryContainerRepository.save(project.getId(), "containerId");
+
+        //Pending 상태로 변경
+        memoryContainerRepository.find(project.getId()).setPending();
+
+        assertThatThrownBy(
+                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+        ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
+
+    }
+
     void deleteContainerImage() {
         // given
         Project project = createProject();
