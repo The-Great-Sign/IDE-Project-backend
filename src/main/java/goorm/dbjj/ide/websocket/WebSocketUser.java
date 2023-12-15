@@ -8,7 +8,7 @@ import lombok.Getter;
  * */
 @AllArgsConstructor
 @Getter
-public class WebSocketUserSession {
+public class WebSocketUser {
     private Long userId;
     private Long projectId;
 }
