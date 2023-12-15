@@ -37,10 +37,7 @@ public class ProjectService {
      * @return
      */
     @Transactional
-    public ProjectDto createProject(ProjectCreateRequestDto requestDto, Long userId) {
-
-        User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException("존재하지 않는 유저입니다."));
+    public ProjectDto createProject(ProjectCreateRequestDto requestDto, User creator) {
 
         /**
          * TODO: 추후 비밀번호는 암호화 필요
