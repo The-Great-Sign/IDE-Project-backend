@@ -9,52 +9,48 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * STOMP 이벤트 리스너
+ * */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebSocketEventListener {
     private final ChatsService chatsService;
     private final SimpMessagingTemplate template;
-    private final SubscribeSessionMapper subscribeSessionMapper;
+    private final WebSocketUserSessionMapper webSocketUserSessionMapper;
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        // TODO: 여기서 연결 관련 로직을 구현합니다.
-        log.trace("WebSocketEventListener.handleWebSocketConnectListener execute");
-    }
-
+    /**
+     * DisConnect 시 채팅방 퇴장 알림 기능 구현 및 WebSocketUserSessionMapper에 존재하는 유저 정보 없애기!
+     * */
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         log.trace("WebSocketEventListener.handleWebSocketDisconnectListener execute");
-        String eventSessionId = event.getSessionId();
-        // 구독 저장소에 있는지 확인
-        WebSocketUserSession webSocketUserSession = subscribeSessionMapper.getSession(eventSessionId).orElseThrow(() -> new BaseException("이미 종료된 웹소켓입니다."));
 
-        // 구독 저장소에 세션 삭제하기 및 종료
-        subscribeSessionMapper.removeSession(eventSessionId);
+        // simpSessionAttributes에 존재하는 uuide 가져오기
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
+        String uuid = simpSessionAttributes.get("WebSocketUserSessionId");
 
-        // 만약에 채팅이라면 퇴장 문구 알림
-        if(webSocketUserSession.getSubscribeType().equals(SubscribeType.CHATTING)){
-            Optional<ChattingResponseDto> exitMessage = chatsService.exit(webSocketUserSession);
-
-            // 채팅창에 인원이 존재할경우에만 exitMessage를 채팅방으로 전송.
-            if(exitMessage.isPresent()) {
-                template.convertAndSend("/topic/project/" + webSocketUserSession.getProjectId() + "/chat",exitMessage);
-            }
+        // WebSocketUserSessionMapper 없애기
+        WebSocketUser removeWebSocketUser = webSocketUserSessionMapper.remove(uuid);
+        if(removeWebSocketUser == null){
+            log.warn("WebSocketChannelInterceptor.preSend 잘못된 사용자 접근입니다.");
+            throw new BaseException("잘못된 사용자 접근");
         }
-        
 
+        // 퇴장 메세지 출력
+        Long userId = removeWebSocketUser.getUserId();
+        Long projectId = removeWebSocketUser.getProjectId();
+        Optional<ChattingResponseDto> exitMessage = chatsService.exit(userId, projectId);
+        if(exitMessage.isPresent()) {
+            template.convertAndSend("/topic/project/"+ projectId + "/chat", exitMessage);
+        }
     }
 
-    @EventListener
-    public void handleSubscribeEvent(SessionSubscribeEvent event) {
-        log.trace("handleSubscribeEvent execute");
-    }
 }
