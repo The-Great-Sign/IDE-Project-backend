@@ -135,7 +135,7 @@ class ContainerServiceTest {
         // when
         //Project에는 ContainerImage가 없다.
         assertThat(project.getContainerImageId()).isNull();
-1
+
         // then
         //삭제 후에는 Project에 ContainerImage가 없어야 한다.
         assertThatThrownBy(() -> containerService.deleteProjectImage(project))
