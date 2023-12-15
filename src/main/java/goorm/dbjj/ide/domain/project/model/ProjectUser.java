@@ -21,4 +21,9 @@ public class ProjectUser {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
     private User user;
+
+    public ProjectUser(Project project, User user) {
+        this.project = project;
+        this.user = user;
+    }
 }
