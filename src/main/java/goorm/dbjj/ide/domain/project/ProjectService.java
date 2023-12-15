@@ -10,7 +10,6 @@ import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,7 @@ public class ProjectService {
     @Transactional
     public ProjectDto createProject(ProjectCreateRequestDto requestDto, Long userId) {
 
-        User user = userRepository.findById(userId)
+        User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 유저입니다."));
 
         /**
@@ -51,13 +50,16 @@ public class ProjectService {
                 requestDto.getDescription(),
                 requestDto.getProgrammingLanguage(),
                 requestDto.getPassword(),
-                user
+                creator
         );
 
         Project savedProject = projectRepository.save(project);
 
+        // 프로젝트 생성과 함께 creator가 프로젝트에 참여하도록 함
+        projectUserRepository.save(new ProjectUser(savedProject, creator));
+
         // 프로젝트 생성 시점에 컨테이너 이미지 생성
-        containerService.createProjectImage(project);
+        containerService.createProjectImage(savedProject);
 
         return ProjectDto.of(savedProject);
     }
