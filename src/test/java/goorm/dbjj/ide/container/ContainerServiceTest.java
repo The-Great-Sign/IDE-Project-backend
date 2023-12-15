@@ -3,59 +3,47 @@ package goorm.dbjj.ide.container;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.model.Project;
+import goorm.dbjj.ide.domain.user.dto.Role;
+import goorm.dbjj.ide.domain.user.dto.SocialType;
+import goorm.dbjj.ide.domain.user.dto.User;
+import goorm.dbjj.ide.mock.DummyContainerUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContainerServiceTest {
-
-    static class DummyContainerUtil implements ContainerUtil {
-
-        @Override
-        public String executeCommand(String containerId, String command) {
-            return "sessionId";
-        }
-
-        @Override
-        public String createContainerImage(ProgrammingLanguage programmingLanguage, String accessPointId) {
-            return "containerImageId";
-        }
-
-        @Override
-        public void deleteContainerImage(String containerImageId) {
-
-        }
-
-        @Override
-        public String runContainer(String containerImageId) {
-            return "containerId";
-        }
-
-        @Override
-        public void stopContainer(String containerId) {
-        }
-    }
-
     private MemoryContainerRepository memoryContainerRepository = new MemoryContainerRepository();
-    private ContainerService containerService = new ContainerService(
+    private ContainerService containerService = new ContainerServiceImpl(
             new DummyContainerUtil(),
             memoryContainerRepository,
             new CommandStringBuilder(),
             new ExecutionIdMapper()
-            );
+    );
 
     private Project createProject() {
         return Project.createProject(
                 "name",
                 "description",
                 ProgrammingLanguage.PYTHON,
-                "password"
+                "password",
+                new User(1L,
+                        "email",
+                        "nickname",
+                        "password",
+                        Role.USER,
+                        SocialType.GOOGLE,
+                        "socialId",
+                        "refreshToken",
+                        LocalDateTime.now(),
+                        LocalDateTime.now())
         );
     }
+
     @AfterEach
     void afterEach() {
         memoryContainerRepository = new MemoryContainerRepository();
@@ -147,7 +135,7 @@ class ContainerServiceTest {
         // when
         //Project에는 ContainerImage가 없다.
         assertThat(project.getContainerImageId()).isNull();
-
+1
         // then
         //삭제 후에는 Project에 ContainerImage가 없어야 한다.
         assertThatThrownBy(() -> containerService.deleteProjectImage(project))
