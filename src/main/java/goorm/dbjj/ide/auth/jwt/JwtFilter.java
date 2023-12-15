@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtAuthProvider jwtAuthProvider;
-    private final JwtIssuer jwtIssuer;
 
     @Value("${jwt.access.header}")
     private String accessHeader;
@@ -32,41 +32,54 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
+    @Value("${app.exception-path}")
+    private static String EXCEPTION_PATH;
+    private final static String TOKEN_PREFIX = "Bearer ";
+
+
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        // request에서 토큰 정보 받아옴.
-        String accessToken =  request.getHeader(accessHeader);
-        String refreshToken = request.getHeader(refreshHeader);
+        String token = resolveTokenFromRequest(request);
 
-        // "Bearer " 뺀 토큰
-        accessToken = HeaderUtil.getToken(accessToken);
-        refreshToken = refreshToken!=null? HeaderUtil.getToken(refreshToken):null;
-
-        // 1. accessToken만 들어왔고, 유효한 경우
-        if(jwtAuthProvider.validateToken(accessToken)){
-            Authentication auth = jwtAuthProvider.getAuthentication(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        // EXCEPTION_PATH는 토큰 검사 안함.
+        if(request.getRequestURI().equals(EXCEPTION_PATH)){
+            filterChain.doFilter(request, response);
+            return;
         }
-        // 2. accessToken이 유효하지 않고, refreshToken이 유효한 경우
-        else if(refreshToken != null && jwtAuthProvider.validateToken(accessToken,refreshToken)){
-            String newToken = jwtIssuer.createToken(refreshToken);
-            response.setHeader(accessHeader, newToken);
 
-            Authentication auth = jwtAuthProvider.getAuthentication(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        // 토큰이 유효하면, 유저 정보 가져올 수 있게 저장.
+        if(isTokenValidAndRefixed(token)){
+            processTokenAuthentication(token);
         }
-        // 3. 모두 유효하지 않은 경우
-        else{
-            throw new BaseException("토큰이 모두 유효하지 않습니다.");
-            }
 
         filterChain.doFilter(request, response);
     }
 
+    private String resolveTokenFromRequest(HttpServletRequest request) {
+        String token = request.getHeader(accessHeader);
 
+        if (!ObjectUtils.isEmpty(token)) {
+            return token;
+        }
+        return null;
+    }
+
+    /**
+     * 토큰이 비어있지 않고, "Bearer "로 시작하는지 확인.
+     */
+    private boolean isTokenValidAndRefixed(String token){
+        return token != null && token.startsWith(TOKEN_PREFIX);
+    }
+
+    private void processTokenAuthentication(String token) {
+        token = token.substring(TOKEN_PREFIX.length());
+        log.trace("토큰 확인: {}", token);
+
+        if (jwtAuthProvider.validateToken(token)) {
+            Authentication auth = jwtAuthProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+    }
 }

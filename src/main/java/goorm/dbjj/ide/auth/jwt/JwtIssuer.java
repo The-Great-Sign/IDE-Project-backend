@@ -40,6 +40,7 @@ public class JwtIssuer {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    // todo: refresh 토큰이 들어왔을 때, accessToken만 생성.
     public String createToken(String refreshToken){
         Optional<User> user = userRepository.findByRefreshToken(refreshToken);
         User realUser = user.orElseThrow();

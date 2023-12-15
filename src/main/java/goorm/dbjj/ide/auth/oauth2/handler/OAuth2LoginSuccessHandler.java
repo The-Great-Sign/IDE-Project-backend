@@ -88,7 +88,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     public void updateRefreshToken(String email, String refreshToken) {
-        log.trace("리프레시 토큰 정보 : {}",refreshToken);
         userRepository.findByEmail(email)
                 .ifPresentOrElse(
                         user -> user.updateRefreshToken(refreshToken),

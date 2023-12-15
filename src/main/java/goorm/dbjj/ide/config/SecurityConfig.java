@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(reqs -> reqs
                         // 인증이 되면 들어갈 수 있는 주소.
                         .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/login").permitAll()
                         .anyRequest().permitAll())
                 // 세션을 사용하지 않으므로 Stateless로 설정
                 .sessionManagement(sm ->
