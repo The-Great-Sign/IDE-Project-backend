@@ -148,6 +148,6 @@ public class ContainerServiceImpl implements ContainerService {
      */
     @Override
     public boolean isContainerRunning(Project project) {
-        return memoryContainerRepository.find(project.getId()) != null;
+        return memoryContainerRepository.find(project.getId()).isRunning();
     }
 }
