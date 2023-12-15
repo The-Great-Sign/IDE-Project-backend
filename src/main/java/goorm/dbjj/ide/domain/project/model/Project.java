@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,17 +39,18 @@ public class Project {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
     // === 생성 팩토리 메서드 === //
-    public static Project createProject(String name, String description, ProgrammingLanguage programmingLanguage, String password) {
+    public static Project createProject(String name, String description, ProgrammingLanguage programmingLanguage, String password, User creator) {
         Project project = new Project();
         project.id = UUID.randomUUID().toString();
         project.name = name;
         project.description = description;
         project.programmingLanguage = programmingLanguage;
         project.password = password;
+        project.creator = creator;
         return project;
     }
 
