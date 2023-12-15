@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Table(name = "Projects")
 @Getter
 @NoArgsConstructor
 public class Project {
