@@ -3,7 +3,7 @@ package goorm.dbjj.ide.websocket.chatting;
 import goorm.dbjj.ide.websocket.chatting.dto.ChatType;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingResponseDto;
-import goorm.dbjj.ide.websocket.chatting.model.Chats;
+import goorm.dbjj.ide.websocket.chatting.model.Chat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,13 +24,13 @@ public class ChatsService {
     public ChattingResponseDto enter(Long projectId, Long userId) {
         log.trace("ChatsService.enter execute");
         // 프로젝트 인원 수 증가
-        chattingCurrentUserMapper.enterProjectCurrentUserMapper(projectId);
+        chattingCurrentUserMapper.increaseCurrentUsersWithProjectId(projectId);
         String content = userId + "유저님이 참여하였습니다.";
 
         return ChattingResponseDto.builder()
                 .messageType(ChatType.ENTER)
                 .content(content)
-                .currentUsers(this.chattingCurrentUserMapper.getProjectCurrentUserMapper(projectId))
+                .currentUsers(this.chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId))
                 .build();
     }
 
@@ -42,11 +42,11 @@ public class ChatsService {
         log.trace("ChatsService.talk execute");
 
         // db에 채팅 기록 저장하기
-        chattingRepository.save(new Chats(chattingContentRequestDto));
+        chattingRepository.save(new Chat(chattingContentRequestDto));
 
         return ChattingResponseDto.builder()
                 .messageType(ChatType.TALK)
-                .UserId(userId)
+                .userId(userId)
                 .content(chattingContentRequestDto.getContent())
                 .build();
     }
@@ -58,18 +58,18 @@ public class ChatsService {
         log.trace("ChatsService.exit execute");
 
         // subscribe 안 하거나(subscribe 하기전에 클라이언트가 강제종료) 인원이 0명인 경우 에러 처리
-        if(chattingCurrentUserMapper.getProjectCurrentUserMapper(projectId) == null
-        || chattingCurrentUserMapper.getProjectCurrentUserMapper(projectId) == 0L){
+        if(chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId) == null
+        || chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId) == 0L){
             return Optional.empty();
         }
 
-        chattingCurrentUserMapper.exitProjectCurrentUserMapper(projectId);
+        chattingCurrentUserMapper.decreaseCurrentUsersWithProjectId(projectId);
         String content = userId + "유저님이 퇴장하였습니다.";
 
         return Optional.ofNullable(ChattingResponseDto.builder()
                 .messageType(ChatType.EXIT)
                 .content(content)
-                .currentUsers(this.chattingCurrentUserMapper.getProjectCurrentUserMapper(projectId))
+                .currentUsers(this.chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId))
                 .build());
     }
 

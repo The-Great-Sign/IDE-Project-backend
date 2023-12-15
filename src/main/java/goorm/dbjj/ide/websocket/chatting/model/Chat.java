@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Chats {
+@Table(name = "Chats")
+public class Chat {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +22,7 @@ public class Chats {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Chats(ChattingContentRequestDto chatsDto) {
+    public Chat(ChattingContentRequestDto chatsDto) {
         this.content = chatsDto.getContent();
     }
 }

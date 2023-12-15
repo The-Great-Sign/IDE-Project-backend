@@ -32,7 +32,7 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         log.trace("WebSocketEventListener.handleWebSocketDisconnectListener execute");
 
-        // simpSessionAttributes에 존재하는 uuide 가져오기
+        // simpSessionAttributes에 존재하는 uuid 가져오기
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
         String uuid = simpSessionAttributes.get("WebSocketUserSessionId");
