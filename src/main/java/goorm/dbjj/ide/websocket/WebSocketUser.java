@@ -10,9 +10,9 @@ import lombok.Getter;
 public class WebSocketUser {
     private Long userId;
     private Long projectId;
-    private boolean isChattingSubscribe; // false : 구독 안함, true : 구독함
-    private boolean isTerminal; // false : 구독 안함, true : 구독함
-    private boolean isCursor; // false : 구독 안함, true : 구독함
+    private Boolean isChattingSubscribe; // false : 구독 안함, true : 구독함
+    private Boolean isTerminal; // false : 구독 안함, true : 구독함
+    private Boolean isCursor; // false : 구독 안함, true : 구독함
 
     public WebSocketUser(Long userId, Long projectId) {
         this.userId = userId;
