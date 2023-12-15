@@ -24,18 +24,24 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
-            validateAndRetrieveUser(headerAccessor);
-        }
+
+        // 모든 메서드가 인증되었는지 확인.
+        WebSocketUser webSocketUser = validateAndRetrieveUser(headerAccessor);
 
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand()) || StompCommand.SEND.equals(headerAccessor.getCommand())) {
+            // 사용자가 이미 구독한 방일 경우에 그냥 메세지 전달 취소
+            if(isAlreadySubscribe(headerAccessor, webSocketUser)){
+                log.warn("이미 구독한 채널 입니다.");
+                throw new BaseException("이미 구독한 채널 입니다.");
+            }
+
             // 1. 사용자가 구독신청한 subscribeProjectId 반환
             String[] split = headerAccessor.getDestination().toString().split("/");
             Long subscribeProjectId = Long.valueOf(split[3]);
             log.trace("subscribe projectId = {}", subscribeProjectId);
 
             // 2. 사용자가 구독한 projectId 반환
-            Long projectId = validateAndRetrieveUser(headerAccessor).getProjectId();
+            Long projectId = webSocketUser.getProjectId();
             log.trace("subscribe projectId = {}", projectId);
 
             // 1번과 2번을 비교하여 같을 경우 구독번호를 반환한다.
@@ -48,6 +54,26 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
         return ChannelInterceptor.super.preSend(message, channel);
     }
+
+    /**
+    * 클라이언트가 채팅/터미널/커서 채널에 구독했는지 확인하는 코드
+    * */
+    private boolean isAlreadySubscribe(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
+        String[] split = headerAccessor.getDestination().toString().split("/");
+        String subscribeType = split[4];
+        if(subscribeType.equals("chat")){
+            if(webSocketUser.isChattingSubscribe()) return false;
+            webSocketUser.SubscribeChatting();
+        } else if(subscribeType.equals("terminal")){
+            if(webSocketUser.isTerminal()) return false;
+            webSocketUser.SubscribeTerminal();
+        } else if(subscribeType.equals("cursor")){
+            if(webSocketUser.isCursor()) return false;
+            webSocketUser.SubscribeCursor();
+        }
+        return true;
+    }
+
 
     /**
      * 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크하는 로직

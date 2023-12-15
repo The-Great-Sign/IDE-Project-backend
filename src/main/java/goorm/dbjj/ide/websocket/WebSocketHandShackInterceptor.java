@@ -11,7 +11,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import java.util.Map;
 import java.util.UUID;
 
-
 /**
  *  HandshakeInterceptor 
  * */
