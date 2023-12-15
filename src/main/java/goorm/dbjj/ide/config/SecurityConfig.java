@@ -50,9 +50,10 @@ public class SecurityConfig {
 
         return cors -> {
             CorsConfiguration configuration = new CorsConfiguration();
-            configuration.addAllowedOrigin("*"); // 모든 웹사이트 요청 가능
+            configuration.addAllowedOrigin("http://localhost:3000"); // localhost:3000 에서만 요청 가능
             configuration.addAllowedMethod("*"); // GET, PUT, POST 다 가능
             configuration.addAllowedHeader("*"); // 모든 헤더 허용
+            configuration.setAllowCredentials(true); // CORS 문제 해결
 
             // 구성된 Cors를 적용.
             cors.configurationSource(request -> configuration);

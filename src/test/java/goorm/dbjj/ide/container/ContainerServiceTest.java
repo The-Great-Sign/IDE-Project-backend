@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.container;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.model.Project;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +23,11 @@ class ContainerServiceTest {
         @Override
         public String createContainerImage(ProgrammingLanguage programmingLanguage, String accessPointId) {
             return "containerImageId";
+        }
+
+        @Override
+        public void deleteContainerImage(String containerImageId) {
+
         }
 
         @Override
@@ -114,5 +120,38 @@ class ContainerServiceTest {
         // then
         assertThat(isRunning1).isTrue();
         assertThat(isRunning2).isFalse();
+    }
+
+    @Test
+    void deleteContainerImage() {
+        // given
+        Project project = createProject();
+        containerService.createProjectImage(project);
+
+        //Project에는 ContainerImage가 있어야 한다.
+        assertThat(project.getContainerImageId()).isNotNull();
+
+        // when
+        containerService.deleteProjectImage(project);
+
+        // then
+        //삭제 후에는 Project에 ContainerImage가 없어야 한다.
+        assertThat(project.getContainerImageId()).isNull();
+    }
+
+    @Test
+    void deleteContainerImageEx1() {
+        // given
+        Project project = createProject();
+
+        // when
+        //Project에는 ContainerImage가 없다.
+        assertThat(project.getContainerImageId()).isNull();
+
+        // then
+        //삭제 후에는 Project에 ContainerImage가 없어야 한다.
+        assertThatThrownBy(() -> containerService.deleteProjectImage(project))
+                .isInstanceOf(BaseException.class)
+                .hasMessage("컨테이너 이미지가 존재하지 않습니다.");
     }
 }

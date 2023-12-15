@@ -37,6 +37,15 @@ class ContainerUtilTest {
                 .build());
     }
 
+    @Test
+    @Disabled
+    void deleteContainerImage() {
+        String containerImage = "arn:aws:ecs:ap-northeast-2:092624380570:task-definition/inaws:12";
+        containerUtil.deleteContainerImage(containerImage);
+
+        assertThat(ecsClient.listTaskDefinitions().taskDefinitionArns()).doesNotContain(containerImage);
+    }
+
     /**
      * 특정 프로젝트의 컨테이너를 수행시키는 테스트입니다.
      * 에러 발생 시 팀장에게 빠른 전달 부탁합니다. (과금과 관계 있음)
