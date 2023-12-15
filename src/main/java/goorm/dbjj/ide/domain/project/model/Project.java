@@ -42,7 +42,7 @@ public class Project {
     @JoinColumn(name = "creator_id")
     private User creator;
 
-    //User가 삭제될 때 Project도 삭제되도록 설정
+    //User가 삭제될 때 ProjectUser도 삭제되도록 설정
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     private List<ProjectUser> projectUsers;
 
