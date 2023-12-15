@@ -1,8 +1,10 @@
-package goorm.dbjj.ide.domain.outputlog;
+package goorm.dbjj.ide.lambdahandler.outputsending;
 
 import goorm.dbjj.ide.container.ExecutionIdMapper;
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEntry;
-import goorm.dbjj.ide.domain.outputlog.dto.request.LogEvent;
+import goorm.dbjj.ide.lambdahandler.executionoutput.OutputSendingService;
+import goorm.dbjj.ide.lambdahandler.executionoutput.OutputSendingServiceImpl;
+import goorm.dbjj.ide.lambdahandler.executionoutput.LogEntry;
+import goorm.dbjj.ide.lambdahandler.executionoutput.LogEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

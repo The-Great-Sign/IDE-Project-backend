@@ -1,5 +1,6 @@
-package goorm.dbjj.ide.container;
+package goorm.dbjj.ide.lambdahandler.containerstatus;
 
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,21 +13,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MemoryContainerRepository {
 
     /**
-     * Map<ProjectId, ContainerId>
+     * Map<ProjectId, ContainerInfo>
      */
-    private final Map<String, String> containerMap = new ConcurrentHashMap<>();
+    private final Map<String, ContainerInfo> containerMap = new ConcurrentHashMap<>();
 
     public void save(String projectId, String containerId) {
-        containerMap.put(projectId, containerId);
+        containerMap.put(projectId, new ContainerInfo(containerId));
     }
 
     /**
-     * projectId를 통해 실행중인 컨테이너 ID를 획득합니다.
+     * projectId를 통해 실행중인 컨테이너 정보를 획득합니다.
      * @param projectId
      * @return
      */
-    public String find(String projectId) {
+    public ContainerInfo find(String projectId) {
         return containerMap.get(projectId);
+    }
+
+    /**
+     * Project ID를 반환합니다.
+     * @param containerId
+     * @return
+     */
+    public String findProjectId(String containerId) {
+        return containerMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().getContainerId().equals(containerId))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     /**

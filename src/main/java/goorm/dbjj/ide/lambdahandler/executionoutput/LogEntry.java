@@ -1,4 +1,4 @@
-package goorm.dbjj.ide.domain.outputlog.dto.request;
+package goorm.dbjj.ide.lambdahandler.executionoutput;
 
 import lombok.*;
 
