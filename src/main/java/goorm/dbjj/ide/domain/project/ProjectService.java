@@ -8,6 +8,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
+import goorm.dbjj.ide.efs.EfsAccessPointUtil;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class ProjectService {
     private final ContainerService containerService;
 //    private final PasswordEncoder passwordEncoder;
     private final EntityManager em;
+    private final EfsAccessPointUtil efsAccessPointUtil;
 
     /**
      * 프로젝트 생성
@@ -56,6 +58,9 @@ public class ProjectService {
 
         // 프로젝트 생성과 함께 creator가 프로젝트에 참여하도록 함
         projectUserRepository.save(new ProjectUser(savedProject, creator));
+
+        //EFS AccessPoint 생성
+        savedProject.setAccessPointId(efsAccessPointUtil.generateAccessPoint(savedProject.getId()));
 
         // 프로젝트 생성 시점에 컨테이너 이미지 생성
         String containerImageId = containerService.createProjectImage(savedProject);
@@ -123,6 +128,13 @@ public class ProjectService {
             containerService.stopContainer(project);
         } catch (Exception e) {
             log.debug("프로젝트 컨테이너 종료 실패 : {}", e.getMessage());
+        }
+
+        //예외로 인하여 다음 코드가 수행되지 않는 상황을 방지하기 위해서 try-catch로 감싸줍니다.
+        try {
+            efsAccessPointUtil.deleteAccessPoint(project.getAccessPointId());
+        } catch (Exception e) {
+            log.debug("프로젝트 EFS AccessPoint 삭제 실패 : {}", e.getMessage());
         }
 
         projectRepository.delete(project);

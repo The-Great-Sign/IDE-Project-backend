@@ -9,6 +9,7 @@ import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.Role;
 import goorm.dbjj.ide.domain.user.dto.SocialType;
 import goorm.dbjj.ide.domain.user.dto.User;
+import goorm.dbjj.ide.efs.EfsAccessPointUtil;
 import goorm.dbjj.ide.mock.DummyContainerService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
@@ -79,6 +80,22 @@ class ProjectServiceTest {
         public ContainerService containerService() {
             return new DummyContainerService();
         }
+
+        @Bean
+        public EfsAccessPointUtil efsAccessPointUtil() {
+            return new EfsAccessPointUtil() {
+                @Override
+                public String generateAccessPoint(String projectId) {
+                    return "/app/" + projectId;
+                }
+
+                @Override
+                public void deleteAccessPoint(String accessPointId) {
+
+                }
+            };
+
+        }
     }
 
     @Test
@@ -116,7 +133,8 @@ class ProjectServiceTest {
         assertThat(projectUserRepository.count()).isEqualTo(1);
 
         // 프로젝트 생성 시점에 컨테이너 이미지 생성
-        assertThat(project.getContainerImageId()).isNotNull();
+        assertThat(project.getContainerImageId()).isEqualTo("containerImageId");
+        assertThat(project.getAccessPointId()).isEqualTo("/app/" + project.getId());
     }
 
 
