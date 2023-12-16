@@ -69,21 +69,17 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
     /**
     * 클라이언트가 채팅/터미널/커서 채널에 구독했는지 확인하는 코드
+     * * @return  true : 구독한 상태, false : 구독안한 상태
     * */
     private boolean isAlreadySubscribe(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         String[] split = headerAccessor.getDestination().toString().split("/");
         String subscribeType = split[4];
         log.trace("SubscribeType = {}",subscribeType);
-        if(subscribeType.equals("chat")){
-            if(webSocketUser.getIsChattingSubscribe()) return true;
-            webSocketUser.SubscribeChatting();
-        } else if(subscribeType.equals("terminal")){
-            if(webSocketUser.getIsTerminal()) return true;
-            webSocketUser.SubscribeTerminal();
-        } else if(subscribeType.equals("cursor")){
-            if(webSocketUser.getIsCursor()) return true;
-            webSocketUser.SubscribeCursor();
+
+        if(webSocketUser.isSubscribe(subscribeType)){
+            return true;
         }
+        webSocketUser.startSubscribe(subscribeType);
         return false;
     }
 
@@ -97,7 +93,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(sessionId);
         if(webSocketUser == null){
-            log.warn("WebSocketChannelInterceptor.preSend 잘못된 사용자 접근입니다.");
+            log.error("WebSocketChannelInterceptor.preSend 잘못된 사용자 접근입니다.");
             throw new BaseException("잘못된 사용자 접근");
         }
 
