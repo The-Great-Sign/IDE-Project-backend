@@ -27,6 +27,8 @@ public class Project {
 
     private String containerImageId;
 
+    private String accessPointId;
+
     @Enumerated(EnumType.STRING)
     private ProgrammingLanguage programmingLanguage;
 
@@ -61,5 +63,9 @@ public class Project {
     // === 세터 == //
     public void setContainerImageId(String containerImageId) {
         this.containerImageId = containerImageId;
+    }
+
+    public void setAccessPointId(String accessPointId) {
+        this.accessPointId = accessPointId;
     }
 }

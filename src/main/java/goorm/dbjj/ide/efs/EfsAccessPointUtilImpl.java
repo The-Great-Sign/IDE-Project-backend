@@ -13,13 +13,19 @@ import software.amazon.awssdk.services.efs.model.CreateAccessPointResponse;
  */
 @Component
 @RequiredArgsConstructor
-public class AccessPointGenerator {
+public class EfsAccessPointUtilImpl implements EfsAccessPointUtil {
 
     @Value("${aws.efs.fileSystemId}")
     private String fileSystemId;
 
     private final EfsClient efsClient;
 
+    /**
+     * EFS Access Point 생성
+     * @param projectId
+     * @return
+     */
+    @Override
     public String generateAccessPoint(String projectId) {
         CreateAccessPointResponse response = efsClient.createAccessPoint(req -> req
                         .fileSystemId(fileSystemId)
@@ -28,5 +34,14 @@ public class AccessPointGenerator {
         );
 
         return response.accessPointId();
+    }
+
+    /**
+     * EFS Access Point 삭제
+     * @param accessPointId
+     */
+    @Override
+    public void deleteAccessPoint(String accessPointId) {
+        efsClient.deleteAccessPoint(req -> req.accessPointId(accessPointId));
     }
 }

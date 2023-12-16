@@ -63,16 +63,14 @@ public class ContainerServiceImpl implements ContainerService {
     @Override
     public String createProjectImage(Project project) {
         log.trace("ContainerService.createProjectImage called");
-        /**
-         * todo: EFS에 AccessPoint를 생성하고 그 ID를 파라미터로 전달받아야합니다.
-         */
+
         if (project.getContainerImageId() != null) {
             throw new BaseException("컨테이너 이미지가 존재합니다.");
         }
 
         String containerImageId = containerUtil.createContainerImage(
                 project.getProgrammingLanguage(),
-                "fsap-04fbb958d168856f3"
+                project.getAccessPointId()
         );
 
         return containerImageId;
