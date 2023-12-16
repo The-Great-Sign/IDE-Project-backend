@@ -77,8 +77,4 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
     }
-
-    public User getUser(@AuthenticationPrincipal User user){
-        return user;
-    }
 }
