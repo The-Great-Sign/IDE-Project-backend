@@ -8,6 +8,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ProjectService {
     private final ProjectUserRepository projectUserRepository;
     private final ContainerService containerService;
 //    private final PasswordEncoder passwordEncoder;
+    private final EntityManager em;
 
     /**
      * 프로젝트 생성
@@ -89,14 +91,13 @@ public class ProjectService {
         }
     }
 
-
     @Transactional
     public void deleteProject(String projectId, User user) {
-
+        User mergedUser = em.merge(user);
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
-        if(!project.getCreator().equals(user)) {
+        if(!project.getCreator().equals(mergedUser)) {
             throw new BaseException("프로젝트 삭제 권한이 없습니다.");
         }
 
