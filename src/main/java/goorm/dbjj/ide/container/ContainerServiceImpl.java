@@ -36,7 +36,7 @@ public class ContainerServiceImpl implements ContainerService {
      * - 어떤 사용자에게 결과를 보내야하는지 알아야 하므로 유저 정보를 가져와야 합니다.
      */
     @Override
-    public void executeCommand(Project project, String path, String command, String userId) {
+    public void executeCommand(Project project, String path, String command, Long userId) {
         log.trace("ContainerService.executeCommand called");
 
         ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());

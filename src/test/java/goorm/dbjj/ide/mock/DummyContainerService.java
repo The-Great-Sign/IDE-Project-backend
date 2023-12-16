@@ -13,7 +13,7 @@ public class DummyContainerService implements ContainerService {
     private Map<String, Long> methodCallCountMap = new HashMap<>();
 
     @Override
-    public void executeCommand(Project project, String path, String command, String userId) {
+    public void executeCommand(Project project, String path, String command, Long userId) {
     }
 
     @Override

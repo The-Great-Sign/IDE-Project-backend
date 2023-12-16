@@ -36,7 +36,7 @@ class OutputSendingServiceImplTest {
         executionSessionIdMapper.put(
                 "logStreamName",
                 "projectId",
-                "userId"
+                1L
         );
 
         assertThat(executionSessionIdMapper.get("logStreamName")).isNotNull();

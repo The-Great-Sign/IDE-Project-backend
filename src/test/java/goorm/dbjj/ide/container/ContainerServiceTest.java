@@ -136,7 +136,7 @@ class ContainerServiceTest {
         //Running 상태로 변경
         memoryContainerRepository.find(project.getId()).setRunning();
 
-        containerService.executeCommand(project, "/app", "python hello.py", "userId");
+        containerService.executeCommand(project, "/app", "python hello.py", 1L);
     }
 
     @Test
@@ -145,7 +145,7 @@ class ContainerServiceTest {
 
         //Running 상태로 변경
         assertThatThrownBy(
-                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+                () -> containerService.executeCommand(project, "/app", "python hello.py", 1L)
         ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
     }
 
@@ -159,7 +159,7 @@ class ContainerServiceTest {
         memoryContainerRepository.find(project.getId()).setPending();
 
         assertThatThrownBy(
-                () -> containerService.executeCommand(project, "/app", "python hello.py", "userId")
+                () -> containerService.executeCommand(project, "/app", "python hello.py", 1L)
         ).isInstanceOf(BaseException.class).hasMessage("컨테이너가 실행중이지 않습니다.");
 
     }

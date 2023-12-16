@@ -15,11 +15,11 @@ public class ExecutionIdMapper {
     @Data
     public static class MappedInfo {
         private String projectId;
-        private String userId;
+        private Long userId;
     }
     private Map<String, MappedInfo> map = new ConcurrentHashMap<>();
 
-    public void put(String executionId, String projectId, String userId) {
+    public void put(String executionId, String projectId, Long userId) {
         MappedInfo mappedInfo = new MappedInfo();
         mappedInfo.setProjectId(projectId);
         mappedInfo.setUserId(userId);
