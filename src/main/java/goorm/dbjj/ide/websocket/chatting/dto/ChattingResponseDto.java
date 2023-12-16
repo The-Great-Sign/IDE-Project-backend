@@ -12,7 +12,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChattingResponseDto {
     private ChatType messageType;
-    private Long projectUserId;
+    private Long userId; // todo : 추후 객체로 전송 해야 함 닉네임 또는 이메일 등
     private String content;
     private Long currentUsers;
 }
