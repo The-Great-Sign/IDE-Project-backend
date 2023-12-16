@@ -1,9 +1,14 @@
 package goorm.dbjj.ide.websocket;
 
+import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.domain.user.dto.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -34,7 +39,25 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
         //todo : jwt UserId 가져와야함.
         // 채팅서비스나 이런데서 db 조회 해서 dto 짚어넣기
         // userRepository.findByEmail(email);
-        Long userId = 1L;
+
+         // SecuritycontextHolder을 사용해서 인증된 사용자의 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 인증된 사용자인지 확인, 아니면 exception.
+        if(authentication == null && !authentication.isAuthenticated()){
+            throw new BaseException("인증된 사용자가 아닙니다.");
+        }
+
+        // todo: 이후 User -> CustomUserDetails로 교체 예정.
+        // 인증된 사용자의 세부 정보 불러오기.
+        User userDetails = (User) authentication.getPrincipal();
+        Long userId = userDetails.getId();
+        log.trace("웹소켓 사용자 ID, 이름 가져오기 : {} {}", userId, userDetails.getNickname());
+
+        /**
+         * 현재는 User Entity 전체에 연결되어 있으므로
+         * userDetails.get~() 이런식으로 유저정보 불러와서 사용가능합니다.
+         */
 
         //todo : userId 및 projectId가 일치하는 .ProjectUser가 있는지 확인
 
@@ -44,7 +67,7 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
 
         // STOMP 메서드를 보내면 사용자 인식 가능하게 함.
         attributes.put("WebSocketUserSessionId", uuid);
-        return true;
+         return true;
     }
 
     /**
@@ -53,5 +76,9 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
      * */
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
+    }
+
+    public User getUser(@AuthenticationPrincipal User user){
+        return user;
     }
 }
