@@ -13,6 +13,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -35,6 +36,7 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
      * http Upgrade 응답 이전에 유효한 유저인지 jwt 를 확인하고, WebSocketUserSessionMapper에 등록하는 메서드
      * */
     @Override
+    @Transactional(readOnly = true)
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
          // SecuritycontextHolder을 사용해서 인증된 사용자의 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
