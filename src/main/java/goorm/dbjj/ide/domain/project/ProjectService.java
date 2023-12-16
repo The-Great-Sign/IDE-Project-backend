@@ -8,6 +8,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ProjectService {
     private final ProjectUserRepository projectUserRepository;
     private final ContainerService containerService;
 //    private final PasswordEncoder passwordEncoder;
+    private final EntityManager em;
 
     /**
      * 프로젝트 생성
@@ -37,10 +39,7 @@ public class ProjectService {
      * @return
      */
     @Transactional
-    public ProjectDto createProject(ProjectCreateRequestDto requestDto, Long userId) {
-
-        User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException("존재하지 않는 유저입니다."));
+    public ProjectDto createProject(ProjectCreateRequestDto requestDto, User creator) {
 
         /**
          * TODO: 추후 비밀번호는 암호화 필요
@@ -59,7 +58,8 @@ public class ProjectService {
         projectUserRepository.save(new ProjectUser(savedProject, creator));
 
         // 프로젝트 생성 시점에 컨테이너 이미지 생성
-        containerService.createProjectImage(savedProject);
+        String containerImageId = containerService.createProjectImage(savedProject);
+        savedProject.setContainerImageId(containerImageId);
 
         return ProjectDto.of(savedProject);
     }
@@ -71,35 +71,35 @@ public class ProjectService {
      * @return 사용자가 프로젝트에 참여 가능하다면 true, 아니라면 false
      */
     @Transactional
-    public boolean enter(String requestPassword, String projectId, Long userId) {
-        User user = userRepository.findById(userId)
+    public void join(String requestPassword, String projectId, User authenticatedUser) {
+        User user = userRepository.findById(authenticatedUser.getId())
                 .orElseThrow(() -> new BaseException("존재하지 않는 유저입니다."));
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
-        // 만약 이미 프로젝트에 참여하고 있다면 true를 반환
+        // 만약 이미 프로젝트에 참여하고 있다면 예외 반환
         if (projectUserRepository.existsByProjectAndUser(project, user)) {
-            return true;
+            throw new BaseException("이미 프로젝트에 참여하고 있습니다.");
         }
 
         // 프로젝트에 참여하고 있지 않다면, 비밀번호를 체크하고 참여
         if (project.getPassword().equals(requestPassword)) {
             projectUserRepository.save(new ProjectUser(project, user));
-            return true;
         } else {
-            return false;
+            throw new BaseException("비밀번호가 일치하지 않습니다.");
         }
     }
 
-
     @Transactional
-    public void deleteProject(String projectId, Long userId) {
+    public void deleteProject(String projectId, User user) {
+        // User를 merge하여 영속성 컨텍스트에 포함시킵니다.
+        User mergedUser = em.merge(user);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
-        if(!project.getCreator().getId().equals(userId)) {
+        if(!project.getCreator().equals(mergedUser)) {
             throw new BaseException("프로젝트 삭제 권한이 없습니다.");
         }
 
@@ -108,6 +108,7 @@ public class ProjectService {
          * 1. 프로젝트 컨테이너 이미지 삭제
          * 2. 프로젝트 컨테이너 종료
          * 3. 프로젝트 저장공간 삭제 - ProjectFileService 완성되면 추가
+         * 4. 프로젝트 DB 삭제
          */
 
         //예외로 인하여 다음 코드가 수행되지 않는 상황을 방지하기 위해서 try-catch로 감싸줍니다.

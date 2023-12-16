@@ -8,7 +8,6 @@ import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * IDE 컨테이너를 관리하는 서비스입니다.
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ContainerServiceImpl implements ContainerService {
 
     private final ContainerUtil containerUtil;
@@ -60,10 +58,10 @@ public class ContainerServiceImpl implements ContainerService {
      * 생성 권한 검증은 이 메서드를 사용하는 측에서 미리 검증함을 전제로 합니다.
      *
      * @param project
+     * @return 생성된 컨테이너 이미지의 ID
      */
     @Override
-    @Transactional
-    public void createProjectImage(Project project) {
+    public String createProjectImage(Project project) {
         log.trace("ContainerService.createProjectImage called");
         /**
          * todo: EFS에 AccessPoint를 생성하고 그 ID를 파라미터로 전달받아야합니다.
@@ -74,10 +72,10 @@ public class ContainerServiceImpl implements ContainerService {
 
         String containerImageId = containerUtil.createContainerImage(
                 project.getProgrammingLanguage(),
-                "accessPointId"
+                "fsap-04fbb958d168856f3"
         );
 
-        project.setContainerImageId(containerImageId);
+        return containerImageId;
     }
 
     /**
@@ -148,6 +146,7 @@ public class ContainerServiceImpl implements ContainerService {
      */
     @Override
     public boolean isContainerRunning(Project project) {
-        return memoryContainerRepository.find(project.getId()).isRunning();
+        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        return containerInfo != null && containerInfo.isRunning();
     }
 }
