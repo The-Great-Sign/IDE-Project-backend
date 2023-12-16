@@ -57,17 +57,18 @@ class ContainerServiceTest {
         Project project = createProject();
 
         // when
-        containerService.createProjectImage(project);
+        String containerImageId = containerService.createProjectImage(project);
 
         // then
-        assertEquals("containerImageId", project.getContainerImageId());
+        assertEquals("containerImageId", containerImageId);
     }
 
     @Test
     void runContainer() {
         // given
         Project project = createProject();
-        containerService.createProjectImage(project);
+        String containerImageId = containerService.createProjectImage(project);
+        project.setContainerImageId(containerImageId);
 
         // when
         containerService.runContainer(project);
@@ -83,7 +84,8 @@ class ContainerServiceTest {
     void stopContainer() {
         // given
         Project project = createProject();
-        containerService.createProjectImage(project);
+        String containerImageId = containerService.createProjectImage(project);
+        project.setContainerImageId(containerImageId);
 
         containerService.runContainer(project);
 
@@ -99,7 +101,9 @@ class ContainerServiceTest {
     void isRunning() {
         // given
         Project project = createProject();
-        containerService.createProjectImage(project);
+        String containerImageId = containerService.createProjectImage(project);
+        project.setContainerImageId(containerImageId);
+
         containerService.runContainer(project);
 
         // when

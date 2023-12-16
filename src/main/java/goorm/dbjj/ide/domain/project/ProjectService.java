@@ -58,7 +58,8 @@ public class ProjectService {
         projectUserRepository.save(new ProjectUser(savedProject, creator));
 
         // 프로젝트 생성 시점에 컨테이너 이미지 생성
-        containerService.createProjectImage(savedProject);
+        String containerImageId = containerService.createProjectImage(savedProject);
+        savedProject.setContainerImageId(containerImageId);
 
         return ProjectDto.of(savedProject);
     }

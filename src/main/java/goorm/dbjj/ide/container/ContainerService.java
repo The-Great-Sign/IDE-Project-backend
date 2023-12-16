@@ -5,7 +5,7 @@ import goorm.dbjj.ide.domain.project.model.Project;
 public interface ContainerService {
     void executeCommand(Project project, String path, String command, String userId);
 
-    void createProjectImage(Project project);
+    String createProjectImage(Project project);
 
     void deleteProjectImage(Project project);
 
