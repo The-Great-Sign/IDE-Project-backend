@@ -95,7 +95,7 @@ class ProjectServiceTest {
                 );
 
         // when
-        ProjectDto projectDto = projectService.createProject(requestDto, user.getId());
+        ProjectDto projectDto = projectService.createProject(requestDto, user);
 
         em.flush();
         em.clear();
@@ -137,13 +137,13 @@ class ProjectServiceTest {
                 "password"
                 );
 
-        ProjectDto projectDto = projectService.createProject(requestDto, user.getId());
+        ProjectDto projectDto = projectService.createProject(requestDto, user);
 
         em.flush();
         em.clear();
 
         // when
-        projectService.deleteProject(projectDto.getId(), user.getId());
+        projectService.deleteProject(projectDto.getId(), user);
 
         em.flush();
         em.clear();

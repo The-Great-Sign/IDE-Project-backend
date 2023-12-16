@@ -17,9 +17,8 @@ public class DummyContainerService implements ContainerService {
     }
 
     @Override
-    public void createProjectImage(Project project) {
-        log.info("DummyContainerService.createProjectImage called");
-        project.setContainerImageId("containerImageId");
+    public String createProjectImage(Project project) {
+        return "containerImageId";
     }
 
     @Override
