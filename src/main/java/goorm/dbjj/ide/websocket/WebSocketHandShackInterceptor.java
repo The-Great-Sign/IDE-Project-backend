@@ -67,7 +67,7 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
 
         // STOMP 메서드를 보내면 사용자 인식 가능하게 함.
         attributes.put("WebSocketUserSessionId", uuid);
-         return true;
+        return true;
     }
 
     /**
