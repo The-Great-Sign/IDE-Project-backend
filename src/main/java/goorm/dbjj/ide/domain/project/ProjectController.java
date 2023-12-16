@@ -32,6 +32,13 @@ public class ProjectController {
         return ApiResponse.ok(projectService.createProject(projectCreateRequestDto, user));
     }
 
+    /**
+     * 프로젝트를 삭제합니다.
+     * 로그인이 되어있어야 합니다.
+     * @param projectId
+     * @param user
+     * @return
+     */
     @DeleteMapping("/{projectId}")
     public ApiResponse<Void> deleteProject(
             @PathVariable String projectId,
@@ -39,12 +46,20 @@ public class ProjectController {
     ) {
         log.trace("ProjectController.deleteProject called");
         log.debug("삭제 요청 : ProjectId = {}, User = {}", projectId, user.getId());
+
         projectService.deleteProject(projectId, user);
         return ApiResponse.ok();
     }
 
+    /**
+     * 프로젝트에 참가합니다.
+     * 비밀번호 입력 시 호출되는 API의 엔드포인트입니다.
+     * @param projectJoinRequestDto
+     * @param user
+     * @return
+     */
     @PostMapping("/join")
-    public ApiResponse<Void> runProject(
+    public ApiResponse<Void> joinProject(
             @RequestBody ProjectJoinRequestDto projectJoinRequestDto,
             @AuthenticationPrincipal User user
     ) {
@@ -54,7 +69,8 @@ public class ProjectController {
         projectService.join(
                 projectJoinRequestDto.getPassword(),
                 projectJoinRequestDto.getProjectId(),
-                user);
+                user
+        );
 
         return ApiResponse.ok();
     }

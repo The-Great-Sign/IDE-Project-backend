@@ -93,7 +93,9 @@ public class ProjectService {
 
     @Transactional
     public void deleteProject(String projectId, User user) {
+        // User를 merge하여 영속성 컨텍스트에 포함시킵니다.
         User mergedUser = em.merge(user);
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
@@ -106,6 +108,7 @@ public class ProjectService {
          * 1. 프로젝트 컨테이너 이미지 삭제
          * 2. 프로젝트 컨테이너 종료
          * 3. 프로젝트 저장공간 삭제 - ProjectFileService 완성되면 추가
+         * 4. 프로젝트 DB 삭제
          */
 
         //예외로 인하여 다음 코드가 수행되지 않는 상황을 방지하기 위해서 try-catch로 감싸줍니다.
