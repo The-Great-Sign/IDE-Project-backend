@@ -9,7 +9,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FastByteArrayOutputStream;
 
 import java.util.concurrent.ConcurrentHashMap;
 

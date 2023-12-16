@@ -1,7 +1,6 @@
 package goorm.dbjj.ide.websocket;
 
 import goorm.dbjj.ide.websocket.dto.UserInfoDto;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
