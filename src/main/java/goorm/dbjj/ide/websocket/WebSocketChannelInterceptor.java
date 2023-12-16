@@ -32,12 +32,10 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         WebSocketUser webSocketUser = validateAndRetrieveUser(headerAccessor);
 
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
-            // 사용자가 이미 구독한 방일 경우에 그냥 메세지 전달 취소
-            if(isAlreadySubscribe(headerAccessor, webSocketUser)){
-                log.warn("이미 구독한 채널 입니다.");
-                throw new BaseException("이미 구독한 채널 입니다.");
-            }
+            // Destination 주소 검증하기
             EqualsSubscribeDestinationProjectId(headerAccessor, webSocketUser);
+            // 구독하기
+            subScribeChannel(headerAccessor, webSocketUser);
         }
 
         if(StompCommand.SEND.equals(headerAccessor.getCommand())){
@@ -68,19 +66,22 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     }
 
     /**
-    * 클라이언트가 채팅/터미널/커서 채널에 구독했는지 확인하는 코드
+    * 클라이언트가 채팅/터미널/커서 채널에 구독하기
      * * @return  true : 구독한 상태, false : 구독안한 상태
     * */
-    private boolean isAlreadySubscribe(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
+    private void subScribeChannel(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         String[] split = headerAccessor.getDestination().toString().split("/");
         String subscribeType = split[4];
         log.trace("SubscribeType = {}",subscribeType);
 
+        // 이미 구독한 상태라면
         if(webSocketUser.isSubscribe(subscribeType)){
-            return true;
+            log.warn("이미 구독한 채널 입니다.");
+            throw new BaseException("이미 구독한 채널 입니다.");
         }
+
+        // 구독안했으면 구독해주기
         webSocketUser.startSubscribe(subscribeType);
-        return false;
     }
 
 
