@@ -71,24 +71,23 @@ public class ProjectService {
      * @return 사용자가 프로젝트에 참여 가능하다면 true, 아니라면 false
      */
     @Transactional
-    public boolean enter(String requestPassword, String projectId, Long userId) {
-        User user = userRepository.findById(userId)
+    public void join(String requestPassword, String projectId, User authenticatedUser) {
+        User user = userRepository.findById(authenticatedUser.getId())
                 .orElseThrow(() -> new BaseException("존재하지 않는 유저입니다."));
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
-        // 만약 이미 프로젝트에 참여하고 있다면 true를 반환
+        // 만약 이미 프로젝트에 참여하고 있다면 예외 반환
         if (projectUserRepository.existsByProjectAndUser(project, user)) {
-            return true;
+            throw new BaseException("이미 프로젝트에 참여하고 있습니다.");
         }
 
         // 프로젝트에 참여하고 있지 않다면, 비밀번호를 체크하고 참여
         if (project.getPassword().equals(requestPassword)) {
             projectUserRepository.save(new ProjectUser(project, user));
-            return true;
         } else {
-            return false;
+            throw new BaseException("비밀번호가 일치하지 않습니다.");
         }
     }
 

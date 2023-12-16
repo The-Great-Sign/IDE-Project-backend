@@ -3,6 +3,7 @@ package goorm.dbjj.ide.domain.project;
 import goorm.dbjj.ide.api.ApiResponse;
 import goorm.dbjj.ide.domain.project.model.ProjectCreateRequestDto;
 import goorm.dbjj.ide.domain.project.model.ProjectDto;
+import goorm.dbjj.ide.domain.project.model.ProjectJoinRequestDto;
 import goorm.dbjj.ide.domain.user.dto.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,22 @@ public class ProjectController {
         log.trace("ProjectController.deleteProject called");
         log.debug("삭제 요청 : ProjectId = {}, User = {}", projectId, user.getId());
         projectService.deleteProject(projectId, user);
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/join")
+    public ApiResponse<Void> runProject(
+            @RequestBody ProjectJoinRequestDto projectJoinRequestDto,
+            @AuthenticationPrincipal User user
+    ) {
+        log.trace("ProjectController.runProject called");
+        log.debug("참가 요청 : ProjectId = {}, User = {}", projectJoinRequestDto.getProjectId(), user.getId());
+
+        projectService.join(
+                projectJoinRequestDto.getPassword(),
+                projectJoinRequestDto.getProjectId(),
+                user);
+
         return ApiResponse.ok();
     }
 }
