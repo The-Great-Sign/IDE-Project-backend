@@ -51,11 +51,11 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private void EqualsSubscribeDestinationProjectId(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         // 1. 사용자가 구독신청한 subscribeProjectId 반환
         String[] split = headerAccessor.getDestination().toString().split("/");
-        Long subscribeProjectId = Long.valueOf(split[3]);
+        String subscribeProjectId = split[3];
         log.trace("subscribe projectId = {}", subscribeProjectId);
 
         // 2. 사용자가 구독한 projectId 반환
-        Long projectId = webSocketUser.getProjectId();
+        String projectId = webSocketUser.getProjectId();
         log.trace("subscribe projectId = {}", projectId);
 
         // 1번과 2번을 비교하여 같을 경우 구독번호를 반환한다.
