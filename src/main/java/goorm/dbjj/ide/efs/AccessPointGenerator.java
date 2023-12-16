@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.efs.model.CreateAccessPointResponse;
 /**
  * EFS Access Point 생성 클래스
  * 프로젝트가 생성되면, EFS 특정 공간을 가리키는 AccessPoint를 만들어야 합니다.
- * EFS AccessPoint는 Project DB에 저장되어 사용됩니다.
+ * EFS AccessPoint는 이미지 빌드시 사용됩니다.
  */
 @Component
 @RequiredArgsConstructor
