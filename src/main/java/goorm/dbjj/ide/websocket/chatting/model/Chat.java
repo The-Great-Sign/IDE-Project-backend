@@ -19,7 +19,7 @@ public class Chat {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_user_id", insertable = false, updatable = false)
-    private ProjectUser projectUserId;
+    private ProjectUser projectUser;
     @Column(length = 255, nullable = false)
     private String content;
     @CreationTimestamp
