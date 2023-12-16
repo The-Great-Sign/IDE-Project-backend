@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket.chatting.model;
 
+import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,7 +17,9 @@ public class Chat {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long projectUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_user_id", insertable = false, updatable = false)
+    private ProjectUser projectUser;
     @Column(length = 255, nullable = false)
     private String content;
     @CreationTimestamp
