@@ -36,6 +36,8 @@ public class ProjectController {
             @PathVariable String projectId,
             @AuthenticationPrincipal User user
     ) {
+        log.trace("ProjectController.deleteProject called");
+        log.debug("삭제 요청 : ProjectId = {}, User = {}", projectId, user.getId());
         projectService.deleteProject(projectId, user);
         return ApiResponse.ok();
     }
