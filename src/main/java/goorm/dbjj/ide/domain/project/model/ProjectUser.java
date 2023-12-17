@@ -2,12 +2,14 @@ package goorm.dbjj.ide.domain.project.model;
 
 import goorm.dbjj.ide.domain.user.dto.User;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.*;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)
+@Getter
 public class ProjectUser {
 
     @Id

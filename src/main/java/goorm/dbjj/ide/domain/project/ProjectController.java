@@ -8,8 +8,11 @@ import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 
 @Slf4j
 @RestController
@@ -85,7 +88,7 @@ public class ProjectController {
             @AuthenticationPrincipal User user
     ) {
         log.trace("ProjectController.runProject called");
-        log.debug("실행 요청 : ProjectId = {}, User = {}", projectId, user.getId());
+        log.debug("프로젝트 컨테이너 실행 요청 : ProjectId = {}, User = {}", projectId, user.getId());
 
         ContainerStatus status = projectService.runProject(projectId, user);
         return ApiResponse.ok(status);
@@ -96,9 +99,59 @@ public class ProjectController {
             @PathVariable String projectId
     ) {
         log.trace("ProjectController.stopProject called");
-        log.debug("종료 요청 : ProjectId = {}", projectId);
+        log.debug("프로젝트 컨테이너 종료 요청 : ProjectId = {}", projectId);
 
         projectService.stopProject(projectId);
         return ApiResponse.ok();
+    }
+
+    /**
+     * 유저가 생성한 프로젝트 목록을 조회합니다.
+     * @param user
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/me/created")
+    public ApiResponse<Page<ProjectDto>> getMyCreatedProject(
+            @AuthenticationPrincipal User user,
+            Pageable pageable
+    ) {
+        log.trace("ProjectController.getMyCreatedProject called");
+        log.debug("생성한 프로젝트 조회 요청 : User = {}", user.getId());
+
+        return ApiResponse.ok(projectService.findMyCreatedProject(user, pageable));
+    }
+
+    /**
+     * 유저가 참여한 프로젝트 목록을 조회합니다.
+     * @param user
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/me/joined")
+    public ApiResponse<Page<ProjectDto>> getMyJoinedProject(
+            @AuthenticationPrincipal User user,
+            Pageable pageable
+    ) {
+        log.trace("ProjectController.getMyJoinedProject called");
+        log.debug("참여한 프로젝트 조회 요청 : User = {}", user.getId());
+
+        return ApiResponse.ok(projectService.findMyJoinedProject(user,pageable));
+    }
+
+    /**
+     * 개별 프로젝트를 조회합니다.
+     * 추후에 validation을 진행해야 합니다.
+     * @param projectId
+     * @return
+     */
+    @GetMapping("/{projectId}")
+    public ApiResponse<ProjectDto> getProject(
+            @PathVariable String projectId
+    ) {
+        log.trace("ProjectController.getProject called");
+        log.debug("프로젝트 단일 조회 요청 : ProjectId = {}",projectId);
+
+        return ApiResponse.ok(projectService.findProjectById(projectId));
     }
 }

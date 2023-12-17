@@ -15,6 +15,8 @@ import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -182,5 +184,30 @@ public class ProjectService {
                 .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
 
         containerService.stopContainer(project);
+    }
+
+    public Page<ProjectDto> findMyCreatedProject(User user, Pageable pageable) {
+        User mergedUser = em.merge(user);
+
+        return projectRepository.findByCreator(mergedUser, pageable)
+                .map(ProjectDto::of);
+    }
+
+    public Page<ProjectDto> findMyJoinedProject(User user, Pageable pageable) {
+        User mergedUser = em.merge(user);
+
+        return projectUserRepository.findByUser(mergedUser, pageable)
+                .map(ProjectUser::getProject)
+                .map(ProjectDto::of);
+    }
+
+    public ProjectDto findProjectById(String projectId) {
+        /**
+         * 추후에 validation 추가하기
+         */
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
+
+        return ProjectDto.of(project);
     }
 }
