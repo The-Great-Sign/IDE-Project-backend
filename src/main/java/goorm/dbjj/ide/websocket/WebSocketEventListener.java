@@ -52,5 +52,4 @@ public class WebSocketEventListener {
             template.convertAndSend("/topic/project/"+ projectId + "/chat", exitMessage);
         }
     }
-
 }

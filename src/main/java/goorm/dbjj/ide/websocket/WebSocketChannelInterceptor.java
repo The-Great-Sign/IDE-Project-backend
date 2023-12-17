@@ -34,7 +34,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             // Destination 주소 검증하기
             EqualsSubscribeDestinationProjectId(headerAccessor, webSocketUser);
             // 구독하기
-            subScribeChannel(headerAccessor, webSocketUser);
+            subscribeChannel(headerAccessor, webSocketUser);
         }
 
         if(StompCommand.SEND.equals(headerAccessor.getCommand())){
@@ -50,7 +50,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private void EqualsSubscribeDestinationProjectId(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         // 1. 사용자가 구독신청한 subscribeProjectId 반환
         String[] split = headerAccessor.getDestination().toString().split("/");
-        String subscribeProjectId = split[3];
+        String subscribeProjectId  = split[1].equals("user")? split[4] : split[3];
         log.trace("subscribe projectId = {}", subscribeProjectId);
 
         // 2. 사용자가 구독한 projectId 반환
@@ -68,9 +68,10 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     * 클라이언트가 채팅/터미널/커서 채널에 구독하기
      * * @return  true : 구독한 상태, false : 구독안한 상태
     * */
-    private void subScribeChannel(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
+    private void subscribeChannel(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         String[] split = headerAccessor.getDestination().toString().split("/");
-        String subscribeType = split[4];
+        // /user로 시작하는 경우 chatuser
+        String subscribeType  = split[1].equals("user")? split[1]+split[5] : split[4];
         log.trace("SubscribeType = {}",subscribeType);
 
         // 이미 구독한 상태라면

@@ -56,6 +56,7 @@ public class WebSocketHandShackInterceptor implements HandshakeInterceptor {
         String projectId = split[split.length-1];
         log.trace("{}", projectId);
 
+        //// db 없이 테스트할때 주석 처리 해야함
         Optional<Project> projectOptional = projectRepository.findById(projectId);
         // 프로젝트가 없을 경우
         if(projectOptional.isEmpty()){
