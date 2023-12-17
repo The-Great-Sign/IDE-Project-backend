@@ -5,6 +5,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectCreateRequestDto;
 import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectJoinRequestDto;
 import goorm.dbjj.ide.domain.user.dto.User;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ public class ProjectController {
 
     /**
      * 프로젝트를 생성합니다.
+     *
      * @param projectCreateRequestDto
      * @param user
      * @return
@@ -35,6 +37,7 @@ public class ProjectController {
     /**
      * 프로젝트를 삭제합니다.
      * 로그인이 되어있어야 합니다.
+     *
      * @param projectId
      * @param user
      * @return
@@ -54,6 +57,7 @@ public class ProjectController {
     /**
      * 프로젝트에 참가합니다.
      * 비밀번호 입력 시 호출되는 API의 엔드포인트입니다.
+     *
      * @param projectJoinRequestDto
      * @param user
      * @return
@@ -72,6 +76,29 @@ public class ProjectController {
                 user
         );
 
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/{projectId}/run")
+    public ApiResponse<ContainerStatus> runProject(
+            @PathVariable String projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        log.trace("ProjectController.runProject called");
+        log.debug("실행 요청 : ProjectId = {}, User = {}", projectId, user.getId());
+
+        ContainerStatus status = projectService.runProject(projectId, user);
+        return ApiResponse.ok(status);
+    }
+
+    @PostMapping("/{projectId}/stop")
+    public ApiResponse<Void> stopProject(
+            @PathVariable String projectId
+    ) {
+        log.trace("ProjectController.stopProject called");
+        log.debug("종료 요청 : ProjectId = {}", projectId);
+
+        projectService.stopProject(projectId);
         return ApiResponse.ok();
     }
 }

@@ -12,7 +12,7 @@ public class ContainerInfo {
 
     public ContainerInfo(String containerId) {
         this.containerId = containerId;
-        this.status = ContainerStatus.STOPPED;
+        this.status = ContainerStatus.PENDING;
     }
 
     public void setRunning() {
