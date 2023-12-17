@@ -9,9 +9,14 @@ import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.efs.EfsAccessPointUtil;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
+import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +36,7 @@ public class ProjectService {
 //    private final PasswordEncoder passwordEncoder;
     private final EntityManager em;
     private final EfsAccessPointUtil efsAccessPointUtil;
+    private final MemoryContainerRepository memoryContainerRepository;
 
     /**
      * 프로젝트 생성
@@ -138,5 +144,70 @@ public class ProjectService {
         }
 
         projectRepository.delete(project);
+    }
+
+    /**
+     * 프로젝트를 실행합니다.
+     * 컨테이너가 구동중이 아니라면, 구동을 시킨 뒤 PENDING 상태를 반환합니다.
+     * @param projectId
+     * @param user
+     * @return 컨테이너가 이미 구동중이라면, 그 상태를 반환합니다.
+     */
+    public ContainerStatus runProject(String projectId, User user) {
+        User mergedUser = em.merge(user);
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
+
+        if (!projectUserRepository.existsByProjectAndUser(project, mergedUser)) {
+            throw new BaseException("프로젝트에 참여하지 않은 유저입니다.");
+        }
+
+        //컨테이너 상태 조회
+        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+
+        if (containerInfo == null) { //컨테이너가 실행중이 아니라면
+            containerService.runContainer(project);
+            return ContainerStatus.PENDING;
+        } else { // 컨테이너가 실행중이라면 그 상태를 반환
+            return containerInfo.getStatus();
+        }
+    }
+
+    /**
+     * 프로젝트를 종료합니다.
+     * 테스트용으로만 사용하는 메서드입니다. 실제 운영 코드에 x
+     * @param projectId
+     */
+    public void stopProject(String projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
+
+        containerService.stopContainer(project);
+    }
+
+    public Page<ProjectDto> findMyCreatedProject(User user, Pageable pageable) {
+        User mergedUser = em.merge(user);
+
+        return projectRepository.findByCreator(mergedUser, pageable)
+                .map(ProjectDto::of);
+    }
+
+    public Page<ProjectDto> findMyJoinedProject(User user, Pageable pageable) {
+        User mergedUser = em.merge(user);
+
+        return projectUserRepository.findByUser(mergedUser, pageable)
+                .map(ProjectUser::getProject)
+                .map(ProjectDto::of);
+    }
+
+    public ProjectDto findProjectById(String projectId) {
+        /**
+         * 추후에 validation 추가하기
+         */
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
+
+        return ProjectDto.of(project);
     }
 }
