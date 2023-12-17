@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket;
 
+import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ class WebSocketChannelInterceptorTest {
         webSocketUserSessionMapper = new WebSocketUserSessionMapper();
 
         String testUUID1 = "test-uuid1";
-        webSocketUserSessionMapper.put(testUUID1, new WebSocketUser(1L,1L));
+        webSocketUserSessionMapper.put(testUUID1, new WebSocketUser(new UserInfoDto(1L,"abc123@gmail.com","Test"),"1"));
     }
     @Test
     @DisplayName("UUID 통과 테스트")
@@ -29,7 +30,7 @@ class WebSocketChannelInterceptorTest {
 
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(testUUID);
 
-        assertThat(webSocketUser.getUserId()).isEqualTo(1L);
-        assertThat(webSocketUser.getProjectId()).isEqualTo(1L);
+        assertThat(webSocketUser.getUserInfoDto().getId()).isEqualTo(1L);
+        assertThat(webSocketUser.getProjectId()).isEqualTo("1");
     }
 }

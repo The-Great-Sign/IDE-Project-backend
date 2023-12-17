@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class ChattingCurrentUserMapper {
-    private final Map<Long, Long> projectCurrentUserMapper;
+    private final Map<String, Long> projectCurrentUserMapper;
     
     public ChattingCurrentUserMapper() {
         this.projectCurrentUserMapper = new ConcurrentHashMap<>();
@@ -24,7 +24,7 @@ public class ChattingCurrentUserMapper {
      * 입장 후 인원수 증가 로직
      * @param  projectId
      * */
-    public void increaseCurrentUsersWithProjectId(Long projectId){
+    public void increaseCurrentUsersWithProjectId(String projectId){
         projectCurrentUserMapper.compute(projectId, (key, value) -> (value == null) ? 1L : value + 1);
     }
 
@@ -32,7 +32,7 @@ public class ChattingCurrentUserMapper {
      * 퇴장 후 인원수 감소 로직
      * @param  projectId
      * */
-    public void decreaseCurrentUsersWithProjectId(Long projectId){
+    public void decreaseCurrentUsersWithProjectId(String projectId){
         projectCurrentUserMapper.computeIfPresent(projectId, (key, value) -> (value > 1) ? --value : 0L);
     }
 
@@ -41,7 +41,7 @@ public class ChattingCurrentUserMapper {
      * @param  projectId
      * @return currentUsers
      * */
-    public Long getCurrentUsersByProjectId(Long projectId){
+    public Long getCurrentUsersByProjectId(String projectId){
         Long currentUsers = projectCurrentUserMapper.get(projectId);
         return currentUsers;
     }

@@ -45,9 +45,9 @@ public class WebSocketEventListener {
         }
 
         // 퇴장 메세지 출력
-        Long userId = removeWebSocketUser.getUserId();
-        Long projectId = removeWebSocketUser.getProjectId();
-        Optional<ChattingResponseDto> exitMessage = chatsService.exit(userId, projectId);
+        String nickname = removeWebSocketUser.getUserInfoDto().getNickname();
+        String projectId = removeWebSocketUser.getProjectId();
+        Optional<ChattingResponseDto> exitMessage = chatsService.exit(nickname, projectId);
         if(exitMessage.isPresent()) {
             template.convertAndSend("/topic/project/"+ projectId + "/chat", exitMessage);
         }
