@@ -4,6 +4,7 @@ import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,5 +39,18 @@ public class WebSocketUserSessionMapper {
      * */
     public boolean existsByProjectAndUser(UserInfoDto userInfoDto, String projectId) {
         return webSocketUserSessionMap.contains(new WebSocketUser(userInfoDto, projectId));
+    }
+
+    /**
+     * userInfoDto와 projectId를 이용해서 세션키를 찾는 로직
+     * @return sessionId
+     * */
+    public String findSessionIdByProjectAndUserInfoDto(UserInfoDto userInfoDto, String projectId) {
+        return webSocketUserSessionMap.entrySet()
+                .stream()
+                .filter(entry -> new WebSocketUser(userInfoDto, projectId).equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 }
