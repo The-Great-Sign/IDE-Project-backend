@@ -11,7 +11,10 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
-
+/**
+ *  STOMP 로 클라이언트에게 전달받는 모든 명령어들이 인증된 사용자, 프로젝트인지 확인하는 로직
+ *  구독시 WebSocketUserMapper에 Set 자료형에 구독한 채팅방 이름을 저장하고 이중 접속을 막는 로직이 담겨 있습니다.
+ * */
 @Slf4j
 @Component
 @AllArgsConstructor

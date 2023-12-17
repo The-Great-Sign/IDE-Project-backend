@@ -22,7 +22,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- *  HandshakeInterceptor 
+ *  HandshakeInterceptor
+ *  웹소켓 Connect 시 가장 먼저 동작하는 인터셉터입니다.
+ *  Http Upgrade 동작 시에 인증된 사용자가 인증된 프로젝트에 접근하는지 검증하고
+ *  WebSocketUserSessionMapper에 key, value(UserInfo,ProejctId)를 저장하는 인터셉터
  * */
 @Slf4j
 @Component
