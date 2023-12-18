@@ -3,7 +3,6 @@ package goorm.dbjj.ide.websocket.terminal;
 import goorm.dbjj.ide.lambdahandler.executionoutput.ExecutionOutputDto;
 import goorm.dbjj.ide.websocket.WebSocketUser;
 import goorm.dbjj.ide.websocket.WebSocketUserSessionMapper;
-import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import goorm.dbjj.ide.websocket.terminal.dto.TerminalExecuteRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +43,7 @@ public class TerminalController {
      * */
     public void terminalExecutionResult(String projectId, Long userId, ExecutionOutputDto executionOutputDto){
         log.trace("terminalExecutionResult execute");
-        UserInfoDto userEmailByUserId = terminalService.getUserInfoDtoByUserId(userId);
-        String sessionId = webSocketUserSessionMapper.findSessionIdByProjectAndUserInfoDto(userEmailByUserId, projectId);
+        String sessionId = webSocketUserSessionMapper.findSessionIdByProjectAndUserInfoDto(userId, projectId);
 
         simpMessagingTemplate.convertAndSendToUser(sessionId,"/queue/project/"+projectId +"/terminal", executionOutputDto);
     }
@@ -61,5 +59,4 @@ public class TerminalController {
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(uuid);
         return webSocketUser.getUserInfoDto().getId();
     }
-
 }
