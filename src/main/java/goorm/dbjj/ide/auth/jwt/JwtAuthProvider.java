@@ -36,6 +36,7 @@ public class JwtAuthProvider {
 
     /**
      * JWT를 사용해서 사용자 인증 정보 추출, Authentication에 담기.
+     *  유저 정보가 비어있다면 exception.
      */
     public Authentication getAuthentication(String token){
         Claims claims = jwtIssuer.getClaims(token);
