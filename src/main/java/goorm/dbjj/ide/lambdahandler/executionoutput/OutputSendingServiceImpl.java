@@ -51,13 +51,22 @@ public class OutputSendingServiceImpl implements OutputSendingService {
 
         String[] splitedMessage = message.split("\n");
 
+        for(int i = 0; i < splitedMessage.length; i++) {
+            splitedMessage[i] = splitedMessage[i].trim();
+        }
+
         if(splitedMessage.length == 4) {
-            return new ExecutionOutputDto(true, "", splitedMessage[1]);
+            return new ExecutionOutputDto(true, "", extractLogicalAddress(splitedMessage[1]));
         } else if (splitedMessage.length == 5) {
-            return new ExecutionOutputDto(true, splitedMessage[1], splitedMessage[2]);
+            return new ExecutionOutputDto(true, splitedMessage[1], extractLogicalAddress(splitedMessage[2]));
         } else {
             log.error("응답 메시지의 형식이 맞지 않습니다. message : {}", message);
             return new ExecutionOutputDto(false,"알 수 없는 오류가 발생했습니다.", "");
         }
+    }
+
+    private String extractLogicalAddress(String path) {
+        return path.substring(path.indexOf("/app") + 4);
+
     }
 }

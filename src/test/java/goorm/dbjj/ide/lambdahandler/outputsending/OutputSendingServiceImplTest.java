@@ -1,11 +1,11 @@
 package goorm.dbjj.ide.lambdahandler.outputsending;
 
 import goorm.dbjj.ide.container.ExecutionIdMapper;
-import goorm.dbjj.ide.lambdahandler.executionoutput.OutputSendingService;
-import goorm.dbjj.ide.lambdahandler.executionoutput.OutputSendingServiceImpl;
-import goorm.dbjj.ide.lambdahandler.executionoutput.LogEntry;
-import goorm.dbjj.ide.lambdahandler.executionoutput.LogEvent;
+import goorm.dbjj.ide.lambdahandler.executionoutput.*;
+import goorm.dbjj.ide.websocket.terminal.TerminalController;
+import goorm.dbjj.ide.websocket.terminal.dto.TerminalExecuteRequestDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 import java.util.List;
 
@@ -14,7 +14,26 @@ import static org.assertj.core.api.Assertions.*;
 
 class OutputSendingServiceImplTest {
     ExecutionIdMapper executionSessionIdMapper = new ExecutionIdMapper();
-    OutputSendingService outputSendingService = new OutputSendingServiceImpl(executionSessionIdMapper);
+
+    static class MockTerminalController extends TerminalController {
+        public MockTerminalController() {
+            super(null, null, null);
+        }
+
+        @Override
+        public void executeTerminal(SimpMessageHeaderAccessor headerAccessor, String projectId, TerminalExecuteRequestDto terminalExecuteRequestDto) {
+
+        }
+
+        @Override
+        public void terminalExecutionResult(String projectId, Long userId, ExecutionOutputDto executionOutputDto) {
+
+        }
+    }
+    OutputSendingService outputSendingService = new OutputSendingServiceImpl(
+            executionSessionIdMapper,
+            new MockTerminalController()
+    );
     @Test
     void outputSendingServiceTest() {
 
@@ -28,7 +47,7 @@ class OutputSendingServiceImplTest {
                         new LogEvent(
                                 "id",
                                 1234,
-                                "FirstLog\ncontent\n/path\n\nhello"
+                                "FirstLog\ncontent\n/app/path\n\nhello"
                         )
                 )
         );
