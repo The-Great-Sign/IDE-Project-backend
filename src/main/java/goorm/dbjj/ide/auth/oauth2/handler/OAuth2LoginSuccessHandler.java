@@ -73,7 +73,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
         // 콘텐츠 타입 설정
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
 
         User user = userRepository.findByEmail(oAuth2User.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("유저 정보가 없습니다."));
@@ -85,7 +85,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         responseMap.put("nickname", user.getNickname());
         responseMap.put("email", user.getEmail());
         responseMap.put("image_url", user.getImageUrl());
-        responseMap.put("created_at", user.getCreatedAt());
+        responseMap.put("created_at", user.getCreatedAt().toString());
 
         // Map을 Json 문자열로 변환
         String jsonResponse = mapper.writeValueAsString(responseMap);
