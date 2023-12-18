@@ -4,7 +4,6 @@ import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,27 +33,14 @@ public class WebSocketUser {
     public boolean isSubscribe(String subscribeType){
         log.info("subscribeType {}", subscribeType);
         
-        // 구독하고 있다면
-        if(this.subscribes.stream().anyMatch(s -> s.equals(subscribeType))){
-            return true;
-        }
-        // 구독 안하고 있다면
-        return false;
+        // 구독하고 있다면 true, 안하면 false
+        return this.subscribes.stream().anyMatch(s -> s.equals(subscribeType));
     }
 
     /**
-    * 이미 실행중인 프로젝트인지 비교할때 사용
-    * */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        WebSocketUser that = (WebSocketUser) o;
-        return Objects.equals(userInfoDto, that.userInfoDto) && Objects.equals(projectId, that.projectId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userInfoDto, projectId);
+     * userId와 projectId 두개가 동일한 객체가 존재하는지 비교문
+     * */
+    public boolean isSameWith(Long userId, String projectId){
+        return this.userInfoDto.getId().equals(userId) && this.projectId.equals(projectId);
     }
 }

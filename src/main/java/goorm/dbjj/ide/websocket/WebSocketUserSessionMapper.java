@@ -45,10 +45,11 @@ public class WebSocketUserSessionMapper {
      * userInfoDto와 projectId를 이용해서 세션키를 찾는 로직
      * @return sessionId
      * */
-    public String findSessionIdByProjectAndUserInfoDto(UserInfoDto userInfoDto, String projectId) {
+    public String findSessionIdByProjectAndUserInfoDto(Long userId, String projectId) {
         return webSocketUserSessionMap.entrySet()
                 .stream()
-                .filter(entry -> new WebSocketUser(userInfoDto, projectId).equals(entry.getValue()))
+//                .filter(entry -> new WebSocketUser(userInfoDto, projectId).equals(entry.getValue()))
+                .filter(entry -> entry.getValue().isSameWith(userId, projectId))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse(null);
