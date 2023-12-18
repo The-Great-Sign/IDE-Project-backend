@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * STOMP 이벤트 리스너
+ * disconnect 시에 채팅방에 퇴장알림을 위해 추가한 이벤트 리스너입니다.
  * */
 @Slf4j
 @Component
@@ -52,5 +53,4 @@ public class WebSocketEventListener {
             template.convertAndSend("/topic/project/"+ projectId + "/chat", exitMessage);
         }
     }
-
 }

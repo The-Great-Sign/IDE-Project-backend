@@ -17,15 +17,18 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker // 웹소켓 메시지 브로커가 활성화됨, stomp 메시징 사용 가능.
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // 소켓 연결을 구성
+    
     private final WebSocketHandShackInterceptor webSocketHandShack;
     private final WebSocketChannelInterceptor webSocketChannelInterceptor;
+    private final CustomHandShakeHandler customHandShakeHandler;
     /**
      * 메시지 브로커의 구성 정의
      * */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic"); // 내부 브로커 설정
-        config.setApplicationDestinationPrefixes("/app","/topic"); // 서버 거치는 접두사 설정.
+        config.enableSimpleBroker("/topic","/queue"); // 내부 브로커 설정
+        config.setApplicationDestinationPrefixes("/app","/topic","/queue"); // 서버 거치는 접두사 설정.
+        config.setUserDestinationPrefix("/user"); // 사용자에게 전송하는 접두사
     }
 
     /**
@@ -33,16 +36,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
      * */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-/*
-       // Postman 테스트용(PR, 배포 시 반드시 주석처리 되어있어야함)
+/*       // Postman 테스트용(PR, 배포 시 반드시 주석처리 되어있어야함)
         registry.addEndpoint("/ws/ide/{projectId}")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터
-*/
+                .setHandshakeHandler(customHandShakeHandler)
+                .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터*/
 
         // withSockJS사용용
         registry.addEndpoint("/ws/ide/{projectId}")
                 .setAllowedOriginPatterns("*")
+                .setHandshakeHandler(customHandShakeHandler)
                 .addInterceptors(webSocketHandShack) // HTTP Upgrade 시 사용하는 인터셉터
                 .withSockJS();
     }
