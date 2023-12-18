@@ -66,7 +66,7 @@ public class OutputSendingServiceImpl implements OutputSendingService {
     }
 
     private String extractLogicalAddress(String path) {
-        return path.substring(path.indexOf("/app") + 4);
+        return path.substring(path.indexOf("/app") + 4)+"/";
 
     }
 }
