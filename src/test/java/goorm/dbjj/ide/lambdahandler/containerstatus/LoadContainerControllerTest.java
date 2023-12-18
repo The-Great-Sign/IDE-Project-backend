@@ -42,7 +42,7 @@ class LoadContainerControllerTest {
         containerStatusChangeRequestDto.setContainerStatus("RUNNING");
 
 
-        assertThat(memoryContainerRepository.find("projectId").getStatus()).isEqualTo(ContainerStatus.STOPPED);
+        assertThat(memoryContainerRepository.find("projectId").getStatus()).isEqualTo(ContainerStatus.PENDING);
 
         loadContainerController.getContainerStatus(containerStatusChangeRequestDto,secretKey);
 
