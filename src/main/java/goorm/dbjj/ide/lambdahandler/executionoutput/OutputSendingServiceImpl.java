@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.lambdahandler.executionoutput;
 
 import goorm.dbjj.ide.container.ExecutionIdMapper;
+import goorm.dbjj.ide.websocket.terminal.TerminalController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class OutputSendingServiceImpl implements OutputSendingService {
 
     private final ExecutionIdMapper executionIdMapper;
+    private final TerminalController terminalController;
 
     @Override
     public void sendTo(LogEntry logEntry) {
@@ -38,6 +40,11 @@ public class OutputSendingServiceImpl implements OutputSendingService {
          * todo: 웹소켓으로 전송하는 로직을 구현합니다.
          * ws.send(projectId, userId, executionOutputDto);
          */
+        terminalController.terminalExecutionResult(
+                mappedInfo.getProjectId(),
+                mappedInfo.getUserId(),
+                executionOutputDto
+        );
     }
 
     private ExecutionOutputDto parseMessage(String message) {
