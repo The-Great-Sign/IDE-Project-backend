@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.websocket.terminal;
 
 import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.container.ContainerService;
 import goorm.dbjj.ide.domain.project.ProjectRepository;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.user.UserRepository;
@@ -17,7 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TerminalService {
-//    private final ContainerService containerService;
+    private final ContainerService containerService;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
@@ -32,7 +33,7 @@ public class TerminalService {
             throw new BaseException("프로젝트가 존재하지 않습니다");
         }
 
-//        containerService.executeCommand(projectOptional.get(), terminalExcuteRequestDto.getPath(), terminalExcuteRequestDto.getCommand(), userId);
+        containerService.executeCommand(projectOptional.get(), terminalExecuteRequestDto.getPath(), terminalExecuteRequestDto.getCommand(), userId);
     }
 
     /**
