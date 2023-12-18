@@ -36,11 +36,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
      * */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-/*       // Postman 테스트용(PR, 배포 시 반드시 주석처리 되어있어야함)
-        registry.addEndpoint("/ws/ide/{projectId}")
+       // Postman 테스트용(PR, 배포 시 반드시 주석처리 되어있어야함)
+        registry.addEndpoint("/ws/ide/test/{projectId}")
                 .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(customHandShakeHandler)
-                .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터*/
+                .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터
 
         // withSockJS사용용
         registry.addEndpoint("/ws/ide/{projectId}")
