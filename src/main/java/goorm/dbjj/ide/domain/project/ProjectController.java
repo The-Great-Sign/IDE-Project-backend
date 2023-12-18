@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.domain.project;
 
 import goorm.dbjj.ide.api.ApiResponse;
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.domain.project.model.ProjectCreateRequestDto;
 import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectJoinRequestDto;
@@ -34,6 +35,12 @@ public class ProjectController {
             @RequestBody ProjectCreateRequestDto projectCreateRequestDto,
             @AuthenticationPrincipal User user
     ) {
+        log.debug("ProjectController.createProject called");
+
+        if(user == null) {
+            throw new BaseException("로그인이 필요합니다.");
+        }
+
         return ApiResponse.ok(projectService.createProject(projectCreateRequestDto, user));
     }
 
@@ -52,6 +59,10 @@ public class ProjectController {
     ) {
         log.trace("ProjectController.deleteProject called");
         log.debug("삭제 요청 : ProjectId = {}, User = {}", projectId, user.getId());
+
+        if(user == null) {
+            throw new BaseException("로그인이 필요합니다.");
+        }
 
         projectService.deleteProject(projectId, user);
         return ApiResponse.ok();
@@ -73,6 +84,10 @@ public class ProjectController {
         log.trace("ProjectController.runProject called");
         log.debug("참가 요청 : ProjectId = {}, User = {}", projectJoinRequestDto.getProjectId(), user.getId());
 
+        if(user == null) {
+            throw new BaseException("로그인이 필요합니다.");
+        }
+
         projectService.join(
                 projectJoinRequestDto.getPassword(),
                 projectJoinRequestDto.getProjectId(),
@@ -89,6 +104,10 @@ public class ProjectController {
     ) {
         log.trace("ProjectController.runProject called");
         log.debug("프로젝트 컨테이너 실행 요청 : ProjectId = {}, User = {}", projectId, user.getId());
+
+        if(user == null) {
+            throw new BaseException("로그인이 필요합니다.");
+        }
 
         ContainerStatus status = projectService.runProject(projectId, user);
         return ApiResponse.ok(status);

@@ -32,7 +32,8 @@ public class OutputSendingController {
             @RequestBody LogEntry logEntry,
             @RequestParam("secretKey") String requestSecretKey
     ) {
-        log.debug("logEntry : {}", logEntry);
+//        log.debug("logEntry : {}", logEntry);
+        log.debug("logEntry: {}", logEntry.getLogStream());
 
         if(requestSecretKey == null || !requestSecretKey.equals(secretKey)) {
             log.warn("secretKey가 일치하지 않습니다.");
