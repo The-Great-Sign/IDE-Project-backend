@@ -22,18 +22,29 @@ public class UserInfoDto {
     }
 
     /**
+     * 터미널, 파일디렉터리 등 userId를 단순히 비교만 하는경우에 사용한다.
+     * */
+    public UserInfoDto(Long id){
+        this.id=id;
+        this.email=null;
+        this.nickname=null;
+    }
+
+
+    /**
     * 웹소켓이 이미 실행되고 있는지 비교하기 위해 생성
+     * id 값만 비교 => db 조회 덜하기 위한 조치
     * */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserInfoDto that = (UserInfoDto) o;
-        return Objects.equals(id, that.id) && Objects.equals(email, that.email) && Objects.equals(nickname, that.nickname);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email, nickname);
+        return Objects.hash(id);
     }
 }

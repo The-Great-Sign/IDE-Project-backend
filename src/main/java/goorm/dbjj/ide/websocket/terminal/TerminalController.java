@@ -44,8 +44,7 @@ public class TerminalController {
      * */
     public void terminalExecutionResult(String projectId, Long userId, ExecutionOutputDto executionOutputDto){
         log.trace("terminalExecutionResult execute");
-        UserInfoDto userEmailByUserId = terminalService.getUserInfoDtoByUserId(userId);
-        String sessionId = webSocketUserSessionMapper.findSessionIdByProjectAndUserInfoDto(userEmailByUserId, projectId);
+        String sessionId = webSocketUserSessionMapper.findSessionIdByProjectAndUserInfoDto(new UserInfoDto(userId), projectId);
 
         simpMessagingTemplate.convertAndSendToUser(sessionId,"/queue/project/"+projectId +"/terminal", executionOutputDto);
     }
@@ -61,5 +60,4 @@ public class TerminalController {
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(uuid);
         return webSocketUser.getUserInfoDto().getId();
     }
-
 }
