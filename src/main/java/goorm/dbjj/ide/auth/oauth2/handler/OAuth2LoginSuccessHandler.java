@@ -1,9 +1,12 @@
 package goorm.dbjj.ide.auth.oauth2.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm.dbjj.ide.auth.jwt.JwtIssuer;
 import goorm.dbjj.ide.auth.jwt.TokenInfo;
 import goorm.dbjj.ide.auth.oauth2.CustomOAuth2User;
 import goorm.dbjj.ide.domain.user.UserRepository;
+import goorm.dbjj.ide.domain.user.dto.User;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -15,6 +18,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -70,11 +75,23 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         // 콘텐츠 타입 설정
         response.setContentType("application/json");
 
-        // JSON 응답 본문 생성 (예시)
-        String responseBody = "{\"message\": \"Login successful\"}";
+        User user = userRepository.findByEmail(oAuth2User.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("유저 정보가 없습니다."));
+
+        // JSON 응답 본문 생성
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("id", user.getId());
+        responseMap.put("nickname", user.getNickname());
+        responseMap.put("email", user.getEmail());
+        responseMap.put("image_url", user.getImageUrl());
+        responseMap.put("created_at", user.getCreatedAt());
+
+        // Map을 Json 문자열로 변환
+        String jsonResponse = mapper.writeValueAsString(responseMap);
 
         // 응답 본문 전송
-        response.getWriter().write(responseBody);
+        response.getWriter().write(jsonResponse);
         response.getWriter().flush();
         response.getWriter().close();
     }

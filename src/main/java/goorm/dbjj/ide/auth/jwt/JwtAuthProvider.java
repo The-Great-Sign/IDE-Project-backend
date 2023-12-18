@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -34,32 +35,18 @@ public class JwtAuthProvider {
     }
 
     /**
-     * accessToken, refreshToken 재발급
-     * (accessToken, refreshToken 같이 들어오면
-     * accessToken이 만료된 걸로 판단.)
-     */
-    public boolean validateToken(String accessToken, String refreshToken){
-        // 토큰들이 비어있지 않고,
-        if(!StringUtils.hasText(accessToken)
-        || !StringUtils.hasText(refreshToken)){
-            return false;
-        }
-
-        Claims accessClaims = jwtIssuer.getClaims(accessToken);
-        Claims refreshClaims = jwtIssuer.getClaims(refreshToken);
-
-        // 토큰의 유저 정보가 일치하면 재발급 인증.
-        return accessClaims != null && refreshClaims != null
-                && jwtIssuer.getSubject(accessClaims).equals(jwtIssuer.getSubject(refreshClaims));
-    }
-
-    /**
      * JWT를 사용해서 사용자 인증 정보 추출, Authentication에 담기.
      */
     public Authentication getAuthentication(String token){
         Claims claims = jwtIssuer.getClaims(token);
         String email = jwtIssuer.getSubject(claims);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        // 유저가 null 일 경우 exception
+        if (userDetails == null) {
+            log.debug("유저 정보가 없습니다. : {}" , email);
+            throw new UsernameNotFoundException("유저 정보가 없습니다");
+        }
 
         return new UsernamePasswordAuthenticationToken(
                 userDetails,null, userDetails.getAuthorities()
