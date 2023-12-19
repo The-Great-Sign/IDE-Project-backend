@@ -1,18 +1,24 @@
 package goorm.dbjj.ide.websocket;
 
 import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.auth.jwt.JwtAuthProvider;
+import goorm.dbjj.ide.auth.jwt.JwtIssuer;
 import goorm.dbjj.ide.domain.project.ProjectRepository;
 import goorm.dbjj.ide.domain.project.ProjectUserRepository;
 import goorm.dbjj.ide.domain.project.model.Project;
+import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,11 +31,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private final WebSocketUserSessionMapper webSocketUserSessionMapper;
     private final ProjectUserRepository projectUserRepository;
     private final ProjectRepository projectRepository;
+
+    // jwt
+    private final JwtAuthProvider jwtAuthProvider;
+    private final JwtIssuer jwtIssuer;
+    private final UserRepository userRepository;
+    private final String TOKEN_PREFIX = "Bearer ";
 
     /**
      * 클라이언트가 보낸 STOMP 메세지 처리하기전 인터셉터
@@ -41,23 +53,31 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
+            log.trace("StompCommand.CONNECT excute");
             List<String> authorization = headerAccessor.getNativeHeader("Authorization");
-            String authorizationValue = authorization.get(0);
+            String accessToken = authorization.get(0); // jwt accesstoken "Bearer "
+            log.trace("액세스 토큰 : {}", accessToken);
 
-            // todo : 현정님 인증 하고 유저 정보 얻어주세요!
-//        SecuritycontextHolder을 사용해서 인증된 사용자의 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        requset => 헤더에 토큰을 받아서 인증된 사용자면 인증된 사용자의 정보를 담아오는 것.
-//        // 인증된 사용자인지 확인, 아니면 exception.
-//        if (authentication == null && !authentication.isAuthenticated()) {
-//            throw new BaseException("인증된 사용자가 아닙니다.");
-//        }
+            if (accessToken == null || !accessToken.startsWith(TOKEN_PREFIX)) {
+                log.debug("유효한 토큰 형식이 아닙니다. : {}", accessToken);
+                throw new BaseException("유효한 토큰 형식이 아닙니다.");
+            }
 
-            // todo : 현정님 여기에 유저정보 담아야해요.
-            // 인증된 사용자의 세부 정보 불러오기.
-            //User userDetails = (User) authentication.getPrincipal();
-//            UserInfoDto userInfoDto = new UserInfoDto(userDetails);
-            UserInfoDto userInfoDto = new UserInfoDto(1L, "이메일", "닉네임");
+            // 토큰만 추출.
+            accessToken = accessToken.substring(TOKEN_PREFIX.length());
+
+            // 토큰이 유효한지 검증.
+            if (!jwtAuthProvider.validateToken(accessToken)) {
+                log.debug("토큰이 유효하지 않습니다. : {}", accessToken);
+                throw new BaseException("토큰이 유효하지 않습니다.");
+            }
+
+            // 토큰을 사용해서 유저 정보 가져오기.
+            String userEmail = jwtIssuer.getSubject(jwtIssuer.getClaims(accessToken));
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new BaseException("해당 이메일을 가진 유저가 없습니다."));
+
+            UserInfoDto userInfoDto = new UserInfoDto(user);
             log.trace("웹소켓 사용자 ID, 이름 가져오기 : {} {}", userInfoDto.getId(), userInfoDto.getNickname());
 
             // URL 마지막 부분에 존재하는 프로젝트ID 가져오기
