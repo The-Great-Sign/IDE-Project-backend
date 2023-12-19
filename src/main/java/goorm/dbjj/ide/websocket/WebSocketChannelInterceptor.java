@@ -9,7 +9,6 @@ import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.websocket.dto.UserInfoDto;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -17,8 +16,6 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -85,7 +82,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             String projectId = split[split.length - 1];
             log.trace("{}", projectId);
 
-    /*        //// db 없이 테스트할때 주석 처리 해야함
+            //// db 없이 테스트할때 주석 처리 해야함
             Optional<Project> projectOptional = projectRepository.findById(projectId);
             // 프로젝트가 없을 경우
             if (projectOptional.isEmpty()) {
@@ -94,7 +91,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             }
 
             // 프로젝트에 참여한 유저가 아닐 경우
-            if (!projectUserRepository.existsByProjectAndUser(projectOptional.get(), userDetails)) {
+            if (!projectUserRepository.existsByProjectAndUser(projectOptional.get(), user)) {
                 log.error("해당 프로젝트의 소유권 없는자가 접근했습니다.");
                 throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
             }
@@ -104,7 +101,6 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 log.warn("이미 실행중인 프로젝트 입니다.");
                 throw new BaseException("이미 실행중인 프로젝트 입니다!");
             }
-*/
             // 세션등록
             String sessionId = getSessionId(headerAccessor);
             webSocketUserSessionMapper.put(sessionId, new WebSocketUser(userInfoDto, projectId));
