@@ -62,7 +62,12 @@ public class SecurityConfig {
 
         return cors -> {
             CorsConfiguration configuration = new CorsConfiguration();
-            configuration.addAllowedOrigin("http://localhost:3000"); // localhost:3000 에서만 요청 가능
+            configuration.addAllowedOrigin("http://localhost:3000");
+            configuration.addAllowedOrigin("http://localhost:3001");
+            configuration.addAllowedOrigin("http://localhost:3002");
+            configuration.addAllowedOrigin("http://localhost:3003");
+            configuration.addAllowedOrigin("http://localhost:3004");
+            configuration.addAllowedOrigin("http://localhost:3005");
             configuration.addAllowedOrigin("http://localhost:8080"); // localhost:8080 에서만 요청 가능
             configuration.addAllowedMethod("*"); // GET, PUT, POST 다 가능
             configuration.addAllowedHeader("*"); // 모든 헤더 허용
