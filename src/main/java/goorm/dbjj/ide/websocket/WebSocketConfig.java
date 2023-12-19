@@ -18,7 +18,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // 소켓 연결을 구성
     
-    private final WebSocketHandShackInterceptor webSocketHandShack;
+//    private final WebSocketHandShackInterceptor webSocketHandShack;
     private final WebSocketChannelInterceptor webSocketChannelInterceptor;
     private final CustomHandShakeHandler customHandShakeHandler;
     /**
@@ -37,16 +37,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
        // Postman 테스트용(PR, 배포 시 반드시 주석처리 되어있어야함)
-        registry.addEndpoint("/ws/ide/test/{projectId}")
+        registry.addEndpoint("/ws/ide/test")
                 .setAllowedOriginPatterns("*")
-                .setHandshakeHandler(customHandShakeHandler)
-                .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터
+                .setHandshakeHandler(customHandShakeHandler);
 
         // withSockJS사용용
-        registry.addEndpoint("/ws/ide/{projectId}/info")
+        registry.addEndpoint("/ws/ide")
                 .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(customHandShakeHandler)
-                .addInterceptors(webSocketHandShack) // HTTP Upgrade 시 사용하는 인터셉터
                 .withSockJS();
     }
 

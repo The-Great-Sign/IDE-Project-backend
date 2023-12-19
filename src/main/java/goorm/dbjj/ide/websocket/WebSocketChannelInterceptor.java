@@ -78,8 +78,9 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             log.trace("웹소켓 사용자 ID, 이름 가져오기 : {} {}", userInfoDto.getId(), userInfoDto.getNickname());
 
             // URL 마지막 부분에 존재하는 프로젝트ID 가져오기
-            String[] split = getUri(headerAccessor).split("/");
-            String projectId = split[split.length - 1];
+            List<String> projectIdValues = headerAccessor.getNativeHeader("ProjectId");
+            String projectId = projectIdValues.get(0);
+
             log.trace("{}", projectId);
 
             //// db 없이 테스트할때 주석 처리 해야함
@@ -191,14 +192,5 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
 
         return simpSessionAttributes.get("WebSocketUserSessionId");
-    }
-
-    /**
-     * 클라이언트가 보낸 URI 를 가져오는 명령어
-     */
-    private String getUri(StompHeaderAccessor headerAccessor) {
-        ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
-
-        return simpSessionAttributes.get("uri");
     }
 }
