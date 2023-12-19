@@ -80,7 +80,9 @@ class ContainerUtilTest {
         String containerId = "arn:aws:ecs:ap-northeast-2:092624380570:task/IDE_CONTAINER/d30bf40102a74406bd51420d5a1e6589";
         String command = "python hello.py";
         String path = "/";
-        String createdCommand = new CommandStringBuilder().createCommand(path, command);
+        String projectId = "";
+        Long userId = 1L;
+        String createdCommand = new CommandStringBuilder().createCommand(path, command, projectId, userId);
         //when
         containerUtil.executeCommand(containerId, createdCommand);
     }

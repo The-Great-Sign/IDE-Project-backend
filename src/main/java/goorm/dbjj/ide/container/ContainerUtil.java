@@ -6,9 +6,8 @@ public interface ContainerUtil {
      *
      * @param containerId
      * @param command
-         * @return 명령어의 결과 로그를 식별할 수 있는 execute ID를 반환합니다.
      */
-    String executeCommand(String containerId, String command);
+    void executeCommand(String containerId, String command);
 
     /**
      * 컨테이너 이미지를 생성하는 메서드

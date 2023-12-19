@@ -8,7 +8,7 @@ public interface OutputSendingService {
 
     /**
      * 사용자에게 수행한 결과를 제공합니다.
-     * @param logEntry
+     * @param executionOutput 터미널 수행 결과입니다.
      */
-    void sendTo(LogEntry logEntry);
+    void sendTo(String executionOutput, String projectId, Long userId);
 }
