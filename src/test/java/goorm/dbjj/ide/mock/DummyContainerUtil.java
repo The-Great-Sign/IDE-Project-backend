@@ -7,8 +7,9 @@ public class DummyContainerUtil implements ContainerUtil {
 
 
     @Override
-    public String executeCommand(String containerId, String command) {
-        return "sessionId";
+    public void executeCommand(String containerId, String command) {
+
+
     }
 
     @Override

@@ -22,8 +22,7 @@ class ContainerServiceTest {
     private ContainerService containerService = new ContainerServiceImpl(
             new DummyContainerUtil(),
             memoryContainerRepository,
-            new CommandStringBuilder(),
-            new ExecutionIdMapper()
+            new CommandStringBuilder()
     );
 
     private Project createProject() {
