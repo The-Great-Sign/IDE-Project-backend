@@ -1,8 +1,6 @@
 package goorm.dbjj.ide.auth.jwt;
 
 import goorm.dbjj.ide.api.exception.BaseException;
-import goorm.dbjj.ide.domain.user.UserRepository;
-import goorm.dbjj.ide.domain.user.dto.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -15,12 +13,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
+/**
+ * 토큰 생성.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtIssuer {
+
     @Value("${jwt.secretKey}")
     private String secretKey;
 
@@ -32,30 +33,13 @@ public class JwtIssuer {
 
     private static final String KEY_ROLES = "role";
 
-    private final UserRepository userRepository;
-
     // Base64 인코딩
     @PostConstruct
     void init(){
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    // todo: refresh 토큰이 들어왔을 때, accessToken만 생성.
-    public String createToken(String refreshToken){
-        Optional<User> user = userRepository.findByRefreshToken(refreshToken);
-        User realUser = user.orElseThrow();
-
-        Claims claims = Jwts.claims().setSubject(realUser.getEmail());
-        claims.put(KEY_ROLES, "ROLE_USER");
-
-        Date now = new Date();
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(new Date(now.getTime() + accessTokenExpirationPeriod))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-    }
-
+    // JWT 토큰 생성.
     public TokenInfo createToken(String email, String role){
 
         Claims claims = Jwts.claims().setSubject(email);
@@ -83,11 +67,13 @@ public class JwtIssuer {
                 .build();
     }
 
+    // Claims에서 이메일 추출.
     public String getSubject(Claims claims){
         log.trace("이메일 : {}", claims.getSubject());
         return claims.getSubject();
     }
 
+    // token에 저장된 정보 가져오기.
     public Claims getClaims(String token){
         Claims claims;
         try{
