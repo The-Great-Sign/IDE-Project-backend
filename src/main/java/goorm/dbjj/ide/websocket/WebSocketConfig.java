@@ -43,7 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // �
                 .addInterceptors(webSocketHandShack); // HTTP Upgrade 시 사용하는 인터셉터
 
         // withSockJS사용용
-        registry.addEndpoint("/ws/ide/{projectId}")
+        registry.addEndpoint("/ws/ide/{projectId}/info")
                 .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(customHandShakeHandler)
                 .addInterceptors(webSocketHandShack) // HTTP Upgrade 시 사용하는 인터셉터
