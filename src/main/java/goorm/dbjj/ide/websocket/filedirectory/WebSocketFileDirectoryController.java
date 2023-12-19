@@ -17,7 +17,7 @@ public class WebSocketFileDirectoryController {
      * @param projectId, userId, object
      * @return object 반환
     * */
-    public void createFileDirectory(
+    public void broadcastFileAndDirectoryDetails(
         String projectId,
         Object object
     ){
