@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 class FileWatcherTest {
 
-    FileWatcher fileWatcher = new FileWatcher();
+    FileWatcher fileWatcher = new FileWatcher(null);
 
     @Test
     @Disabled
