@@ -44,10 +44,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${app.exception-path2}")
     private String EXCEPTION_PATH2;
 
-    @Value(("${app.exception-path3}"))
+    @Value("${app.exception-path3}")
     private String EXCEPTION_PATH3;
 
-    @Value(("${app.exception-path4}"))
+    @Value("${app.exception-path4}")
     private String EXCEPTION_PATH4;
 
 
