@@ -38,8 +38,11 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    @Value("${app.exception-paths}")
-    private List<String> EXCEPTION_PATHS;
+    @Value("${app.exception-path1}")
+    private String EXCEPTION_PATH1;
+
+    @Value("${app.exception-path2}")
+    private String EXCEPTION_PATH2;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -59,8 +62,15 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+
         // EXCEPTION_PATH는 토큰 검사 안함.
-        if(EXCEPTION_PATHS.contains(request.getRequestURI())){
+        if(request.getRequestURI().contains(EXCEPTION_PATH1)){
+            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(request.getRequestURI().contains(EXCEPTION_PATH2)){
             log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
