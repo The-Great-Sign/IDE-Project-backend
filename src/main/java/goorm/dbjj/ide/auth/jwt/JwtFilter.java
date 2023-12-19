@@ -69,6 +69,13 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        //get IP
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        if (ip == null)
+            ip = request.getRemoteAddr();
+
+        log.trace("IP : {}", ip);
+
 
         // EXCEPTION_PATH는 토큰 검사 안함.
         if(request.getRequestURI().contains(EXCEPTION_PATH1)){
