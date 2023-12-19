@@ -23,23 +23,25 @@ public class OutputSendingController {
     /**
      * Lambda로부터 로그를 전송받습니다.
      * 이후 로그를 사용자에게 전달합니다.
-     * @param logEntry 로그 정보가 담겨있습니다.
+     * @param executionOutput 로그 정보가 담겨있습니다.
      * @param requestSecretKey lambda에서 보내는 secretKey로, 이 값이 일치해야만 로그를 전송합니다.
      *                        외부에서 API를 악성 호출하는 것을 방지합니다.
      */
     @PostMapping("/api/execution/output")
     public ResponseEntity<Void> sendOutput(
-            @RequestBody LogEntry logEntry,
-            @RequestParam("secretKey") String requestSecretKey
+            @RequestBody String executionOutput,
+            @RequestParam("secretKey") String requestSecretKey,
+            String projectId,
+            Long userId
     ) {
-//        log.debug("logEntry : {}", logEntry);
-        log.debug("logEntry: {}", logEntry.getLogStream());
+        log.debug("executionOutput: {}", executionOutput);
 
         if(requestSecretKey == null || !requestSecretKey.equals(secretKey)) {
             log.warn("secretKey가 일치하지 않습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        outputSendingService.sendTo(logEntry);
+
+        outputSendingService.sendTo(executionOutput, projectId, userId);
 
         return ResponseEntity.ok().build();
     }

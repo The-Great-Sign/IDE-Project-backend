@@ -28,7 +28,6 @@ public class ContainerServiceImpl implements ContainerService {
     private final ContainerUtil containerUtil;
     private final MemoryContainerRepository memoryContainerRepository;
     private final CommandStringBuilder commandStringBuilder;
-    private final ExecutionIdMapper executionIdMapper;
 
     /**
      * 컨테이너에 명령을 실행시킵니다.
@@ -45,12 +44,10 @@ public class ContainerServiceImpl implements ContainerService {
             throw new BaseException("컨테이너가 실행중이지 않습니다.");
         }
 
-        String sessionId = containerUtil.executeCommand(
+        containerUtil.executeCommand(
                 containerInfo.getContainerId(),
-                commandStringBuilder.createCommand(path,command)
+                commandStringBuilder.createCommand(path,command, project.getId(), userId)
         );
-
-        executionIdMapper.put(sessionId, project.getId(), userId);
     }
 
     /**
@@ -68,12 +65,10 @@ public class ContainerServiceImpl implements ContainerService {
             throw new BaseException("컨테이너 이미지가 존재합니다.");
         }
 
-        String containerImageId = containerUtil.createContainerImage(
+        return containerUtil.createContainerImage(
                 project.getProgrammingLanguage(),
                 project.getAccessPointId()
         );
-
-        return containerImageId;
     }
 
     /**

@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.container.command;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,9 +12,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommandStringBuilder {
 
-    private final String template = "bash -c 'cd /app ; cd .%s ; %s ; pwd'";
+    @Value("${aws.lambda.secretKey}")
+    private String secretKey;
 
-    public String createCommand(String path, String command){
-        return String.format(template, path, command);
+    @Value("${app.outputSeparator}")
+    private String separator;
+
+    @Value("${app.outputSendingUrl}")
+    private String outputSendingUrl;
+
+    // (bash -c 'python3 hello.py'; echo -e "\n---\n"; pwd) | curl -d @- "http://localhost:8080/api/execution/output?secretKey=123
+    private final String TEMPLATE = "(bash -c 'cd /app ; cd .%s ; %s ; echo -e %s ; pwd') |" +
+            " curl -d @- \"%s?secretKey=%s&userId=%s&projectId=%s\"";
+
+    public String createCommand(String path, String command, String projectId, Long userId){
+        return String.format(TEMPLATE, path, command, separator, outputSendingUrl, secretKey, userId, projectId);
     }
 }

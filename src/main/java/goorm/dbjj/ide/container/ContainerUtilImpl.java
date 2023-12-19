@@ -16,7 +16,7 @@ public class ContainerUtilImpl implements ContainerUtil {
     private final RunTaskRequestHelper runTaskRequestHelper;
 
     @Override
-    public String executeCommand(String containerId, String command) {
+    public void executeCommand(String containerId, String command) {
         ExecuteCommandRequest request = ExecuteCommandRequest.builder()
                 .cluster("IDE_CONTAINER")
                 .task(containerId)
@@ -26,9 +26,6 @@ public class ContainerUtilImpl implements ContainerUtil {
 
         ExecuteCommandResponse response = ecsClient.executeCommand(request);
         log.debug("executeCommandResponse: {}", response);
-
-        //응답값을 식별할 수 있는 executionId 반환
-        return response.session().sessionId();
     }
 
     @Override

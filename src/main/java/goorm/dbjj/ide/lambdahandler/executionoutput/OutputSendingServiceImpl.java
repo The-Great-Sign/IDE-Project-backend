@@ -1,9 +1,9 @@
 package goorm.dbjj.ide.lambdahandler.executionoutput;
 
-import goorm.dbjj.ide.container.ExecutionIdMapper;
 import goorm.dbjj.ide.websocket.terminal.TerminalController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -11,62 +11,41 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OutputSendingServiceImpl implements OutputSendingService {
 
-    private final ExecutionIdMapper executionIdMapper;
+    @Value("${app.outputSeparator}")
+    private String separator;
+
     private final TerminalController terminalController;
 
     @Override
-    public void sendTo(LogEntry logEntry) {
-        /**
-         * 로그로부터 executionId를 획득합니다.
-         */
-        String executionId = logEntry.getLogStream();
-        String message = logEntry.getLogEvents().get(0).getMessage();
-        ExecutionOutputDto executionOutputDto = parseMessage(message);
+    public void sendTo(String executionOutput, String projectId, Long userId) {
+
+        ExecutionOutputDto executionOutputDto = parseMessage(executionOutput);
         log.debug("output : {}", executionOutputDto);
 
-        /**
-         * executionId를 누가 어떤 프로젝트에서 수행했는지 가져옵니다.
-         */
-        ExecutionIdMapper.MappedInfo mappedInfo = executionIdMapper.get(executionId);
-
-        if (mappedInfo == null) {
-            log.error("실행 정보와 매칭되는 유저 정보가 없습니다. executionId : {}", executionId);
-            return;
-        }
-
-        executionIdMapper.remove(executionId);
-
-        /**
-         * todo: 웹소켓으로 전송하는 로직을 구현합니다.
-         * ws.send(projectId, userId, executionOutputDto);
-         */
+        //웹소켓으로 전송합니다.
         terminalController.terminalExecutionResult(
-                mappedInfo.getProjectId(),
-                mappedInfo.getUserId(),
+                projectId,
+                userId,
                 executionOutputDto
         );
     }
 
     private ExecutionOutputDto parseMessage(String message) {
 
-        String[] splitedMessage = message.split("\n");
+        String[] splitedMessage = message.split(separator);
 
         for(int i = 0; i < splitedMessage.length; i++) {
             splitedMessage[i] = splitedMessage[i].trim();
         }
 
-        if(splitedMessage.length == 4) {
-            return new ExecutionOutputDto(true, "", extractLogicalAddress(splitedMessage[1]));
-        } else if (splitedMessage.length == 5) {
-            return new ExecutionOutputDto(true, splitedMessage[1], extractLogicalAddress(splitedMessage[2]));
-        } else {
-            log.error("응답 메시지의 형식이 맞지 않습니다. message : {}", message);
-            return new ExecutionOutputDto(false,"알 수 없는 오류가 발생했습니다.", "");
-        }
+        return switch (splitedMessage.length) {
+            case 1 -> new ExecutionOutputDto(true, "", extractLogicalAddress(splitedMessage[0]));
+            case 2 -> new ExecutionOutputDto(true, splitedMessage[0], extractLogicalAddress(splitedMessage[1]));
+            default -> new ExecutionOutputDto(false, "알 수 없는 오류가 발생했습니다.", "");
+        };
     }
 
     private String extractLogicalAddress(String path) {
         return path.substring(path.indexOf("/app") + 4)+"/";
-
     }
 }
