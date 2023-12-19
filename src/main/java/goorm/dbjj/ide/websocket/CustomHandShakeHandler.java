@@ -8,6 +8,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.security.Principal;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 웹소켓 핸드쉐이크 과정에서 WebSocketUserSessionMapper의 키인 SessionId를 STOMP에 저장해서 CONNECTED 시에 사용자가 확인가능.
@@ -20,8 +21,9 @@ public class CustomHandShakeHandler extends DefaultHandshakeHandler {
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         log.trace("determineUser execute");
-        String sessionId = (String) attributes.get("WebSocketUserSessionId");
+        String sessionId = UUID.randomUUID().toString();
         log.trace("sessionId = {}", sessionId);
+        attributes.put("WebSocketUserSessionId", sessionId);
         return new StompPrincipal(sessionId);
     }
 }
