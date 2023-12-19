@@ -1,7 +1,8 @@
 package goorm.dbjj.ide.auth.jwt;
 
-import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.api.exception.UnAuthorizedException;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 /**
@@ -76,11 +78,10 @@ public class JwtFilter extends OncePerRequestFilter {
             log.trace("액세스 토큰 확인: {}", accessToken);
 
             // 토큰이 만료되었는지 확인.
-            if (jwtAuthProvider.validateToken(accessToken)) {
-                // 유저 권한 부여.
-                Authentication auth = jwtAuthProvider.getAuthentication(accessToken);
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
+            validateToken(request,response,accessToken);
+
+            Authentication auth = jwtAuthProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         /**
@@ -94,9 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
             log.trace("리프레시 토큰 확인: {}", refreshToken);
 
             // 토큰이 만료되었는지 확인.
-            if (!jwtAuthProvider.validateToken(refreshToken)){
-                throw new BaseException("유효하지 않는 토큰입니다.");
-            }
+            validateToken(request,response,refreshToken);
 
             // 새로 발급 받은 토큰 -> response에 넘기기.
             TokenInfo newTokens = jwtAuthProvider.renewTokens(refreshToken);
@@ -114,6 +113,7 @@ public class JwtFilter extends OncePerRequestFilter {
          * 3. 토큰이 없는 경우.
          */
         else{
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰이 없거나 잘못된 토큰 정보입니다.", request.getRequestURI());
             throw new UnAuthorizedException("토큰이 없거나 잘못된 토큰 정보 입니다.");
         }
         filterChain.doFilter(request, response);
@@ -122,5 +122,51 @@ public class JwtFilter extends OncePerRequestFilter {
     // 토큰이 비어있지 않고, "Bearer "로 시작하는지 확인.
     private boolean isTokenPrefixed(String token){
         return token != null && token.startsWith(TOKEN_PREFIX);
+    }
+
+    // 토큰 유효성 검증
+    private void validateToken(HttpServletRequest request, HttpServletResponse response, String token) throws IOException {
+
+        Claims claims;
+        try{
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+        } catch (ExpiredJwtException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰이 만료되었습니다.", request.getRequestURI());
+            throw new UnAuthorizedException("토큰이 만료되었습니다.");
+        } catch (MalformedJwtException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "액세스 토큰이 유효하지 않습니다.", request.getRequestURI());
+            throw new UnAuthorizedException("유효하지 않은 토큰입니다.");
+        } catch (SignatureException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "토큰 서명이 올바르지 않습니다.", request.getRequestURI());
+            throw new UnAuthorizedException("토큰 서명이 올바르지 않습니다.");
+        } catch (UnsupportedJwtException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "지원하지 않는 토큰 입니다.", request.getRequestURI());
+            throw new UnAuthorizedException("지원하지 않는 토큰 입니다.");
+        } catch (IllegalArgumentException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "토큰 내용이 비어있습니다.", request.getRequestURI());
+            throw new UnAuthorizedException("토큰 내용이 비어있습니다.");
+        } catch (Exception e) {
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "시스템 내부에서 오류가 발생하였습니다.", request.getRequestURI());
+            throw new UnAuthorizedException("시스템 내부에서 오류가 발생하였습니다.");
+        }
+    }
+
+    // 응답 처리를 위한 메서드
+    private void sendErrorResponse(HttpServletResponse response, int status, String message, String path) throws IOException {
+        String jsonResponse = String.format(
+                "{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"path\": \"%s\"}",
+                LocalDateTime.now(), status, message, path
+        );
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse);
+        response.getWriter().flush();
+        response.getWriter().close();
     }
 }
