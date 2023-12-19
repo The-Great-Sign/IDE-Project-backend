@@ -13,7 +13,7 @@ public class ContainerLoadingController {
     private final SimpMessagingTemplate template;
 
     /**
-     * 파일 디렉터리 관련 모든 이벤트를 클라이언트에 전송하는 로직
+     * 컨테이너 로딩정보를 해당 프로젝트의 모든 유저에게 전송.
      * @param projectId, object
      * */
     public void broadcastContainerLoading(
