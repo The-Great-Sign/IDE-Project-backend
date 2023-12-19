@@ -14,8 +14,7 @@ public class WebSocketFileDirectoryController {
 
     /**
      * 파일 디렉터리 관련 모든 이벤트를 클라이언트에 전송하는 로직
-     * @param projectId, userId, object
-     * @return object 반환
+     * @param projectId, object
     * */
     public void broadcastFileAndDirectoryDetails(
         String projectId,
