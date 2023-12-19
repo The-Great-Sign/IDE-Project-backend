@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * 인증된 사용자인지 확인하는 filter
@@ -37,8 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    @Value("${app.exception-path}")
-    private String EXCEPTION_PATH;
+    @Value("${app.exception-paths}")
+    private List<String> EXCEPTION_PATHS;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -59,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         // EXCEPTION_PATH는 토큰 검사 안함.
-        if(request.getRequestURI().equals(EXCEPTION_PATH)){
+        if(EXCEPTION_PATHS.contains(request.getRequestURI())){
             log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
