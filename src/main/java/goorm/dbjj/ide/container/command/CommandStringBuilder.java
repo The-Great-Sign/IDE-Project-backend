@@ -22,7 +22,7 @@ public class CommandStringBuilder {
     private String outputSendingUrl;
 
     // (bash -c 'python3 hello.py'; echo -e "\n---\n"; pwd) | curl -d @- "http://localhost:8080/api/execution/output?secretKey=123
-    private final String TEMPLATE = "bash -c '(cd /app ; cd .%s ; %s ; echo -e \"%s\" ; pwd) |" +
+    private final String TEMPLATE = "bash -c '(cd /app ; cd .%s ; %s ; echo -e \"%s\" ; pwd) 2>&1 |" +
             " curl -d @- \"%s?secretKey=%s&userId=%s&projectId=%s\"'";
 
     public String createCommand(String path, String command, String projectId, Long userId){
