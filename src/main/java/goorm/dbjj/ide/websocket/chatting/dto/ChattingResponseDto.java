@@ -9,7 +9,6 @@ import lombok.Getter;
  * */
 @Builder
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChattingResponseDto {
     private ChatType messageType;
     private String userNickname;
