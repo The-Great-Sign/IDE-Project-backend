@@ -17,5 +17,7 @@ class AccessPointGeneratorTest {
         String projectId = "testProjectId";
         String accessPointId = accessPointGenerator.generateAccessPoint(projectId);
         System.out.println(accessPointId);
+
+        accessPointGenerator.deleteAccessPoint(accessPointId);
     }
 }

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectUserRepository projectUserRepository;
     private final ContainerService containerService;
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final EntityManager em;
     private final EfsAccessPointUtil efsAccessPointUtil;
     private final MemoryContainerRepository memoryContainerRepository;
@@ -59,7 +60,7 @@ public class ProjectService {
                 requestDto.getName(),
                 requestDto.getDescription(),
                 requestDto.getProgrammingLanguage(),
-                requestDto.getPassword(),
+                passwordEncoder.encode(requestDto.getPassword()),
                 creator
         );
 
@@ -101,7 +102,7 @@ public class ProjectService {
         }
 
         // 프로젝트에 참여하고 있지 않다면, 비밀번호를 체크하고 참여
-        if (project.getPassword().equals(requestPassword)) {
+        if (passwordEncoder.matches(requestPassword, project.getPassword())) {
             projectUserRepository.save(new ProjectUser(project, user));
         } else {
             throw new BaseException("비밀번호가 일치하지 않습니다.");
