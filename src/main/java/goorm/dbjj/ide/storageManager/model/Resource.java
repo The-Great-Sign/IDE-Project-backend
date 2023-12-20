@@ -1,6 +1,8 @@
 package goorm.dbjj.ide.storageManager.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -11,7 +13,8 @@ public class Resource {
     protected String fullPath;
     private String content;
     protected ResourceType resourceType;
-    private List<Resource> child;
+    private List<Resource> children;
+    private Resource[] child;
 
     private Resource(String name, String fullPath, ResourceType resourceType) {
         this.name = name;
@@ -38,12 +41,12 @@ public class Resource {
         return new Resource(name, path, resourceType);
     }
 
-    public void setChild(List<Resource> child) {
-        this.child = child;
+    public void setChild(List<Resource> children) {
+        this.children = children;
     }
 
-    public void addChild(Resource child) {
-        this.child.add(child);
+    public void addChildren(Resource children) {
+        this.children.add(children);
     }
 
     @Override
@@ -55,10 +58,16 @@ public class Resource {
         StringBuilder sb = new StringBuilder();
         sb.append(indent).append("Name: ").append(name).append(", Type: ").append(resourceType).append("\n");
         if (resourceType == ResourceType.DIRECTORY && child != null) {
-            for (Resource res : child) {
+            for (Resource res : children) {
                 sb.append(res.toStringHelper(indent + "  ")); // 들여쓰기를 위해 공백 추가
             }
         }
         return sb.toString();
+    }
+    public boolean isDirectory() {
+        return this.resourceType == ResourceType.DIRECTORY;
+    }
+    public boolean isFile() {
+        return this.resourceType == ResourceType.FILE;
     }
 }
