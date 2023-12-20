@@ -1,4 +1,4 @@
-package goorm.dbjj.ide.websocket.chatting;
+package goorm.dbjj.ide.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * */
 @Slf4j
 @Component
-public class ChattingCurrentUserMapper {
+public class WebSocketProjectUserCountMapper {
     private final Map<String, Long> projectCurrentUserMapper;
     
-    public ChattingCurrentUserMapper() {
+    public WebSocketProjectUserCountMapper() {
         this.projectCurrentUserMapper = new ConcurrentHashMap<>();
     }
 
@@ -44,5 +44,13 @@ public class ChattingCurrentUserMapper {
     public Long getCurrentUsersByProjectId(String projectId){
         Long currentUsers = projectCurrentUserMapper.get(projectId);
         return currentUsers;
+    }
+
+    /**
+     * 프로젝트가 0명일 경우 Mapper에서 삭제
+     * @param projectId
+     * */
+    public void removeCurrentUsersByProjectId(String projectId){
+        projectCurrentUserMapper.remove(projectId);
     }
 }

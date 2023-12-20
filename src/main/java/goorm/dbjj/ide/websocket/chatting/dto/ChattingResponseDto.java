@@ -1,6 +1,5 @@
 package goorm.dbjj.ide.websocket.chatting.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 

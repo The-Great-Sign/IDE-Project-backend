@@ -33,6 +33,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private final WebSocketUserSessionMapper webSocketUserSessionMapper;
     private final ProjectUserRepository projectUserRepository;
     private final ProjectRepository projectRepository;
+    private final WebSocketProjectUserCountMapper webSocketProjectUserCountMapper;
 
     // jwt
     private final JwtAuthProvider jwtAuthProvider;
@@ -83,7 +84,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
             log.trace("{}", projectId);
 
-            //// db 없이 테스트할때 주석 처리 해야함
+            // db 없이 테스트할때 주석 처리 해야함
             Optional<Project> projectOptional = projectRepository.findById(projectId);
             // 프로젝트가 없을 경우
             if (projectOptional.isEmpty()) {
@@ -103,8 +104,10 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             // 세션등록
             String sessionId = getSessionId(headerAccessor);
             webSocketUserSessionMapper.put(sessionId, new WebSocketUser(userInfoDto, projectId));
-        }
 
+            // 프로젝트 인원 수 증가
+            webSocketProjectUserCountMapper.increaseCurrentUsersWithProjectId(projectId);
+        }
 
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             // 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크
@@ -190,7 +193,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
 
         String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
-        if(sessionId == null){
+        if (sessionId == null) {
             log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
             throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
         }

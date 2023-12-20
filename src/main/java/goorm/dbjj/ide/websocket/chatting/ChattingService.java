@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.websocket.chatting;
 
 import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.websocket.WebSocketProjectUserCountMapper;
 import goorm.dbjj.ide.websocket.chatting.dto.ChatType;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingResponseDto;
@@ -10,14 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChatsService {
+public class ChattingService {
     private final ChattingRepository chattingRepository;
-    private final ChattingCurrentUserMapper chattingCurrentUserMapper;
+    private final WebSocketProjectUserCountMapper webSocketProjectUserCountMapper;
 
     /**
      * 클라이언트가 채팅방 입장 알림 및 세션 등록하기
@@ -27,21 +26,20 @@ public class ChatsService {
             String userNickname
     ) {
         log.trace("ChatsService.enter execute");
-        // 프로젝트 인원 수 증가
-        chattingCurrentUserMapper.increaseCurrentUsersWithProjectId(projectId);
+
         String content = userNickname + "님이 참여하였습니다.";
 
         try {
-            Thread.sleep(100);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
-            throw new BaseException("채팅 참여 메세지 에러");
+            throw new BaseException("채팅 참여 메세지 Thread.sleep 에러");
         }
 
         return ChattingResponseDto.builder()
                 .messageType(ChatType.ENTER)
                 .userNickname(userNickname)
                 .content(content)
-                .currentUsers(this.chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId))
+                .currentUsers(this.webSocketProjectUserCountMapper.getCurrentUsersByProjectId(projectId))
                 .build();
     }
 
@@ -62,34 +60,25 @@ public class ChatsService {
                 .messageType(ChatType.TALK)
                 .userNickname(userNickname)
                 .content(chattingContentRequestDto.getContent())
-                .currentUsers(this.chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId))
+                .currentUsers(this.webSocketProjectUserCountMapper.getCurrentUsersByProjectId(projectId))
                 .build();
     }
 
     /**
      * 클라이언트가 채팅종료 시 퇴장 알림
      * */
-    public Optional<ChattingResponseDto> exit(
+    public ChattingResponseDto exit(
             String userNickname,
             String projectId
     ){
         log.trace("ChatsService.exit execute");
-
-        // subscribe 안 하거나(subscribe 하기전에 클라이언트가 강제종료) 인원이 0명인 경우 에러 처리
-        if(chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId) == null
-        || chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId) == 0L){
-            return Optional.empty();
-        }
-
-        chattingCurrentUserMapper.decreaseCurrentUsersWithProjectId(projectId);
         String content = userNickname + "님이 퇴장하였습니다.";
 
-        return Optional.ofNullable(ChattingResponseDto.builder()
+        return ChattingResponseDto.builder()
                 .messageType(ChatType.EXIT)
                 .userNickname(userNickname)
                 .content(content)
-                .currentUsers(this.chattingCurrentUserMapper.getCurrentUsersByProjectId(projectId))
-                .build());
+                .currentUsers(this.webSocketProjectUserCountMapper.getCurrentUsersByProjectId(projectId))
+                .build();
     }
-
 }

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class ChattingController {
 
-    private final ChatsService chatsService;
+    private final ChattingService chattingService;
     private final SimpMessagingTemplate template;
     private final WebSocketUserSessionMapper webSocketUserSessionMapper;
 
@@ -39,7 +39,7 @@ public class ChattingController {
         // 세션 방식을 이용해서 유저 아이디 가져오기
         String userNickname = getUserNickname(headerAccessor);
 
-        ChattingResponseDto enterMessage = chatsService.enter(projectId, userNickname);
+        ChattingResponseDto enterMessage = chattingService.enter(projectId, userNickname);
         template.convertAndSend("/topic/project/"+projectId+"/chat",enterMessage);
     }
 
@@ -58,7 +58,19 @@ public class ChattingController {
         String userNickname = getUserNickname(headerAccessor);
         String projectId = getProjectId(headerAccessor);
 
-        return chatsService.talk(chatsDtoChattingContentRequestDto, userNickname, projectId);
+        return chattingService.talk(chatsDtoChattingContentRequestDto, userNickname, projectId);
+    }
+
+    /**
+     * 퇴장 메세지 컨트롤러
+     * 인터셉터에서 WebSocketProjectUserCountMapper의 인원이 1명 이상일 경우 호출됨.
+     * */
+    public void exit(
+            String projectId,
+            String nickname
+    ){
+        ChattingResponseDto exitMessage = chattingService.exit(nickname, projectId);
+        template.convertAndSend("/topic/project/" + projectId + "/chat", exitMessage);
     }
 
     /**
