@@ -26,7 +26,6 @@ public class WebSocketUserSessionMapper {
     }
 
     public WebSocketUser get(String uuid){
-        log.trace("WebSocketUser : {}", this.webSocketUserSessionMap.get(uuid));
         return this.webSocketUserSessionMap.get(uuid);
     }
 

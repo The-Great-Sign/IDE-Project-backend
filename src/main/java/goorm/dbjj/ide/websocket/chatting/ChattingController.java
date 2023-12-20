@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket.chatting;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.websocket.WebSocketUser;
 import goorm.dbjj.ide.websocket.WebSocketUserSessionMapper;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
@@ -55,19 +56,42 @@ public class ChattingController {
 
         // 세션 방식을 이용해서 유저 아이디 가져오기
         String userNickname = getUserNickname(headerAccessor);
+        String projectId = getProjectId(headerAccessor);
 
-        return chatsService.talk(chatsDtoChattingContentRequestDto, userNickname);
+        return chatsService.talk(chatsDtoChattingContentRequestDto, userNickname, projectId);
     }
 
     /**
      * headerAccessor에서 세션아이디 추출 및
+     * */
+    private String getSessionId(SimpMessageHeaderAccessor headerAccessor) {
+        ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
+
+        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
+        if(sessionId == null){
+            log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
+            throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
+        }
+        return sessionId;
+    }
+
+    /**
      * 세션 아이디를 이용해서 유저 아이디 반환해주는 메서드
      * */
     private String getUserNickname(SimpMessageHeaderAccessor headerAccessor) {
-        ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
-        String uuid = simpSessionAttributes.get("WebSocketUserSessionId");
+        String sessionId = getSessionId(headerAccessor);
 
-        WebSocketUser webSocketUser = webSocketUserSessionMapper.get(uuid);
+        WebSocketUser webSocketUser = webSocketUserSessionMapper.get(sessionId);
         return webSocketUser.getUserInfoDto().getNickname();
+    }
+
+    /**
+     * 세션 아이디를 이용해서 프로젝트 아이디 반환해주는 메서드
+     * */
+    private String getProjectId(SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = getSessionId(headerAccessor);
+
+        WebSocketUser webSocketUser = webSocketUserSessionMapper.get(sessionId);
+        return webSocketUser.getProjectId();
     }
 }
