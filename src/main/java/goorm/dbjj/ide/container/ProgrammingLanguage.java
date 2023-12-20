@@ -9,7 +9,9 @@ import java.util.List;
  */
 @Getter
 public enum ProgrammingLanguage {
-    PYTHON("python:3", List.of("python","-m","http.server","8000"));
+    PYTHON("python:3"),
+    JAVA("openjdk:11"),
+    CPP("gcc:latest");
 
     /**
      * Docker Hub에서 사용하는 이미지 이름
@@ -19,10 +21,8 @@ public enum ProgrammingLanguage {
     /**
      * 컨테이너가 실행될 때 실행할 명령어
      */
-    private final List<String> command;
 
-    ProgrammingLanguage(String image, List<String> command) {
+    ProgrammingLanguage(String image) {
         this.image = image;
-        this.command = command;
     }
 }
