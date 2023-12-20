@@ -53,7 +53,6 @@ public class WebSocketUserSessionMapper {
     public String findSessionIdByProjectAndUserInfoDto(Long userId, String projectId) {
         return webSocketUserSessionMap.entrySet()
                 .stream()
-//                .filter(entry -> new WebSocketUser(userInfoDto, projectId).equals(entry.getValue()))
                 .filter(entry -> entry.getValue().isSameWith(userId, projectId))
                 .map(Map.Entry::getKey)
                 .findFirst()
