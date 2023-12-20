@@ -97,11 +97,9 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
             }
 
-            // 이미 실행중인 프로젝트인지 검증
-            if (webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId)) {
-                log.warn("이미 실행중인 프로젝트 입니다.");
-                throw new BaseException("이미 실행중인 프로젝트 입니다!");
-            }
+            // 동시접속 막는 로직 : 프로젝트가 참여한 유저인지 검증 로직
+            webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId);
+
             // 세션등록
             String sessionId = getSessionId(headerAccessor);
             webSocketUserSessionMapper.put(sessionId, new WebSocketUser(userInfoDto, projectId));

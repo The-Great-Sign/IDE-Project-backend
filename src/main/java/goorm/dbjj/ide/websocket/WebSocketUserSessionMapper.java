@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,12 @@ public class WebSocketUserSessionMapper {
      * 실행중인 프로젝트인지 확인하는 로직
      * @return true:이미 존재함, false: 존재안함
      * */
-    public boolean existsByProjectAndUser(UserInfoDto userInfoDto, String projectId) {
-        return webSocketUserSessionMap.contains(new WebSocketUser(userInfoDto, projectId));
+    public void existsByProjectAndUser(UserInfoDto userInfoDto, String projectId) {
+        if(webSocketUserSessionMap.values().stream()
+                .anyMatch(w ->  w.getProjectId().equals(projectId) && w.getUserInfoDto().getId().equals(userInfoDto.getId()))){
+            log.warn("이미 실행중인 프로젝트 입니다.");
+            throw new BaseException("이미 실행중인 프로젝트 입니다!");
+        }
     }
 
     /**
