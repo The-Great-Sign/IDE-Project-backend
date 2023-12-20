@@ -23,6 +23,9 @@ class ContainerUtilTest {
     @Autowired
     private ContainerUtil containerUtil;
 
+    @Autowired
+    private CommandStringBuilder commandStringBuilder;
+
     @Test
     @Disabled
     void createContainerImage() {
@@ -77,12 +80,12 @@ class ContainerUtilTest {
     void executeCommand() {
 
         //given
-        String containerId = "arn:aws:ecs:ap-northeast-2:092624380570:task/IDE_CONTAINER/d30bf40102a74406bd51420d5a1e6589";
-        String command = "python hello.py";
+        String containerId = "arn:aws:ecs:ap-northeast-2:092624380570:task/IDE_CONTAINER/ae756009ce644ed6a3e3a00e136a2c1f";
+        String command = "javac Main.java && java Main";
         String path = "/";
-        String projectId = "";
+        String projectId = "ea90e9ad-3b48-459f-a460-15a762b2cb15";
         Long userId = 1L;
-        String createdCommand = new CommandStringBuilder().createCommand(path, command, projectId, userId);
+        String createdCommand = commandStringBuilder.createCommand(path, command, projectId, userId);
         //when
         containerUtil.executeCommand(containerId, createdCommand);
     }
