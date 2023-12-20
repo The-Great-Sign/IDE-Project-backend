@@ -17,12 +17,18 @@ public class WebSocketUser {
     private final String projectId;
     private final Set<String> subscribes;
 
+    /**
+     * 생성자
+     * */
     public WebSocketUser(UserInfoDto userInfoDto, String projectId) {
         this.userInfoDto = userInfoDto;
         this.projectId = projectId;
         this.subscribes = ConcurrentHashMap.newKeySet(); // 키를 이용한 Set 구현.
     }
 
+    /**
+     * 구독타입 저장하기
+     * */
     public void startSubscribe(String subscribeType){
         this.subscribes.add(subscribeType);
     }
@@ -31,8 +37,6 @@ public class WebSocketUser {
      * 구독하고 있는지 확인하는 메서드
      * */
     public boolean isSubscribe(String subscribeType){
-        log.info("subscribeType {}", subscribeType);
-        
         // 구독하고 있다면 true, 안하면 false
         return this.subscribes.stream().anyMatch(s -> s.equals(subscribeType));
     }
