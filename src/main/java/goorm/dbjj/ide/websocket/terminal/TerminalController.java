@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket.terminal;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.lambdahandler.executionoutput.ExecutionOutputDto;
 import goorm.dbjj.ide.websocket.WebSocketUser;
 import goorm.dbjj.ide.websocket.WebSocketUserSessionMapper;
@@ -54,6 +55,11 @@ public class TerminalController {
      * */
     private Long getUserId(SimpMessageHeaderAccessor headerAccessor) {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
+        if (simpSessionAttributes == null) {
+            log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
+            throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
+        }
+
         String uuid = simpSessionAttributes.get("WebSocketUserSessionId");
 
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(uuid);

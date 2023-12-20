@@ -195,8 +195,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
             throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
         }
-        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
 
-        return sessionId;
+        return simpSessionAttributes.get("WebSocketUserSessionId");
     }
 }

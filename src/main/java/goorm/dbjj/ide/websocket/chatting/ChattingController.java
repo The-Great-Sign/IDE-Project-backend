@@ -78,13 +78,12 @@ public class ChattingController {
      * */
     private String getSessionId(SimpMessageHeaderAccessor headerAccessor) {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
-
-        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
-        if(sessionId == null){
+        if(simpSessionAttributes == null){
             log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
             throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
         }
-        return sessionId;
+
+        return simpSessionAttributes.get("WebSocketUserSessionId");
     }
 
     /**
