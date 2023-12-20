@@ -18,10 +18,6 @@ public enum ProgrammingLanguage {
      */
     private final String image;
 
-    /**
-     * 컨테이너가 실행될 때 실행할 명령어
-     */
-
     ProgrammingLanguage(String image) {
         this.image = image;
     }
