@@ -39,7 +39,7 @@ public class TaskDefinitionHelper {
                 .networkMode(NetworkMode.AWSVPC)
                 .cpu("512")
                 .memory("1024")
-                .family("python")
+                .family(programmingLanguage.name())
                 .build();
     }
 
@@ -71,7 +71,7 @@ public class TaskDefinitionHelper {
                 .memory(1024)
                 .memoryReservation(1024)
                 .essential(true)
-                .command(programmingLanguage.getCommand())
+                .command("sleep", "infinity") //컨테이너가 무한히 대기
                 .linuxParameters(linux -> linux.initProcessEnabled(true))
                 .mountPoints(MOUNT_POINT)
                 .build();
