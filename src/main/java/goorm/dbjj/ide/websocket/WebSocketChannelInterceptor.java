@@ -130,14 +130,14 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      * Destination 주소와 구독한 ProjectId가 동일한 지 확인하는 함수
      */
     private void EqualsSubscribeDestinationProjectId(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
+        log.trace("EqualsSubscribeDestinationProjectId execute");
         // 1. 사용자가 구독신청한 subscribeProjectId 반환
         String[] split = headerAccessor.getDestination().toString().split("/");
         String subscribeProjectId = split[1].equals("user") ? split[4] : split[3];
-        log.trace("subscribe projectId = {}", subscribeProjectId);
 
         // 2. 사용자가 구독한 projectId 반환
         String projectId = webSocketUser.getProjectId();
-        log.trace("subscribe projectId = {}", projectId);
+        log.trace("subscribe projectId = {} , current subscribe proejct Id = {}", projectId, subscribeProjectId);
 
         // 1번과 2번을 비교하여 같을 경우 구독번호를 반환한다.
         if (!subscribeProjectId.equals(projectId)) {
@@ -147,8 +147,8 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     }
 
     /**
+     * 만약 구독 되어 있다면 예외던짐.
      * 클라이언트가 채팅/터미널/커서 채널에 구독하기
-     * * @return  true : 구독한 상태, false : 구독안한 상태
      */
     private void subscribeChannel(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
         String[] split = headerAccessor.getDestination().toString().split("/");
@@ -172,7 +172,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      */
     private WebSocketUser validateAndRetrieveUser(StompHeaderAccessor headerAccessor) {
         String sessionId = getSessionId(headerAccessor);
-        log.trace("sessionId = {}", sessionId);
+        log.trace("validateAndRetrieveUser sessionId = {}", sessionId);
 
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(sessionId);
         if (webSocketUser == null) {
@@ -189,6 +189,11 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private String getSessionId(StompHeaderAccessor headerAccessor) {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
 
-        return simpSessionAttributes.get("WebSocketUserSessionId");
+        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
+        if(sessionId == null){
+            log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
+            throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
+        }
+        return sessionId;
     }
 }
