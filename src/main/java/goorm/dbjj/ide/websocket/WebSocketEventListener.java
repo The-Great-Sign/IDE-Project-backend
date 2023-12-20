@@ -1,6 +1,5 @@
 package goorm.dbjj.ide.websocket;
 
-import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.websocket.chatting.ChatsService;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -41,16 +40,15 @@ public class WebSocketEventListener {
         // WebSocketUserSessionMapper 없애기
         WebSocketUser removeWebSocketUser = webSocketUserSessionMapper.remove(uuid);
         if(removeWebSocketUser == null){
-            log.warn("WebSocketChannelInterceptor.preSend 잘못된 사용자 접근입니다.");
-            throw new BaseException("잘못된 사용자 접근");
-        }
-
-        // 퇴장 메세지 출력
-        String nickname = removeWebSocketUser.getUserInfoDto().getNickname();
-        String projectId = removeWebSocketUser.getProjectId();
-        Optional<ChattingResponseDto> exitMessage = chatsService.exit(nickname, projectId);
-        if(exitMessage.isPresent()) {
-            template.convertAndSend("/topic/project/"+ projectId + "/chat", exitMessage);
+            log.warn("WebSocketEventListener.handleWebSocketDisconnectListener 웹소켓을 종료하고자 하는 사용자가 없습니다.");
+        } else {
+            // 퇴장 메세지 출력
+            String nickname = removeWebSocketUser.getUserInfoDto().getNickname();
+            String projectId = removeWebSocketUser.getProjectId();
+            Optional<ChattingResponseDto> exitMessage = chatsService.exit(nickname, projectId);
+            if (exitMessage.isPresent()) {
+                template.convertAndSend("/topic/project/" + projectId + "/chat", exitMessage);
+            }
         }
     }
 }
