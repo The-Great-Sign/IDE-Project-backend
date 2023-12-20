@@ -1,25 +1,29 @@
 package goorm.dbjj.ide.storageManager;
+
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.storageManager.exception.ResourceNotFoundException;
-import goorm.dbjj.ide.storageManager.model.ResourceType;
 import goorm.dbjj.ide.storageManager.model.Resource;
+import goorm.dbjj.ide.storageManager.model.ResourceType;
 import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import static goorm.dbjj.ide.storageManager.model.ResourceType.*;
+
+import static goorm.dbjj.ide.storageManager.model.ResourceType.DIRECTORY;
 
 @Component
 public class FileIoStorageManager implements StorageManager {
 
     @Override
-    public void saveFile(String path, String fileName, String content) { // saveFile + CreateFile 병합함 -> 덮어씌우기 형식으로 변환
-        File file = new File(path, fileName); // 파일 경로, 이름 합침
+    public void saveFile(String filePath, String content) { // saveFile + CreateFile 병합함 -> 덮어씌우기 형식으로 변환
+        File file = new File(filePath); // 파일 경로, 이름 합침
         try (FileWriter fileWriter = new FileWriter(file)) { // 알아서 덮어쓰기함.
             fileWriter.write(content); // 파일에 content 작성
 //                fileWriter.flush();
 
         } catch (IOException e) {
+            e.printStackTrace();
             throw new BaseException("파일 처리중 오류 발생");
         }
     }

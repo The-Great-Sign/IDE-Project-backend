@@ -5,7 +5,7 @@ import goorm.dbjj.ide.storageManager.model.Resource;
 public interface StorageManager {
     final String RESOURCE_SEPARATOR = "/"; // 분리선
 
-    void saveFile(String path, String fileName, String content);
+    void saveFile(String filePath, String content);
 
     Resource loadFile(String path);
 
