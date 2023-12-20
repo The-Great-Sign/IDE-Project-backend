@@ -3,6 +3,7 @@ package goorm.dbjj.ide.domain.project;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.ContainerService;
 import goorm.dbjj.ide.domain.fileDirectory.FileIoProjectFileService;
+import goorm.dbjj.ide.domain.fileDirectory.initiator.ProjectDirectoryInitiator;
 import goorm.dbjj.ide.domain.project.model.ProjectCreateRequestDto;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.project.model.ProjectDto;
@@ -38,7 +39,7 @@ public class ProjectService {
     private final EntityManager em;
     private final EfsAccessPointUtil efsAccessPointUtil;
     private final MemoryContainerRepository memoryContainerRepository;
-    private final FileIoProjectFileService fileIoProjectFileService;
+    private final ProjectDirectoryInitiator projectDirectoryInitiator;
 
     /**
      * 프로젝트 생성
@@ -74,7 +75,8 @@ public class ProjectService {
         String containerImageId = containerService.createProjectImage(savedProject);
         savedProject.setContainerImageId(containerImageId);
 
-        fileIoProjectFileService.initProjectDirectory(project.getId());
+        // 프로젝트 디렉터리 생성 및 초기화
+        projectDirectoryInitiator.initProjectDirectory(savedProject);
 
         return ProjectDto.of(savedProject);
     }
