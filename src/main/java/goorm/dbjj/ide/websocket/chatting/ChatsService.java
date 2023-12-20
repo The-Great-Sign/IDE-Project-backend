@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.websocket.chatting;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.websocket.chatting.dto.ChatType;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingContentRequestDto;
 import goorm.dbjj.ide.websocket.chatting.dto.ChattingResponseDto;
@@ -29,6 +30,12 @@ public class ChatsService {
         // 프로젝트 인원 수 증가
         chattingCurrentUserMapper.increaseCurrentUsersWithProjectId(projectId);
         String content = userNickname + "님이 참여하였습니다.";
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new BaseException("채팅 참여 메세지 에러");
+        }
 
         return ChattingResponseDto.builder()
                 .messageType(ChatType.ENTER)
