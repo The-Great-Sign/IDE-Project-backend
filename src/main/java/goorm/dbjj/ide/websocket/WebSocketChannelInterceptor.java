@@ -191,12 +191,12 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      */
     private String getSessionId(StompHeaderAccessor headerAccessor) {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
-
-        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
-        if (sessionId == null) {
+        if (simpSessionAttributes == null) {
             log.trace("웹소켓 세션 아이디를 찾을 수 없습니다!");
             throw new BaseException("웹소켓 세션 아이디를 찾을 수 없습니다.");
         }
+        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
+
         return sessionId;
     }
 }
