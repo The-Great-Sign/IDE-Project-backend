@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,7 @@ public class WebSocketEventListener {
     /**
      * DisConnect 시 채팅방 퇴장 알림 기능 구현 및 WebSocketUserSessionMapper에 존재하는 유저 정보 없애기!
      * */
+    @Transactional(readOnly = true)
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         log.trace("WebSocketEventListener.handleWebSocketDisconnectListener execute");
@@ -38,6 +40,11 @@ public class WebSocketEventListener {
         // simpSessionAttributes에 존재하는 uuid 가져오기
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
+        if(simpSessionAttributes == null){
+            log.trace("웹소켓 비정상적인 DICONNECT");
+            throw new BaseException("세션 아이디가 존재하지 않습니다.");
+        }
+
         String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
 
         // WebSocketUserSessionMapper 에 해당하는 유저 sessionId 없애기
