@@ -3,6 +3,7 @@ package goorm.dbjj.ide.lambdahandler.containerstatus;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatusChangeRequestDto;
+import goorm.dbjj.ide.websocket.containerloading.ContainerLoadingController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class ContainerStatusService {
 
     private final MemoryContainerRepository memoryContainerRepository;
-
+    private final ContainerLoadingController containerLoadingController;
     /**
      * 전달받은 로그로부터 MemoryContainerRepository의 정보를 변경합니다.
      * @param requestDto
@@ -32,17 +33,16 @@ public class ContainerStatusService {
 
         // 전달된 Status에 대해서 각기 다른 처리를 해줍니다.
         if(changeStatus.equals("RUNNING")) {
-            /**
-             * TODO: 해당 컨테이너 ID를 통해 Project를 식별한 뒤, 해당 프로젝트의 로딩 상태를 구독한 사용자들에게 전달한다.
-             */
-            log.debug("projectId : {}", projectId);
+
+            //메모리 저장공간의 정보를 RUNNING으로 변경
             ContainerInfo containerInfo = memoryContainerRepository.find(projectId);
             containerInfo.setRunning();
-            log.debug("containerInfo : {}", containerInfo);
 
-            // 이후 projectId를 통해 해당 프로젝트의 로딩 상태를 구독한 사용자들에게 전달한다.
+            //구독한 사용자에게 컨테이너가 로딩되었음을 전달
+            containerLoadingController.broadcastContainerLoading(projectId, containerInfo);
 
         } else if (changeStatus.equals("PENDING")) {
+            //메모리 저장공간의 정보를 PENDING으로 변경
             memoryContainerRepository.find(projectId).setPending();
         }
     }
