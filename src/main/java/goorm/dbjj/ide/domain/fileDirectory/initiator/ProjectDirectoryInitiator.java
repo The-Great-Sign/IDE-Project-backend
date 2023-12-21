@@ -3,6 +3,7 @@ package goorm.dbjj.ide.domain.fileDirectory.initiator;
 import goorm.dbjj.ide.container.ProgrammingLanguage;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.storageManager.StorageManager;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,7 @@ public class ProjectDirectoryInitiator {
      * 프로젝트 디렉터리를 생성합니다.
      * @param project 대상 프로젝트
      */
-    public void initProjectDirectory(Project project) {
+    public void initProjectDirectory(Project project) throws CustomIOException {
         log.trace("initProjectDirectory called");
 
         //디렉터리 생성
@@ -42,7 +43,7 @@ public class ProjectDirectoryInitiator {
      * @param path
      * @param programmingLanguage
      */
-    private void createDefaultFile(String path, ProgrammingLanguage programmingLanguage) {
+    private void createDefaultFile(String path, ProgrammingLanguage programmingLanguage) throws CustomIOException {
 
         String fileName = getFileName(programmingLanguage);
         String content = getFileContent(programmingLanguage);
