@@ -84,19 +84,20 @@ public class FileWatcher {
      * @param file      변경된 파일
      */
     private void sendToUser(FileWatchEventType eventType, File file) {
+        String projectId = extractProjectId(file.getPath());
+
         FileWatchEvent fileWatchEvent = new FileWatchEvent(
                 eventType,
-                extractLogicalAddress(file.getPath())
+                extractLogicalAddress(file.getPath(), projectId)
         );
 
         log.debug("fileWatchEvent : {}", fileWatchEvent);
 
         webSocketFileDirectoryController.broadcastFileAndDirectoryDetails(
-                extractProjectId(file.getPath()),
+                projectId,
                 fileWatchEvent
         );
     }
-
 
     /**
      * EFS 스토리지의 디렉터리 경로에서 프로젝트 아이디를 추출합니다.
@@ -114,9 +115,14 @@ public class FileWatcher {
         }
     }
 
-    private String extractLogicalAddress(String path) {
+    /**
+     * EFS 스토리지의 디렉터리 경로에서 논리적 주소를 추출합니다.
+     * @param path
+     * @return
+     */
+    private String extractLogicalAddress(String path, String projectId) {
         try {
-            return path.substring(path.indexOf("/app") + 4);
+            return path.substring(path.indexOf(projectId) + projectId.length() + 1);
         } catch (Exception e) {
             return null;
         }
