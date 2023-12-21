@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
 public class ContainerInfo {
 
     private final String containerId;

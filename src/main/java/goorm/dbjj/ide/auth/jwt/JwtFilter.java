@@ -50,6 +50,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${app.exception-path4}")
     private String EXCEPTION_PATH4;
 
+    @Value("${app.exception-path5}")
+    private String EXCEPTION_PATH5;
+
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -97,6 +100,12 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if(request.getRequestURI().contains(EXCEPTION_PATH4)){
+            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(request.getRequestURI().contains(EXCEPTION_PATH5)){
             log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
