@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.util.filewatcher;
 
+import goorm.dbjj.ide.storageManager.model.ResourceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class FileWatchEvent {
 
-    private FileWatchEventType eventType;
+    private FileWatchEventType event;
+    private ResourceType type;
     private String path;
 }
