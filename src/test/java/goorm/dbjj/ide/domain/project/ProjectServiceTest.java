@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -51,6 +52,9 @@ class ProjectServiceTest {
 
     @Autowired
     EntityManager em;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @AfterEach
     void afterEach() {
@@ -125,7 +129,7 @@ class ProjectServiceTest {
         assertThat(project.getName()).isEqualTo(requestDto.getName());
         assertThat(project.getDescription()).isEqualTo(requestDto.getDescription());
         assertThat(project.getProgrammingLanguage()).isEqualTo(requestDto.getProgrammingLanguage());
-        assertThat(project.getPassword()).isEqualTo(requestDto.getPassword());
+        assertThat(passwordEncoder.matches(requestDto.getPassword(), project.getPassword())).isTrue();
         assertThat(project.getCreator()).isEqualTo(creator);
 
         // 프로젝트 생성과 함께 creator가 프로젝트에 참여하도록 함
