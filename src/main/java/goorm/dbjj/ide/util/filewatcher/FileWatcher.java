@@ -122,7 +122,7 @@ public class FileWatcher {
      */
     private String extractLogicalAddress(String path, String projectId) {
         try {
-            return path.substring(path.indexOf(projectId) + projectId.length() + 1);
+            return path.substring(path.indexOf(projectId) + projectId.length());
         } catch (Exception e) {
             return null;
         }
