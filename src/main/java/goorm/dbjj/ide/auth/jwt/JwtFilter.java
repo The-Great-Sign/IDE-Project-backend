@@ -38,21 +38,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    @Value("${app.exception-path1}")
-    private String EXCEPTION_PATH1;
-
-    @Value("${app.exception-path2}")
-    private String EXCEPTION_PATH2;
-
-    @Value("${app.exception-path3}")
-    private String EXCEPTION_PATH3;
-
-    @Value("${app.exception-path4}")
-    private String EXCEPTION_PATH4;
-
+    @Value("${app.exception-paths}")
+    private List<String> EXCEPTION_PATHS;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
+
+
 
     private final static String TOKEN_PREFIX = "Bearer ";
 
@@ -78,26 +70,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         // EXCEPTION_PATH는 토큰 검사 안함.
-        if(request.getRequestURI().contains(EXCEPTION_PATH1)){
-            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if(request.getRequestURI().contains(EXCEPTION_PATH2)){
-            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if(request.getRequestURI().contains(EXCEPTION_PATH3)){
-            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if(request.getRequestURI().contains(EXCEPTION_PATH4)){
-            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
+        if(EXCEPTION_PATHS.contains(request.getRequestURI())){
             filterChain.doFilter(request, response);
             return;
         }
