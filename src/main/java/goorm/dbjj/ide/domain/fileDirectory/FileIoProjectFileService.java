@@ -18,11 +18,9 @@ import static goorm.dbjj.ide.storageManager.StorageManager.RESOURCE_SEPARATOR;
 @Slf4j
 @Component
 public class FileIoProjectFileService implements ProjectFileService {
-    //    private static final String ROOT_DRICETORY = "/home/ubunto/efs/app";
 
     @Value("${app.efs-root-directory}")
-//    private String ROOT_DIRECTORY;
-    private static final String ROOT_DIRECTORY = "/Users/goorm/Desktop";
+    private String ROOT_DIRECTORY;
 
     private String getFullPath(String projectId, String subPath) {
         if(!StringUtils.isEmpty(subPath) && !subPath.startsWith(RESOURCE_SEPARATOR)){
@@ -87,8 +85,8 @@ public class FileIoProjectFileService implements ProjectFileService {
         List<ResourceDto> resourceDtos = new ArrayList<>();
         if (resources != null) {
             for (Resource resource : resources) {
-                String resourcePath = parentPath + RESOURCE_SEPARATOR + resource;
-                resourceDtos.add(convertResourceToResourceDto(resource, resourcePath));
+                String resourceFullPath = parentPath + RESOURCE_SEPARATOR + resource.getName();
+                resourceDtos.add(convertResourceToResourceDto(resource, resourceFullPath));
             }
         }
         return resourceDtos;
@@ -96,12 +94,14 @@ public class FileIoProjectFileService implements ProjectFileService {
 
     private ResourceDto convertResourceToResourceDto(Resource resource, String fullPath) {
         List<ResourceDto> childDtos = null;
+        String relationPath = getRelativePath(fullPath);
 
         if (resource.isDirectory()) {
             childDtos = new ArrayList<>();
             if (resource.getChildren() != null) {
                 for (Resource child : resource.getChildren()) {
                     String childFullPath = fullPath + RESOURCE_SEPARATOR + child.getName();
+                    String childRelativePath = getRelativePath(fullPath);
                     childDtos.add(convertResourceToResourceDto(child, childFullPath));
                 }
             }
