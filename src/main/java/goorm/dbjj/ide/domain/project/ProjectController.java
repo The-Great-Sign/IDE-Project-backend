@@ -7,6 +7,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectDto;
 import goorm.dbjj.ide.domain.project.model.ProjectJoinRequestDto;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class ProjectController {
     public ApiResponse<ProjectDto> createProject(
             @RequestBody ProjectCreateRequestDto projectCreateRequestDto,
             @AuthenticationPrincipal User user
-    ) {
+    ) throws CustomIOException {
         log.debug("ProjectController.createProject called");
 
         if(user == null) {

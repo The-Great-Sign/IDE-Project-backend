@@ -14,6 +14,7 @@ import goorm.dbjj.ide.efs.EfsAccessPointUtil;
 import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class ProjectService {
      * @return
      */
     @Transactional
-    public ProjectDto createProject(ProjectCreateRequestDto requestDto, User creator) {
+    public ProjectDto createProject(ProjectCreateRequestDto requestDto, User creator) throws CustomIOException {
 
         /**
          * TODO: 추후 비밀번호는 암호화 필요

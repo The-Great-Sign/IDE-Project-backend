@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.test;
 
 import goorm.dbjj.ide.storageManager.StorageManager;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ public class TestController {
     private final StorageManager storageManager;
 
     @GetMapping("/remove")
-    public String remove() {
+    public String remove() throws CustomIOException {
         File file = new File(ROOT_DIRECTORY+"/900feca1-b386-4c24-bdbf-8b4aa64c8b24");
         for (File listFile : file.listFiles()) {
             storageManager.deleteFile(listFile.getAbsolutePath());
