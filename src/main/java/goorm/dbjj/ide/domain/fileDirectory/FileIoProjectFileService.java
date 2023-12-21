@@ -21,15 +21,29 @@ public class FileIoProjectFileService implements ProjectFileService {
     //    private static final String ROOT_DRICETORY = "/home/ubunto/efs/app";
 
     @Value("${app.efs-root-directory}")
-    private  String ROOT_DIRECTORY;
+//    private String ROOT_DIRECTORY;
+    private static final String ROOT_DIRECTORY = "/Users/goorm/Desktop";
 
     private String getFullPath(String projectId, String subPath) {
+        if(!StringUtils.isEmpty(subPath) && !subPath.startsWith(RESOURCE_SEPARATOR)){
+            throw new IllegalArgumentException("Path 는 반드시 '/' 로 시작해야 합니다.");
+        }
         if (StringUtils.isEmpty(subPath)) {
             log.trace("전체 경로 = {}", ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId);
             return ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId; // "/app" + "/" + projectId -> /app/projectId
         }
-        log.trace("전체 경로 = {}", ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath );
+        log.trace("전체 경로 = {}", ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath);
         return ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath;
+    }
+    private String getRelativePath(String fullPath) {
+        if (fullPath != null && fullPath.startsWith(ROOT_DIRECTORY)) {
+            String withoutRoot = fullPath.substring(ROOT_DIRECTORY.length());
+            log.trace("클라이언트 전달 상대경로 = {}", withoutRoot.startsWith(RESOURCE_SEPARATOR) ? // root 가 '/' 로 시작하는지 확인
+                    withoutRoot.substring(withoutRoot.indexOf(RESOURCE_SEPARATOR, 1)) : withoutRoot);
+            return withoutRoot.startsWith(RESOURCE_SEPARATOR) ? // root 가 '/' 로 시작하는지 확인
+                    withoutRoot.substring(withoutRoot.indexOf(RESOURCE_SEPARATOR, 1)) : withoutRoot;
+        }
+        return fullPath;
     }
 
     private final FileIoStorageManager storageManager;
@@ -57,7 +71,7 @@ public class FileIoProjectFileService implements ProjectFileService {
         log.trace("Service.loadProjectDirectory - 디렉토리 구조 조회");
         String directoryPath = buildFullPath(projectId);
         Resource directory = loadDirectory(directoryPath);
-        return convertResourceListToDtoList(directory.getChildren());
+        return convertResourceListToDtoList(directory.getChildren(), directoryPath);
     }
 
     private String buildFullPath(String projectId) {
@@ -69,33 +83,37 @@ public class FileIoProjectFileService implements ProjectFileService {
         return storageManager.loadDirectory(fullPath);
     }
 
-    private List<ResourceDto> convertResourceListToDtoList(List<Resource> resources) {
+    private List<ResourceDto> convertResourceListToDtoList(List<Resource> resources, String parentPath) {
         List<ResourceDto> resourceDtos = new ArrayList<>();
         if (resources != null) {
             for (Resource resource : resources) {
-                resourceDtos.add(convertResourceToResourceDto(resource));
+                String resourcePath = parentPath + RESOURCE_SEPARATOR + resource;
+                resourceDtos.add(convertResourceToResourceDto(resource, resourcePath));
             }
         }
         return resourceDtos;
     }
 
-    private ResourceDto convertResourceToResourceDto(Resource resource) {
+    private ResourceDto convertResourceToResourceDto(Resource resource, String fullPath) {
         List<ResourceDto> childDtos = null;
 
         if (resource.isDirectory()) {
             childDtos = new ArrayList<>();
             if (resource.getChildren() != null) {
                 for (Resource child : resource.getChildren()) {
-                    childDtos.add(convertResourceToResourceDto(child));
+                    String childFullPath = fullPath + RESOURCE_SEPARATOR + child.getName();
+                    childDtos.add(convertResourceToResourceDto(child, childFullPath));
                 }
             }
         }
+        String relativePath = getRelativePath(fullPath);
 
         return ResourceDto.builder()
-                .id(UUID.randomUUID().toString().substring(0,6))
+                .id(UUID.randomUUID().toString().substring(0, 6))
                 .name(resource.getName())
                 .type(resource.getResourceType().toString())
                 .children(childDtos)
+                .path(relativePath)
                 .build();
     }
 
@@ -110,13 +128,10 @@ public class FileIoProjectFileService implements ProjectFileService {
     }
 
 
-
     @Override
     public void saveFile(String projectId, String filePath, String content) {
         log.trace("Service.saveFile - 파일 수정 및 저장");
         String fullPath = getFullPath(projectId, filePath);
-        String[] splitedPath = filePath.split(RESOURCE_SEPARATOR);
-        String fileName = splitedPath[splitedPath.length - 1];
         storageManager.saveFile(fullPath, content);
     }
 
@@ -125,24 +140,31 @@ public class FileIoProjectFileService implements ProjectFileService {
         log.trace("Service.loadFile - 파일 조회");
         String fullPath = getFullPath(projectId, filePath);
         Resource resource = storageManager.loadFile(fullPath);
-        return toFileResponseDto(resource, fullPath);
 
+        String relativePath = getRelativePath(fullPath);
+        return toFileResponseDto(resource, relativePath);
     }
 
 
     @Override
     public void deleteFile(String projectId, String filePath) {
+        if(projectId == null || projectId.trim().isEmpty()) {
+            throw new IllegalArgumentException("projectId 는 null 값이거나 빈값이 들어올 수 없습니다.");
+        }
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("경로는 null 값이거나 비어있을 수 없습니다.");
+        }
         log.trace("Service.deleteFile - 파일 및 디렉토리 삭제");
         String fullPath = getFullPath(projectId, filePath);
         storageManager.deleteFile(fullPath);
     }
 
-    private FileResponseDto toFileResponseDto(Resource resource, String filePath) {
+    private FileResponseDto toFileResponseDto(Resource resource, String relativePath) {
 
         return FileResponseDto.builder()
                 .fileName(resource.getName())
                 .content(resource.getContent())
-                .filePath(filePath)
+                .filePath(relativePath)
                 .build();
     }
 }
