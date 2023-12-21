@@ -16,6 +16,7 @@ public class ResourceDto {
     private String name;
     private String type;
     private List<ResourceDto> children;
+    private String path;
 
     /**
      * 파일이라면 null이 되어야한다.

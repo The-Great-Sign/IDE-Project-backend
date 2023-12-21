@@ -4,12 +4,11 @@ import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.storageManager.exception.ResourceNotFoundException;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import goorm.dbjj.ide.storageManager.model.ResourceType;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import static goorm.dbjj.ide.storageManager.model.ResourceType.DIRECTORY;
 
 @Component
@@ -51,7 +50,7 @@ public class FileIoStorageManager implements StorageManager {
     }
 
     @Override
-    public void deleteFile(String path) { // delete -> 파일 디렉토리 동일 처리(병합)
+    public void deleteFile(@NotNull String path) { // delete -> 파일 디렉토리 동일 처리(병합)
         File file = new File(path);
 
         // 하위 파일 및 폴더 먼저 삭제
