@@ -18,8 +18,10 @@ public class TestController {
 
     @GetMapping("/remove")
     public String remove() {
-        storageManager.deleteFile(ROOT_DIRECTORY+"/900feca1-b386-4c24-bdbf-8b4aa64c8b24");
-        storageManager.createDirectory(ROOT_DIRECTORY+"/900feca1-b386-4c24-bdbf-8b4aa64c8b24");
+        File file = new File(ROOT_DIRECTORY+"/900feca1-b386-4c24-bdbf-8b4aa64c8b24");
+        for (File listFile : file.listFiles()) {
+            storageManager.deleteFile(listFile.getAbsolutePath());
+        }
 
         return "삭제되었습니다. 파이팅!";
     }
