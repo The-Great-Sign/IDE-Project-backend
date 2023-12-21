@@ -4,7 +4,6 @@ import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.domain.project.ProjectRepository;
 import goorm.dbjj.ide.domain.project.ProjectUserRepository;
 import goorm.dbjj.ide.domain.project.model.Project;
-import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

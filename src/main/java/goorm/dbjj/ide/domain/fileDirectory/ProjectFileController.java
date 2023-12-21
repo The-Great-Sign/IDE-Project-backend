@@ -8,6 +8,7 @@ import goorm.dbjj.ide.model.dto.FileLoadRequestDto;
 import goorm.dbjj.ide.model.dto.FileResponseDto;
 import goorm.dbjj.ide.model.dto.FileSaveRequestDto;
 import goorm.dbjj.ide.storageManager.model.ResourceDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -77,7 +78,7 @@ public class ProjectFileController {
 
     @DeleteMapping("/api/files")
     public ApiResponse<Void> deleteFile(
-            @RequestBody FileDeleteRequestDto fileDeleteRequestDto,
+           @Valid @RequestBody FileDeleteRequestDto fileDeleteRequestDto,
             @AuthenticationPrincipal User user
     ) {
         log.trace("ProjectFileController.deleteFile 실행");

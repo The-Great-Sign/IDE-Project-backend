@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.storageManager;
 
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ public class FileIoStorageManagerTest {
 
 
     @Test
-    void loadFile() {
+    void loadFile() throws CustomIOException {
         Resource resource = fileIoStorageManager.loadFile(baseDir);
 
         System.out.println(resource);
@@ -31,20 +32,20 @@ public class FileIoStorageManagerTest {
 
 
     @Test
-    void deleteFile() {
+    void deleteFile() throws CustomIOException {
         String filePath = baseDir + "/test5/test6";
         fileIoStorageManager.deleteFile(filePath);
     }
 
     @Test
-    void loadDirectory() {
+    void loadDirectory() throws CustomIOException {
         Resource directory = fileIoStorageManager.loadDirectory(baseDir + "/test");
 
         System.out.println(directory);
     }
 
     @Test
-    void createDirectory() {
+    void createDirectory() throws CustomIOException {
         String filePath = baseDir + "/test5/test4";
         fileIoStorageManager.createDirectory(filePath);
     }
