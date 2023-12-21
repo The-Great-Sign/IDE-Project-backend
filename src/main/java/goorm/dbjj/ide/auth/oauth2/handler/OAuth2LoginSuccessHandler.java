@@ -61,7 +61,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         TokenInfo tokenInfo = jwtIssuer.createToken(oAuth2User.getEmail(),"ROLE_USER");
 
-
         log.trace("액세스 토큰 발행 : {}",tokenInfo.getAccessToken());
         log.trace("리프레시 토큰 발행 : {}", tokenInfo.getRefreshToken());
 
@@ -69,31 +68,15 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         sendAccessAndRefreshToken(response, tokenInfo.getAccessToken(), tokenInfo.getRefreshToken());
         updateRefreshToken(oAuth2User.getEmail(), tokenInfo.getRefreshToken());
 
-        // HTTP 상태 코드 설정
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        // 콘텐츠 타입 설정
-        response.setContentType("application/json; charset=UTF-8");
+        // HTTP 상태 코드 설정 - 302 Redirect
+        response.setStatus(HttpServletResponse.SC_FOUND);
 
         User user = userRepository.findByEmail(oAuth2User.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("유저 정보가 없습니다."));
 
-        // JSON 응답 본문 생성
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("id", user.getId());
-        responseMap.put("nickname", user.getNickname());
-        responseMap.put("email", user.getEmail());
-        responseMap.put("image_url", user.getImageUrl());
-        responseMap.put("created_at", user.getCreatedAt().toString());
-
-        // Map을 Json 문자열로 변환
-        String jsonResponse = mapper.writeValueAsString(responseMap);
-
-        // 응답 본문 전송
-        response.getWriter().write(jsonResponse);
-        response.getWriter().flush();
-        response.getWriter().close();
+        //토큰과 함께 프론트엔드로 전달
+        String token = "Bearer "+tokenInfo.getAccessToken();
+        response.sendRedirect("http://localhost:3000?token="+token+"&refresh_token="+tokenInfo.getRefreshToken());
     }
 
     private void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
