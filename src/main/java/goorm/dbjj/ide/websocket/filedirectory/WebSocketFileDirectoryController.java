@@ -20,7 +20,7 @@ public class WebSocketFileDirectoryController {
         String projectId,
         Object object
     ){
-        log.trace("웹소켓 [디렉터리] 전송, projectId = {}, object ={}", projectId, object);
+        log.trace("웹소켓 [디렉터리] 변경 상태 전송, projectId = {}, object ={}", projectId, object);
         simpMessagingTemplate.convertAndSend("/topic/project/" + projectId + "/file", object);
     }
 }
