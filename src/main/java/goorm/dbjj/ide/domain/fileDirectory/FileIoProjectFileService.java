@@ -1,7 +1,9 @@
 package goorm.dbjj.ide.domain.fileDirectory;
 
+import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.model.dto.FileResponseDto;
 import goorm.dbjj.ide.storageManager.FileIoStorageManager;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import goorm.dbjj.ide.storageManager.model.ResourceDto;
 import io.micrometer.common.util.StringUtils;
@@ -24,15 +26,16 @@ public class FileIoProjectFileService implements ProjectFileService {
 
     private String getFullPath(String projectId, String subPath) {
         if(!StringUtils.isEmpty(subPath) && !subPath.startsWith(RESOURCE_SEPARATOR)){
-            throw new IllegalArgumentException("Path 는 반드시 '/' 로 시작해야 합니다.");
+            throw new BaseException("Path 는 반드시 '/' 로 시작해야 합니다.");
+            //추후의 사항이지만, "/../{projectId}" 고려 해야함
         }
-        if (StringUtils.isEmpty(subPath)) {
-            log.trace("전체 경로 = {}", ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId);
-            return ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId; // "/app" + "/" + projectId -> /app/projectId
-        }
-        log.trace("전체 경로 = {}", ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath);
-        return ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath;
+
+        String fullPath = ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath;
+        log.trace("전체 경로 = {}", fullPath);
+
+        return fullPath;
     }
+
     private String getRelativePath(String fullPath) {
         if (fullPath != null && fullPath.startsWith(ROOT_DIRECTORY)) {
             String withoutRoot = fullPath.substring(ROOT_DIRECTORY.length());
@@ -54,14 +57,27 @@ public class FileIoProjectFileService implements ProjectFileService {
     public void initProjectDirectory(String projectId) {
         log.trace("Service.initProjectDirectory - 첫 로그인 시 프로젝트 디렉토리 생성");
         String directoryPath = getFullPath(projectId, "");
-        storageManager.createDirectory(directoryPath);
+
+        try {
+            storageManager.createDirectory(directoryPath);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
+
     }
 
     @Override
     public void createDirectory(String projectId, String path) {
         log.trace("Service.createDirectory - 디렉토리 생성");
         String fullPath = getFullPath(projectId, path);
-        storageManager.createDirectory(fullPath);
+
+        try {
+            storageManager.createDirectory(fullPath);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
     @Override
@@ -73,12 +89,16 @@ public class FileIoProjectFileService implements ProjectFileService {
     }
 
     private String buildFullPath(String projectId) {
-        return getFullPath(projectId, "");
+        return ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId;
     }
 
     private Resource loadDirectory(String fullPath) {
-
-        return storageManager.loadDirectory(fullPath);
+        try {
+            return storageManager.loadDirectory(fullPath);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
     private List<ResourceDto> convertResourceListToDtoList(List<Resource> resources, String parentPath) {
@@ -119,12 +139,20 @@ public class FileIoProjectFileService implements ProjectFileService {
 
     @Override
     public void moveFile(String projectId, String oldPath, String newPath) { // 생성과 삭제 조합 -> oldPath에서 삭제하고 newPath에서 다시 생성 => File 단위 O, Directory 단위 X
+
         log.trace("Service.moveFile - 파일 이동");
+
         String fileOldPath = getFullPath(projectId, oldPath);
         String fileNewPath = getFullPath(projectId, newPath);
-        Resource resource = storageManager.loadFile(fileOldPath);
-        storageManager.saveFile(fileNewPath, resource.getContent());
-        storageManager.deleteFile(fileOldPath);
+
+        try {
+            Resource resource = storageManager.loadFile(fileOldPath);
+            storageManager.saveFile(fileNewPath, resource.getContent());
+            storageManager.deleteFile(fileOldPath);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
 
@@ -132,31 +160,51 @@ public class FileIoProjectFileService implements ProjectFileService {
     public void saveFile(String projectId, String filePath, String content) {
         log.trace("Service.saveFile - 파일 수정 및 저장");
         String fullPath = getFullPath(projectId, filePath);
-        storageManager.saveFile(fullPath, content);
+        try {
+            storageManager.saveFile(fullPath, content);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
     @Override
     public FileResponseDto loadFile(String projectId, String filePath) { // 재귀로 로드 // 관심사 분리
         log.trace("Service.loadFile - 파일 조회");
         String fullPath = getFullPath(projectId, filePath);
-        Resource resource = storageManager.loadFile(fullPath);
 
-        String relativePath = getRelativePath(fullPath);
-        return toFileResponseDto(resource, relativePath);
+        try {
+            Resource resource = storageManager.loadFile(fullPath);
+            String relativePath = getRelativePath(fullPath);
+            return toFileResponseDto(resource, relativePath);
+
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
 
     @Override
     public void deleteFile(String projectId, String filePath) {
+        log.trace("Service.deleteFile - 파일 및 디렉토리 삭제");
+
         if(projectId == null || projectId.trim().isEmpty()) {
-            throw new IllegalArgumentException("projectId 는 null 값이거나 빈값이 들어올 수 없습니다.");
+            throw new BaseException("projectId 는 null 값이거나 빈값이 들어올 수 없습니다.");
         }
         if (filePath == null || filePath.trim().isEmpty()) {
-            throw new IllegalArgumentException("경로는 null 값이거나 비어있을 수 없습니다.");
+            log.trace("경로 값 오류발생 - path값 재확인이 필요합니다. ");
+            throw new BaseException("경로는 null 값이거나 비어있을 수 없습니다.");
         }
-        log.trace("Service.deleteFile - 파일 및 디렉토리 삭제");
+
         String fullPath = getFullPath(projectId, filePath);
-        storageManager.deleteFile(fullPath);
+
+        try {
+            storageManager.deleteFile(fullPath);
+        } catch (CustomIOException e) {
+            String relativePath = getRelativePath(e.getModel().getPath());
+            throw new BaseException(e.getModel().getMessage() + " Path: " + relativePath);
+        }
     }
 
     private FileResponseDto toFileResponseDto(Resource resource, String relativePath) {
