@@ -20,7 +20,7 @@ public class ContainerLoadingController {
             String projectId,
             Object object
     ){
-        log.trace("웹소켓 컨테이너 로딩 상태 전송, projectId = {}, object ={}", projectId, object);
+        log.trace("웹소켓 [컨테이너] [로딩 상태] 전송, projectId = {}, object ={}", projectId, object);
         template.convertAndSend("/topic/project/"+projectId+"/container-loading",object);
     }
 }
