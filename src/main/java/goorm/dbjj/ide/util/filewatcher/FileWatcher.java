@@ -1,5 +1,6 @@
 package goorm.dbjj.ide.util.filewatcher;
 
+import goorm.dbjj.ide.storageManager.model.ResourceType;
 import goorm.dbjj.ide.websocket.filedirectory.WebSocketFileDirectoryController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +77,7 @@ public class FileWatcher {
         log.info("FileWatcher Start, dir : {}", dir);
     }
 
+
     /**
      * 프로젝트의 파일이 변경되었을 때, 해당 프로젝트를 사용하는 유저들에게 변경사항을 알립니다.
      * WS로 변경됐음을 전송합니다.
@@ -86,8 +88,11 @@ public class FileWatcher {
     private void sendToUser(FileWatchEventType eventType, File file) {
         String projectId = extractProjectId(file.getPath());
 
+        ResourceType resourceType = file.isDirectory() ? ResourceType.DIRECTORY : ResourceType.FILE;
+
         FileWatchEvent fileWatchEvent = new FileWatchEvent(
                 eventType,
+                resourceType,
                 extractLogicalAddress(file.getPath(), projectId)
         );
 
