@@ -20,9 +20,7 @@ public class CustomHandShakeHandler extends DefaultHandshakeHandler {
 
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        log.trace("determineUser execute");
         String sessionId = UUID.randomUUID().toString();
-        log.trace("sessionId = {}", sessionId);
         attributes.put("WebSocketUserSessionId", sessionId);
         return new StompPrincipal(sessionId);
     }

@@ -46,12 +46,10 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        log.trace("WebSocketChannelInterceptor.preSend execute");
-
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
-            log.trace("StompCommand.CONNECT excute");
+            log.trace("웹소켓 [CONNECT] 요청");
             List<String> authorization = headerAccessor.getNativeHeader("Authorization");
             String accessToken = authorization.get(0); // jwt accesstoken "Bearer "
             log.trace("액세스 토큰 : {}", accessToken);
@@ -110,6 +108,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         }
 
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
+            log.trace("웹소켓 [SUBSCRIBE] 요청");
             // 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크
             WebSocketUser webSocketUser = validateAndRetrieveUser(headerAccessor);
 
@@ -120,6 +119,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         }
 
         if (StompCommand.SEND.equals(headerAccessor.getCommand())) {
+            log.trace("웹소켓 [SEND] 요청");
             // 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크
             WebSocketUser webSocketUser = validateAndRetrieveUser(headerAccessor);
 
@@ -133,18 +133,18 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      * Destination 주소와 구독한 ProjectId가 동일한 지 확인하는 함수
      */
     private void EqualsSubscribeDestinationProjectId(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
-        log.trace("EqualsSubscribeDestinationProjectId execute");
+        log.trace("웹 소켓 Destination 주소가 같은지 판별");
         // 1. 사용자가 구독신청한 subscribeProjectId 반환
         String[] split = headerAccessor.getDestination().toString().split("/");
         String subscribeProjectId = split[1].equals("user") ? split[4] : split[3];
 
         // 2. 사용자가 구독한 projectId 반환
         String projectId = webSocketUser.getProjectId();
-        log.trace("subscribe projectId = {} , current subscribe proejct Id = {}", projectId, subscribeProjectId);
+        log.trace("웹소켓 Destination 주소 : [현재 주소] proejct Id = {} , [구독 주소] proejct Id = {}", projectId, subscribeProjectId);
 
         // 1번과 2번을 비교하여 같을 경우 구독번호를 반환한다.
         if (!subscribeProjectId.equals(projectId)) {
-            log.warn("WebSocketChannelInterceptor.preSend 접속한 프로젝트와 구독하고자하는 프로젝트가 다릅니다");
+            log.warn("웹소켓 접속한 프로젝트와 구독하고자하는 프로젝트가 다릅니다");
             throw new BaseException("해당 프로젝트로 접근할 수 없습니다.");
         }
     }
@@ -161,7 +161,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
         // 이미 구독한 상태라면
         if (webSocketUser.isSubscribe(subscribeType)) {
-            log.warn("이미 구독한 채널 입니다.");
+            log.warn("웹소켓 구독 중복 에러 입니다. subscribeType = {}", subscribeType);
             throw new BaseException("이미 구독한 채널 입니다.");
         }
 
@@ -175,11 +175,11 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      */
     private WebSocketUser validateAndRetrieveUser(StompHeaderAccessor headerAccessor) {
         String sessionId = getSessionId(headerAccessor);
-        log.trace("validateAndRetrieveUser sessionId = {}", sessionId);
+        log.trace("웹소켓 검증 로직 실행, sessionId = {}", sessionId);
 
         WebSocketUser webSocketUser = webSocketUserSessionMapper.get(sessionId);
         if (webSocketUser == null) {
-            log.error("WebSocketChannelInterceptor.preSend 잘못된 사용자 접근입니다.");
+            log.error("웹소켓에 없는 세션아이디를 가진 잘못된 사용자 접근입니다.");
             throw new BaseException("잘못된 사용자 접근");
         }
 

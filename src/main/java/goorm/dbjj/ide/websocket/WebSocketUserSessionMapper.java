@@ -30,7 +30,11 @@ public class WebSocketUserSessionMapper {
     }
 
     public WebSocketUser remove(String uuid){
-        return this.webSocketUserSessionMap.remove(uuid);
+        WebSocketUser webSocketUser = this.webSocketUserSessionMap.remove(uuid);
+        if(webSocketUser == null){
+            throw new BaseException("웹소켓 DISCONNECT 시 유저정보가 없어서 띄우는 에러");
+        }
+        return webSocketUser;
     }
 
     /**
@@ -40,7 +44,7 @@ public class WebSocketUserSessionMapper {
     public void existsByProjectAndUser(UserInfoDto userInfoDto, String projectId) {
         if(webSocketUserSessionMap.values().stream()
                 .anyMatch(w ->  w.getProjectId().equals(projectId) && w.getUserInfoDto().getId().equals(userInfoDto.getId()))){
-            log.warn("이미 실행중인 프로젝트 입니다.");
+            log.warn("웹소켓 이미 실행중인 프로젝트 입니다. proejctId = {}", projectId);
             throw new BaseException("이미 실행중인 프로젝트 입니다!");
         }
     }

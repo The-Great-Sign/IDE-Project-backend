@@ -35,9 +35,9 @@ public class ChattingController {
             SimpMessageHeaderAccessor headerAccessor,
             @DestinationVariable("projectId") String projectId
     ){
-        log.trace("ChattingController.enter execute");
         // 세션 방식을 이용해서 유저 아이디 가져오기
         String userNickname = getUserNickname(headerAccessor);
+        log.trace("웹소켓 [채팅] [입장] 메세지 출력 projectId = {}, nickName = {}", projectId, userNickname);
 
         ChattingResponseDto enterMessage = chattingService.enter(projectId, userNickname);
         template.convertAndSend("/topic/project/"+projectId+"/chat",enterMessage);
@@ -52,11 +52,11 @@ public class ChattingController {
             SimpMessageHeaderAccessor headerAccessor,
             @Payload ChattingContentRequestDto chatsDtoChattingContentRequestDto
     ) {
-        log.trace("ChattingController.chatting execute");
-
         // 세션 방식을 이용해서 유저 아이디 가져오기
         String userNickname = getUserNickname(headerAccessor);
         String projectId = getProjectId(headerAccessor);
+
+        log.trace("웹소켓 [채팅] [메세지] 출력 chatsDtoChattingContentRequestDto = {}, projectId = {}, nickName = {}", chatsDtoChattingContentRequestDto, projectId, userNickname);
 
         return chattingService.talk(chatsDtoChattingContentRequestDto, userNickname, projectId);
     }
@@ -69,6 +69,7 @@ public class ChattingController {
             String projectId,
             String nickname
     ){
+        log.trace("웹소켓 [채팅] [퇴장] 메세지 출력 projectId = {}, nickName = {}", projectId, nickname);
         ChattingResponseDto exitMessage = chattingService.exit(nickname, projectId);
         template.convertAndSend("/topic/project/" + projectId + "/chat", exitMessage);
     }
