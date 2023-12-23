@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Resource {
+    private Long id;
     protected String name;
     protected String fullPath;
     private String content;
@@ -16,29 +17,31 @@ public class Resource {
     private List<Resource> children;
     private Resource[] child;
 
-    private Resource(String name, String fullPath, ResourceType resourceType) {
+    private Resource(long id, String name, String fullPath, ResourceType resourceType) {
+        this.id = id;
         this.name = name;
         this.fullPath = fullPath;
         this.resourceType = resourceType;
     }
 
-    private Resource(String name, String fullPath, String content, ResourceType resourceType) {
+    private Resource(long id, String name, String fullPath, String content, ResourceType resourceType) {
+        this.id = id;
         this.name = name;
         this.fullPath = fullPath;
         this.content = content;
         this.resourceType = resourceType;
     }
 
-    public static Resource file(String name, String path, String content) {
-        return new Resource(name, path, content, ResourceType.FILE);
+    public static Resource file(long id, String name, String path, String content) {
+        return new Resource(id, name, path, content, ResourceType.FILE);
     }
 
-    public static Resource directory(String name, String path) {
-        return new Resource(name, path,null, ResourceType.DIRECTORY);
+    public static Resource directory(long id, String name, String path) {
+        return new Resource(id, name, path, null, ResourceType.DIRECTORY);
     }
 
-    public static Resource resource(String name, String path, ResourceType resourceType) {
-        return new Resource(name, path, resourceType);
+    public static Resource resource(long id, String name, String path, ResourceType resourceType) {
+        return new Resource(id, name, path, resourceType);
     }
 
     public void setChild(List<Resource> children) {

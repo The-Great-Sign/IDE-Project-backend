@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.ALWAYS) // null값 무시
 public class ResourceDto {
-    private String id;
+    private long id;
     private String name;
     private String type;
     private List<ResourceDto> children;

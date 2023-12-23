@@ -129,7 +129,7 @@ public class FileIoProjectFileService implements ProjectFileService {
         String relativePath = getRelativePath(fullPath);
 
         return ResourceDto.builder()
-                .id(UUID.randomUUID().toString().substring(0, 6))
+                .id(resource.getId())
                 .name(resource.getName())
                 .type(resource.getResourceType().toString())
                 .children(childDtos)
@@ -210,6 +210,7 @@ public class FileIoProjectFileService implements ProjectFileService {
     private FileResponseDto toFileResponseDto(Resource resource, String relativePath) {
 
         return FileResponseDto.builder()
+                .id(resource.getId())
                 .fileName(resource.getName())
                 .content(resource.getContent())
                 .filePath(relativePath)
