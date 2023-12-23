@@ -41,6 +41,7 @@ public class ProjectFileController {
         );
 
         FileResponseDto responseDto = FileResponseDto.builder()
+                .id(file.getId())
                 .filePath(file.getFilePath())
                 .fileName(file.getFileName())
                 .content(file.getContent()).build();
