@@ -1,14 +1,14 @@
 package goorm.dbjj.ide.domain.user;
 
+import goorm.dbjj.ide.api.ApiResponse;
 import goorm.dbjj.ide.domain.user.dto.User;
-import org.springframework.http.ResponseEntity;
+import goorm.dbjj.ide.domain.user.dto.UserDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@Slf4j
 @RestController
 public class UserController {
 
@@ -21,16 +21,8 @@ public class UserController {
     }
 
     @GetMapping("/user/info")
-    public ResponseEntity<Map<String, Object>> getUserInfo(@AuthenticationPrincipal User user){
-
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.put("id", user.getId());
-        responseMap.put("nickname", user.getNickname());
-        responseMap.put("email", user.getEmail());
-        responseMap.put("image_url", user.getImageUrl());
-        responseMap.put("created_at", user.getCreatedAt().toString());
-
-        return ResponseEntity.ok(responseMap);
+    public ApiResponse<UserDto> getUserInfo(@AuthenticationPrincipal User user){
+        log.trace("UserController.getUserInfo() called");
+        return ApiResponse.ok(UserDto.of(user));
     }
 }
