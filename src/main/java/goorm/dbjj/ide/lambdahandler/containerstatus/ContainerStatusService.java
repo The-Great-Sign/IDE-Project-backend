@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ContainerStatusService {
 
-    private final MemoryContainerRepository memoryContainerRepository;
+    private final ContainerStore containerStore;
     private final ContainerLoadingController containerLoadingController;
     /**
      * 전달받은 로그로부터 MemoryContainerRepository의 정보를 변경합니다.
@@ -23,7 +23,7 @@ public class ContainerStatusService {
         String changeStatus = requestDto.getContainerStatus();
 
         // 컨테이너 ID를 통해 프로젝트 ID를 획득합니다.
-        String projectId = memoryContainerRepository.findProjectId(requestDto.getTaskArn());
+        String projectId = containerStore.findProjectId(requestDto.getTaskArn());
 
         // projectId가 없다면, 실행된 적이 없는 프로젝트로부터 변경사항이 전달된 것으로 에러를 발생시켜야합니다.
         if(projectId == null) {
@@ -35,7 +35,7 @@ public class ContainerStatusService {
         if(changeStatus.equals("RUNNING")) {
 
             //메모리 저장공간의 정보를 RUNNING으로 변경
-            ContainerInfo containerInfo = memoryContainerRepository.find(projectId);
+            ContainerInfo containerInfo = containerStore.find(projectId);
             containerInfo.setRunning();
 
             //구독한 사용자에게 컨테이너가 로딩되었음을 전달
@@ -43,7 +43,7 @@ public class ContainerStatusService {
 
         } else if (changeStatus.equals("PENDING")) {
             //메모리 저장공간의 정보를 PENDING으로 변경
-            memoryContainerRepository.find(projectId).setPending();
+            containerStore.find(projectId).setPending();
         }
     }
 }

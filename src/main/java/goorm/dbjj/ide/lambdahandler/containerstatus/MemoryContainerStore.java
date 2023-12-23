@@ -1,7 +1,7 @@
 package goorm.dbjj.ide.lambdahandler.containerstatus;
 
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,14 +9,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * 수행중인 컨테이너와 프로젝트 이름을 매핑시켜 저장하는 메모리 저장소입니다.
  * 컨테이너 중복 실행 여부 등을 판단하기 위해 사용됩니다.
  */
-@Repository
-public class MemoryContainerRepository {
+@Component
+public class MemoryContainerStore implements ContainerStore {
 
     /**
      * Map<ProjectId, ContainerInfo>
      */
     private final Map<String, ContainerInfo> containerMap = new ConcurrentHashMap<>();
 
+    @Override
     public void save(String projectId, String containerId) {
         containerMap.put(projectId, new ContainerInfo(containerId));
     }
@@ -26,6 +27,7 @@ public class MemoryContainerRepository {
      * @param projectId
      * @return
      */
+    @Override
     public ContainerInfo find(String projectId) {
         return containerMap.get(projectId);
     }
@@ -35,6 +37,7 @@ public class MemoryContainerRepository {
      * @param containerId
      * @return
      */
+    @Override
     public String findProjectId(String containerId) {
         return containerMap.entrySet()
                 .stream()
@@ -48,6 +51,7 @@ public class MemoryContainerRepository {
      * 컨테이너가 종료되었을 때 호출하는 메서드입니다.
      * @param projectId
      */
+    @Override
     public void remove(String projectId) {
         containerMap.remove(projectId);
     }
@@ -56,6 +60,7 @@ public class MemoryContainerRepository {
      * 현재 수행중인 컨테이너의 개수를 반환합니다.
      * @return
      */
+    @Override
     public int size() {
         return containerMap.size();
     }
