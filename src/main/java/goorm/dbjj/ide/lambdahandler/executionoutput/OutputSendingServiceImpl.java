@@ -15,6 +15,7 @@ public class OutputSendingServiceImpl implements OutputSendingService {
     private String separator;
 
     private final TerminalController terminalController;
+    private final LogicalDirectoryExtractor extractor;
 
     @Override
     public void sendTo(String executionOutput, String projectId, Long userId) {
@@ -45,19 +46,9 @@ public class OutputSendingServiceImpl implements OutputSendingService {
         }
 
         return switch (splitedMessage.length) {
-            case 1 -> new ExecutionOutputDto(true, "", extractLogicalAddress(splitedMessage[0]));
-            case 2 -> new ExecutionOutputDto(true, splitedMessage[0], extractLogicalAddress(splitedMessage[1]));
+            case 1 -> new ExecutionOutputDto(true, "", extractor.extract(splitedMessage[0]));
+            case 2 -> new ExecutionOutputDto(true, splitedMessage[0], extractor.extract(splitedMessage[1]));
             default -> new ExecutionOutputDto(false, "알 수 없는 오류가 발생했습니다.", "");
         };
-    }
-
-    /**
-     * 도커 path에서 사용자의 상대 주소를 추출합니다.
-     * @param path
-     * @return
-     */
-    private String extractLogicalAddress(String path) {
-        String logicalDirectory = path.substring(path.indexOf("/app")+ 4);
-        return logicalDirectory.isEmpty() ? "/" : logicalDirectory;
     }
 }
