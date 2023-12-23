@@ -49,6 +49,7 @@ public class ProjectDirectoryInitiator {
         String content = getFileContent(programmingLanguage);
 
         storageManager.saveFile(path + "/" + fileName, content);
+        storageManager.saveFile(path + "/readme.md", "대박징조 화이팅");
     }
 
     private String getFileName(ProgrammingLanguage programmingLanguage) {
