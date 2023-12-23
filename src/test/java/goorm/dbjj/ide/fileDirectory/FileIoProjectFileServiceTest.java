@@ -130,14 +130,14 @@ public class FileIoProjectFileServiceTest {
     void noFile() {
         assertThatThrownBy (
                 () -> projectFileService.loadFile("project1","/hello2.py")
-        ).isInstanceOf(BaseException.class).hasMessage("파일 load 실패 Path: /hello2.py");
+        ).isInstanceOf(BaseException.class).hasMessage("load 실패 Path: /hello2.py");
     }
 
     @Test
     void noDirectory() {
         assertThatThrownBy(
                 () -> projectFileService.loadFile("project2","/hi")
-        ).isInstanceOf(BaseException.class).hasMessage("파일 load 실패 Path: /hi");
+        ).isInstanceOf(BaseException.class).hasMessage("load 실패 Path: /hi");
     }
 
     @Test

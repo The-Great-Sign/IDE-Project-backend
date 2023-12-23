@@ -26,7 +26,8 @@ class OutputSendingServiceImplTest {
         }
     }
     OutputSendingService outputSendingService = new OutputSendingServiceImpl(
-            new MockTerminalController()
+            new MockTerminalController(),
+            new LogicalDirectoryExtractor()
     );
 
     @Value("${app.outputSeparator}")

@@ -27,6 +27,8 @@ public class FileWatcher {
 
     private final WebSocketFileDirectoryController webSocketFileDirectoryController;
 
+    private final String EXCEPT_FILE = ".*\\.swp";
+
     public void watch(String dir) throws Exception {
 
         FileAlterationObserver observer = new FileAlterationObserver(dir);
@@ -53,17 +55,32 @@ public class FileWatcher {
                 sendToUser(DELETE, directory);
             }
 
+            @Override
+            public void onFileChange(File file) {
+                /*
+                File Change에 대해서는 별도로 알리지 않아도 됩니다.
+                 */
+            }
+
             /**
              * 현재 swap 파일의 생성 역시 감지되는 이슈가 있습니다.
              * @param file The file created (ignored)
              */
             @Override
             public void onFileCreate(File file) {
+                if (file.getName().matches(EXCEPT_FILE)) {
+                    return;
+                }
+
                 sendToUser(CREATE, file);
             }
 
             @Override
             public void onFileDelete(File file) {
+                if (file.getName().matches(EXCEPT_FILE)) {
+                    return;
+                }
+
                 sendToUser(DELETE, file);
             }
 
@@ -122,6 +139,7 @@ public class FileWatcher {
 
     /**
      * EFS 스토리지의 디렉터리 경로에서 논리적 주소를 추출합니다.
+     *
      * @param path
      * @return
      */
