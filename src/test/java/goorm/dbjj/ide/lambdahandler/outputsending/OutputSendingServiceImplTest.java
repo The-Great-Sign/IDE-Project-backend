@@ -1,6 +1,5 @@
 package goorm.dbjj.ide.lambdahandler.outputsending;
 
-import goorm.dbjj.ide.container.ExecutionIdMapper;
 import goorm.dbjj.ide.lambdahandler.executionoutput.*;
 import goorm.dbjj.ide.websocket.terminal.TerminalController;
 import goorm.dbjj.ide.websocket.terminal.dto.TerminalExecuteRequestDto;
@@ -8,11 +7,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-
 
 class OutputSendingServiceImplTest {
 
