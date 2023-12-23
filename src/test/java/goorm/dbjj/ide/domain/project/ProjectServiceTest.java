@@ -11,6 +11,7 @@ import goorm.dbjj.ide.domain.user.dto.SocialType;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.efs.EfsAccessPointUtil;
 import goorm.dbjj.ide.mock.DummyContainerService;
+import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -103,7 +104,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    void createProjectSuccess() {
+    void createProjectSuccess() throws CustomIOException {
         // given
         User user = createUser();
         userRepository.save(user);
@@ -147,7 +148,7 @@ class ProjectServiceTest {
      * 원래는 프로젝트 생성과 독립적으로 수행되어야 하는 것이 맞지만, 편의상 프로젝트 생성과 함께 수행합니다.
      */
     @Test
-    void deleteProjectSuccess() {
+    void deleteProjectSuccess() throws CustomIOException {
         // given
         User user = createUser();
         userRepository.save(user);
