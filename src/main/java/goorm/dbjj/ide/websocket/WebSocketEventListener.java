@@ -55,13 +55,14 @@ public class WebSocketEventListener {
 
         //인원이 0명인 경우 에러 처리
         if (webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == null || webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == 0L) {
-            log.trace("웹소켓 프로젝트ID {{}} 현재인원 0명으로 프로젝트를 종료합니다.", removeWebSocketUser.getProjectId());
             // webSocketProjectUserCountMapper의 유저
             webSocketProjectUserCountMapper.removeCurrentUsersByProjectId(removeWebSocketUser.getProjectId());
 
-            // 특정 프로젝트에 현재 인원 0 명일 경우 프로젝트 종료 로직
+/*            // 특정 프로젝트에 현재 인원 0 명일 경우 프로젝트 종료 로직
             Project project = projectRepository.findById(removeWebSocketUser.getProjectId()).orElseThrow(() -> new BaseException("웹소켓에 현재 프로젝트가 존재하지 않습니다"));
-            containerService.stopContainer(project);
+
+            log.trace("웹소켓 [종료] 프로젝트ID {{}} 현재인원 0명으로 프로젝트를 종료합니다.", removeWebSocketUser.getProjectId());
+            containerService.stopContainer(project);*/
         } else {
             chattingController.exit(removeWebSocketUser.getProjectId(), removeWebSocketUser.getUserInfoDto().getNickname());
         }
