@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.storageManager;
 
 import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.domain.fileDirectory.FileIdGenerator;
 import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import goorm.dbjj.ide.storageManager.model.ResourceType;
@@ -47,7 +48,7 @@ public class FileIoStorageManager implements StorageManager {
             throw new CustomIOException("load 실패", filePath);
             //"message", "path"
         }
-        return Resource.file(fileName, filePath, content);
+        return Resource.file(FileIdGenerator.generate(file), fileName, filePath, content);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class FileIoStorageManager implements StorageManager {
             throw new CustomIOException("디렉터리가 아닙니다.",path);
         }
 
-        Resource resource = Resource.directory(file.getName(), file.getAbsolutePath());
+        Resource resource = Resource.directory(FileIdGenerator.generate(file), file.getName(), file.getAbsolutePath());
         resource.setChild(loadDirectoryRecursive(file));
         return resource;
     }
@@ -102,7 +103,12 @@ public class FileIoStorageManager implements StorageManager {
         if (files != null) {
             for (File file : files) {
                 String fullPath = file.getAbsolutePath();
-                Resource resource = Resource.resource(file.getName(), fullPath, file.isFile() ? ResourceType.FILE : DIRECTORY);
+                Resource resource = Resource.resource (
+                        FileIdGenerator.generate(file), // 파일 생성 시간 기준으로 ID 생성
+                        file.getName(),
+                        fullPath,
+                        file.isFile() ? ResourceType.FILE : DIRECTORY
+                );
                 if (file.isDirectory()) {
                     List<Resource> child = loadDirectoryRecursive(file);
                     resource.setChild(child);

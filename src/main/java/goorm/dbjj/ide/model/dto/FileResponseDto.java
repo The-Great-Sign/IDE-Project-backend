@@ -11,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileResponseDto {
+    private long id;
     private String filePath;
     private String fileName;
     private String content;
