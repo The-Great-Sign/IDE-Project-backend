@@ -2,7 +2,6 @@ package goorm.dbjj.ide.domain.project;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.ContainerService;
-import goorm.dbjj.ide.domain.fileDirectory.FileIoProjectFileService;
 import goorm.dbjj.ide.domain.fileDirectory.initiator.ProjectDirectoryInitiator;
 import goorm.dbjj.ide.domain.project.model.ProjectCreateRequestDto;
 import goorm.dbjj.ide.domain.project.model.Project;
@@ -11,7 +10,7 @@ import goorm.dbjj.ide.domain.project.model.ProjectUser;
 import goorm.dbjj.ide.domain.user.UserRepository;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.efs.EfsAccessPointUtil;
-import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.ContainerStore;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import goorm.dbjj.ide.storageManager.exception.CustomIOException;
@@ -40,7 +39,7 @@ public class ProjectService {
     private final PasswordEncoder passwordEncoder;
     private final EntityManager em;
     private final EfsAccessPointUtil efsAccessPointUtil;
-    private final MemoryContainerRepository memoryContainerRepository;
+    private final ContainerStore containerStore;
     private final ProjectDirectoryInitiator projectDirectoryInitiator;
 
     /**
@@ -172,7 +171,7 @@ public class ProjectService {
         }
 
         //컨테이너 상태 조회
-        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        ContainerInfo containerInfo = containerStore.find(project.getId());
 
         if (containerInfo == null) { //컨테이너가 실행중이 아니라면
             containerService.runContainer(project);

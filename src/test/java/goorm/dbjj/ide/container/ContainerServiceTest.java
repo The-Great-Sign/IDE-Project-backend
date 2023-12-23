@@ -2,11 +2,12 @@ package goorm.dbjj.ide.container;
 
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
-import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.ContainerStore;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.domain.user.dto.Role;
 import goorm.dbjj.ide.domain.user.dto.SocialType;
 import goorm.dbjj.ide.domain.user.dto.User;
+import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerStore;
 import goorm.dbjj.ide.mock.DummyContainerUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,10 +19,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ContainerServiceTest {
-    private MemoryContainerRepository memoryContainerRepository = new MemoryContainerRepository();
+    private ContainerStore containerStore = new MemoryContainerStore();
     private ContainerService containerService = new ContainerServiceImpl(
             new DummyContainerUtil(),
-            memoryContainerRepository,
+            containerStore,
             new CommandStringBuilder()
     );
 
@@ -47,7 +48,7 @@ class ContainerServiceTest {
 
     @AfterEach
     void afterEach() {
-        memoryContainerRepository = new MemoryContainerRepository();
+        containerStore = new MemoryContainerStore();
     }
 
     @Test
@@ -73,9 +74,9 @@ class ContainerServiceTest {
         containerService.runContainer(project);
 
         //then
-        assertThat(memoryContainerRepository.find(project.getId())).isNotNull();
-        assertThat(memoryContainerRepository.find(project.getId()).getContainerId()).isEqualTo("containerId");
-        assertThat(memoryContainerRepository.size()).isEqualTo(1);
+        assertThat(containerStore.find(project.getId())).isNotNull();
+        assertThat(containerStore.find(project.getId()).getContainerId()).isEqualTo("containerId");
+        assertThat(containerStore.size()).isEqualTo(1);
     }
 
     @Test
@@ -92,8 +93,8 @@ class ContainerServiceTest {
         containerService.stopContainer(project);
 
         // then
-        assertThat(memoryContainerRepository.find(project.getId())).isNull();
-        assertThat(memoryContainerRepository.size()).isEqualTo(0);
+        assertThat(containerStore.find(project.getId())).isNull();
+        assertThat(containerStore.size()).isEqualTo(0);
     }
 
     @Test
@@ -111,7 +112,7 @@ class ContainerServiceTest {
         boolean isRunning1 = containerService.isContainerRunning(project);
 
         // RUNNING 상태가 되면 실행중 상태로 바꾼다. 이 이벤트는 외부에서 전송됨
-        memoryContainerRepository.find(project.getId()).setRunning();
+        containerStore.find(project.getId()).setRunning();
 
         // RUNNING 상태에는 isContainerRunning이 true를 반환한다.
         boolean isRunning2 = containerService.isContainerRunning(project);
@@ -130,10 +131,10 @@ class ContainerServiceTest {
     @Test
     void executeSuccess() {
         Project project = createProject();
-        memoryContainerRepository.save(project.getId(), "containerId");
+        containerStore.save(project.getId(), "containerId");
 
         //Running 상태로 변경
-        memoryContainerRepository.find(project.getId()).setRunning();
+        containerStore.find(project.getId()).setRunning();
 
         containerService.executeCommand(project, "/app", "python hello.py", 1L);
     }
@@ -152,10 +153,10 @@ class ContainerServiceTest {
     void executeFailPending() {
         Project project = createProject();
         containerService.createProjectImage(project);
-        memoryContainerRepository.save(project.getId(), "containerId");
+        containerStore.save(project.getId(), "containerId");
 
         //Pending 상태로 변경
-        memoryContainerRepository.find(project.getId()).setPending();
+        containerStore.find(project.getId()).setPending();
 
         assertThatThrownBy(
                 () -> containerService.executeCommand(project, "/app", "python hello.py", 1L)

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 class LoadContainerControllerTest {
 
     @Autowired
-    MemoryContainerRepository memoryContainerRepository;
+    ContainerStore containerStore;
 
     @Autowired
     ContainerStatusController loadContainerController;
@@ -27,14 +27,14 @@ class LoadContainerControllerTest {
 
     @AfterEach
     void tearDown() {
-        memoryContainerRepository = new MemoryContainerRepository();
+        containerStore = new MemoryContainerStore();
     }
 
 
     @Test
     void statusChangeRequest() {
 
-        memoryContainerRepository.save("projectId", "containerId");
+        containerStore.save("projectId", "containerId");
 
         ContainerStatusChangeRequestDto containerStatusChangeRequestDto = new ContainerStatusChangeRequestDto();
         containerStatusChangeRequestDto.setTaskArn("containerId");
@@ -42,11 +42,11 @@ class LoadContainerControllerTest {
         containerStatusChangeRequestDto.setContainerStatus("RUNNING");
 
 
-        assertThat(memoryContainerRepository.find("projectId").getStatus()).isEqualTo(ContainerStatus.PENDING);
+        assertThat(containerStore.find("projectId").getStatus()).isEqualTo(ContainerStatus.PENDING);
 
         loadContainerController.getContainerStatus(containerStatusChangeRequestDto,secretKey);
 
-        assertThat(memoryContainerRepository.find("projectId").getStatus()).isEqualTo(ContainerStatus.RUNNING);
+        assertThat(containerStore.find("projectId").getStatus()).isEqualTo(ContainerStatus.RUNNING);
     }
 
     @Test

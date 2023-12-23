@@ -3,7 +3,7 @@ package goorm.dbjj.ide.container;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.container.command.CommandStringBuilder;
 import goorm.dbjj.ide.domain.project.model.Project;
-import goorm.dbjj.ide.lambdahandler.containerstatus.MemoryContainerRepository;
+import goorm.dbjj.ide.lambdahandler.containerstatus.ContainerStore;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class ContainerServiceImpl implements ContainerService {
 
     private final ContainerUtil containerUtil;
-    private final MemoryContainerRepository memoryContainerRepository;
+    private final ContainerStore containerStore;
     private final CommandStringBuilder commandStringBuilder;
 
     /**
@@ -38,7 +38,7 @@ public class ContainerServiceImpl implements ContainerService {
     public void executeCommand(Project project, String path, String command, Long userId) {
         log.trace("ContainerService.executeCommand called");
 
-        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        ContainerInfo containerInfo = containerStore.find(project.getId());
 
         if (containerInfo == null || !containerInfo.isRunning()) {
             throw new BaseException("컨테이너가 실행중이지 않습니다.");
@@ -103,9 +103,9 @@ public class ContainerServiceImpl implements ContainerService {
             throw new BaseException("컨테이너 이미지가 존재하지 않습니다.");
         }
 
-        if (memoryContainerRepository.find(project.getId()) == null) {
+        if (containerStore.find(project.getId()) == null) {
             String containerId = containerUtil.runContainer(project.getContainerImageId());
-            memoryContainerRepository.save(project.getId(), containerId);
+            containerStore.save(project.getId(), containerId);
         } else {
             throw new BaseException("이미 실행중인 컨테이너가 있습니다.");
         }
@@ -122,10 +122,10 @@ public class ContainerServiceImpl implements ContainerService {
     public void stopContainer(Project project) {
         log.trace("ContainerService.stopContainer called");
 
-        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        ContainerInfo containerInfo = containerStore.find(project.getId());
         if (containerInfo != null) {
             containerUtil.stopContainer(containerInfo.getContainerId());
-            memoryContainerRepository.remove(project.getId());
+            containerStore.remove(project.getId());
         } else {
             throw new BaseException("실행중인 컨테이너가 없습니다.");
         }
@@ -139,7 +139,7 @@ public class ContainerServiceImpl implements ContainerService {
      */
     @Override
     public boolean isContainerRunning(Project project) {
-        ContainerInfo containerInfo = memoryContainerRepository.find(project.getId());
+        ContainerInfo containerInfo = containerStore.find(project.getId());
         return containerInfo != null && containerInfo.isRunning();
     }
 }
