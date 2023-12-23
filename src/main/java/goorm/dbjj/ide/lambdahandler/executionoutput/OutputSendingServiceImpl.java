@@ -32,8 +32,7 @@ public class OutputSendingServiceImpl implements OutputSendingService {
     }
 
     /**
-     * 이 private 메서드로 인해 테스트가 어려워지는 문제 발생
-     * 추후 분리 예정
+     * 메시지를 파싱합니다.
      * @param message
      * @return
      */
