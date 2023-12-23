@@ -30,6 +30,12 @@ public class OutputSendingServiceImpl implements OutputSendingService {
         );
     }
 
+    /**
+     * 이 private 메서드로 인해 테스트가 어려워지는 문제 발생
+     * 추후 분리 예정
+     * @param message
+     * @return
+     */
     private ExecutionOutputDto parseMessage(String message) {
 
         String[] splitedMessage = message.split(separator);
@@ -45,7 +51,13 @@ public class OutputSendingServiceImpl implements OutputSendingService {
         };
     }
 
+    /**
+     * 도커 path에서 사용자의 상대 주소를 추출합니다.
+     * @param path
+     * @return
+     */
     private String extractLogicalAddress(String path) {
-        return path.substring(path.indexOf("/app") + 4)+"/";
+        String logicalDirectory = path.substring(path.indexOf("/app")+ 4);
+        return logicalDirectory.isEmpty() ? "/" : logicalDirectory;
     }
 }
