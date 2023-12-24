@@ -31,6 +31,12 @@ public class FileIoStorageManager implements StorageManager {
     @Override
     public Resource loadFile(String path) throws CustomIOException {
         File file = new File(path);
+        if (file.isDirectory()) {
+            throw new CustomIOException("최종 경로가 File이 아닌 Directory 입니다." + path, path);
+        }
+        if (!file.isFile()) {
+            throw new CustomIOException("유효하지 않은 File입니다." + path, path);
+        }
 
         String fileName = file.getName();
         String filePath = file.getPath();
@@ -45,7 +51,7 @@ public class FileIoStorageManager implements StorageManager {
             }
             content = sb.toString();
         } catch (IOException e) {
-            throw new CustomIOException("load 실패", filePath);
+            throw new CustomIOException("파일 load 실패" + e.getMessage(), filePath);
             //"message", "path"
         }
         return Resource.file(FileIdGenerator.generate(file), fileName, filePath, content);

@@ -6,14 +6,12 @@ import goorm.dbjj.ide.storageManager.FileIoStorageManager;
 import goorm.dbjj.ide.storageManager.exception.CustomIOException;
 import goorm.dbjj.ide.storageManager.model.Resource;
 import goorm.dbjj.ide.storageManager.model.ResourceDto;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static goorm.dbjj.ide.storageManager.StorageManager.RESOURCE_SEPARATOR;
 
@@ -25,15 +23,25 @@ public class FileIoProjectFileService implements ProjectFileService {
     private String ROOT_DIRECTORY;
 
     private String getFullPath(String projectId, String subPath) {
-        if(!StringUtils.isEmpty(subPath) && !subPath.startsWith(RESOURCE_SEPARATOR)){
-            throw new BaseException("Path 는 반드시 '/' 로 시작해야 합니다.");
-            //추후의 사항이지만, "/../{projectId}" 고려 해야함
-        }
+
+        validateSubPath(subPath);
 
         String fullPath = ROOT_DIRECTORY + RESOURCE_SEPARATOR + projectId + subPath;
         log.trace("전체 경로 = {}", fullPath);
 
         return fullPath;
+    }
+
+    private void validateSubPath(String subPath) {
+        if (subPath == null || subPath.trim().isEmpty()) {
+            throw new BaseException("subPath가 null값이거나 비어있을 수 없습니다.");
+        }
+        if (!subPath.startsWith(RESOURCE_SEPARATOR)) {
+            throw new BaseException("subPath는 반드시 '/'로 시작해야 합니다.");
+        }
+        if (subPath.contains("/../")) {
+            throw new BaseException("잘못된 subPath 입력 또는 상위 Directory로 접근할 수 없습니다");
+        }
     }
 
     private String getRelativePath(String fullPath) {
@@ -189,7 +197,7 @@ public class FileIoProjectFileService implements ProjectFileService {
     public void deleteFile(String projectId, String filePath) {
         log.trace("Service.deleteFile - 파일 및 디렉토리 삭제");
 
-        if(projectId == null || projectId.trim().isEmpty()) {
+        if (projectId == null || projectId.trim().isEmpty()) {
             throw new BaseException("projectId 는 null 값이거나 빈값이 들어올 수 없습니다.");
         }
         if (filePath == null || filePath.trim().isEmpty()) {
@@ -217,5 +225,3 @@ public class FileIoProjectFileService implements ProjectFileService {
                 .build();
     }
 }
-
-
