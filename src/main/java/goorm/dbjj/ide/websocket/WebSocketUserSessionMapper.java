@@ -38,6 +38,13 @@ public class WebSocketUserSessionMapper {
     }
 
     /**
+     * 테스트용 클리어 코드
+     * */
+    public void clear(){
+        webSocketUserSessionMap.clear();
+    }
+
+    /**
      * 실행중인 프로젝트인지 확인하는 로직
      * @return true:이미 존재함, false: 존재안함
      * */

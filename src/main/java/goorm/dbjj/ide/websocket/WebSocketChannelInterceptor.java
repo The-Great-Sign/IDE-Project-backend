@@ -48,30 +48,20 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
+        handlerValidStompConnectCommand(headerAccessor);
+        handlerValidStompSubscribeCommand(headerAccessor);
+        handlerValidStompSendCommand(headerAccessor);
+
+        return ChannelInterceptor.super.preSend(message, channel);
+    }
+
+    /**
+     * STOMP의 CONNECT 요청을 처리하고, 해당 요청의 유효성을 검증
+     * */
+    private void handlerValidStompConnectCommand(StompHeaderAccessor headerAccessor) {
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
             log.trace("웹소켓 [CONNECT] 요청");
-            List<String> authorization = headerAccessor.getNativeHeader("Authorization");
-            String accessToken = authorization.get(0); // jwt accesstoken "Bearer "
-            log.trace("액세스 토큰 : {}", accessToken);
-
-            if (accessToken == null || !accessToken.startsWith(TOKEN_PREFIX)) {
-                log.debug("유효한 토큰 형식이 아닙니다. : {}", accessToken);
-                throw new BaseException("유효한 토큰 형식이 아닙니다.");
-            }
-
-            // 토큰만 추출.
-            accessToken = accessToken.substring(TOKEN_PREFIX.length());
-
-            // 토큰이 유효한지 검증.
-            if (!jwtAuthProvider.validateToken(accessToken)) {
-                log.debug("토큰이 유효하지 않습니다. : {}", accessToken);
-                throw new BaseException("토큰이 유효하지 않습니다.");
-            }
-
-            // 토큰을 사용해서 유저 정보 가져오기.
-            String userEmail = jwtIssuer.getSubject(jwtIssuer.getClaims(accessToken));
-            User user = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new BaseException("해당 이메일을 가진 유저가 없습니다."));
+            User user = getUserFromValidJwt(headerAccessor);
 
             UserInfoDto userInfoDto = new UserInfoDto(user);
             log.trace("웹소켓 사용자 ID, 이름 가져오기 : {} {}", userInfoDto.getId(), userInfoDto.getNickname());
@@ -80,21 +70,9 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             List<String> projectIdValues = headerAccessor.getNativeHeader("ProjectId");
             String projectId = projectIdValues.get(0);
 
-            log.trace("{}", projectId);
+            log.trace("웹소켓 [프로젝트] ID = {}", projectId);
 
-            // db 없이 테스트할때 주석 처리 해야함
-            Optional<Project> projectOptional = projectRepository.findById(projectId);
-            // 프로젝트가 없을 경우
-            if (projectOptional.isEmpty()) {
-                log.error("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
-                throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
-            }
-
-            // 프로젝트에 참여한 유저가 아닐 경우
-            if (!projectUserRepository.existsByProjectAndUser(projectOptional.get(), user)) {
-                log.error("해당 프로젝트의 소유권 없는자가 접근했습니다.");
-                throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
-            }
+            checkUserAccessToProject(projectId, user);
 
 /*            // 동시접속 막는 로직 : 프로젝트가 참여한 유저인지 검증 로직
             webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId);*/
@@ -106,7 +84,12 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             // 프로젝트 인원 수 증가
             webSocketProjectUserCountMapper.increaseCurrentUsersWithProjectId(projectId);
         }
+    }
 
+    /**
+     * STOMP의 SUBSCRIBE 요청을 처리하고, 해당 요청의 유효성을 검증
+     * */
+    private void handlerValidStompSubscribeCommand(StompHeaderAccessor headerAccessor) {
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             log.trace("웹소켓 [SUBSCRIBE] 요청");
             // 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크
@@ -117,7 +100,12 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             // 구독하기
             subscribeChannel(headerAccessor, webSocketUser);
         }
+    }
 
+    /**
+     * STOMP의 SEND 요청을 처리하고, 해당 요청의 유효성을 검증
+     * */
+    private void handlerValidStompSendCommand(StompHeaderAccessor headerAccessor) {
         if (StompCommand.SEND.equals(headerAccessor.getCommand())) {
             log.trace("웹소켓 [SEND] 요청");
             // 클라이언트가 보낸 STOMP 메세지의 사용자가 유효한 사용자인지 체크
@@ -125,8 +113,54 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
             EqualsSubscribeDestinationProjectId(headerAccessor, webSocketUser);
         }
+    }
 
-        return ChannelInterceptor.super.preSend(message, channel);
+    /**
+     * 사용자가 프로젝트에 접근할 권한이 있는지 확인하는 로직
+     * */
+    private void checkUserAccessToProject(String projectId, User user) {
+        // db 없이 테스트할때 주석 처리 해야함
+        Optional<Project> projectOptional = projectRepository.findById(projectId);
+        // 프로젝트가 없을 경우
+        if (projectOptional.isEmpty()) {
+            log.error("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
+            throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
+        }
+
+        // 프로젝트에 참여한 유저가 아닐 경우
+        if (!projectUserRepository.existsByProjectAndUser(projectOptional.get(), user)) {
+            log.error("웹소켓 해당 프로젝트의 소유권 없는자가 접근했습니다.");
+            throw new BaseException("웹소켓에 연결될 프로젝트가 존재하지 않습니다.");
+        }
+    }
+
+    /**
+     *  유효한 JWT에서 사용자 정보를 가져오는 로직
+     * */
+    private User getUserFromValidJwt(StompHeaderAccessor headerAccessor) {
+        List<String> authorization = headerAccessor.getNativeHeader("Authorization");
+        String accessToken = authorization.get(0); // jwt accesstoken "Bearer "
+        log.trace("액세스 토큰 : {}", accessToken);
+
+        if (accessToken == null || !accessToken.startsWith(TOKEN_PREFIX)) {
+            log.debug("유효한 토큰 형식이 아닙니다. : {}", accessToken);
+            throw new BaseException("유효한 토큰 형식이 아닙니다.");
+        }
+
+        // 토큰만 추출.
+        accessToken = accessToken.substring(TOKEN_PREFIX.length());
+
+        // 토큰이 유효한지 검증.
+        if (!jwtAuthProvider.validateToken(accessToken)) {
+            log.debug("토큰이 유효하지 않습니다. : {}", accessToken);
+            throw new BaseException("토큰이 유효하지 않습니다.");
+        }
+
+        // 토큰을 사용해서 유저 정보 가져오기.
+        String userEmail = jwtIssuer.getSubject(jwtIssuer.getClaims(accessToken));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new BaseException("해당 이메일을 가진 유저가 없습니다."));
+        return user;
     }
 
     /**
@@ -157,7 +191,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         String[] split = headerAccessor.getDestination().toString().split("/");
         // /user로 시작하는 경우 chatuser
         String subscribeType = split[1].equals("user") ? split[1] + split[5] : split[4];
-        log.trace("SubscribeType = {}", subscribeType);
+        log.trace("웹소켓 [SubscribeType] = {}", subscribeType);
 
         // 이미 구독한 상태라면
         if (webSocketUser.isSubscribe(subscribeType)) {

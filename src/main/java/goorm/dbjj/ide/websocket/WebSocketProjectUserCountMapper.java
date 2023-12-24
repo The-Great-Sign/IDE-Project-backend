@@ -53,4 +53,11 @@ public class WebSocketProjectUserCountMapper {
     public void removeCurrentUsersByProjectId(String projectId){
         projectCurrentUserMapper.remove(projectId);
     }
+
+    /**
+     * 테스트용 코드
+     * */
+    public void clear(){
+        projectCurrentUserMapper.clear();
+    }
 }
