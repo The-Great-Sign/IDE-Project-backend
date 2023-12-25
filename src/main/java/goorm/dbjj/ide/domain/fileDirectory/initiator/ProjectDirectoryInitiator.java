@@ -1,9 +1,12 @@
 package goorm.dbjj.ide.domain.fileDirectory.initiator;
 
 import goorm.dbjj.ide.container.ProgrammingLanguage;
+import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadata;
+import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadataRepository;
 import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.storageManager.StorageManager;
 import goorm.dbjj.ide.storageManager.exception.CustomIOException;
+import goorm.dbjj.ide.storageManager.model.ResourceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +24,7 @@ public class ProjectDirectoryInitiator {
     private String baseDir;
 
     private final StorageManager storageManager;
+    private final FileMetadataRepository fileMetadataRepository;
 
     /**
      * 프로젝트 디렉터리를 생성합니다.
@@ -34,7 +38,7 @@ public class ProjectDirectoryInitiator {
         storageManager.createDirectory(path);
 
         //기본 파일 생성
-        createDefaultFile(path, project.getProgrammingLanguage());
+        createDefaultFile(project, path, project.getProgrammingLanguage());
     }
 
     /**
@@ -43,12 +47,16 @@ public class ProjectDirectoryInitiator {
      * @param path
      * @param programmingLanguage
      */
-    private void createDefaultFile(String path, ProgrammingLanguage programmingLanguage) throws CustomIOException {
+    private void createDefaultFile(Project project, String path, ProgrammingLanguage programmingLanguage) throws CustomIOException {
 
         String fileName = getFileName(programmingLanguage);
         String content = getFileContent(programmingLanguage);
 
+
+        fileMetadataRepository.save(new FileMetadata(project, "/" + fileName, ResourceType.FILE));
         storageManager.saveFile(path + "/" + fileName, content);
+
+        fileMetadataRepository.save(new FileMetadata(project, "/readme.md", ResourceType.FILE));
         storageManager.saveFile(path + "/readme.md", "대박징조 화이팅");
     }
 
