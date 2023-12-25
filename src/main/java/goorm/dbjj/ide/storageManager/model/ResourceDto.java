@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.storageManager.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.ALWAYS) // null값 무시
+@JsonInclude(JsonInclude.Include.NON_NULL) // null값 무시
+@JsonPropertyOrder({"id", "name", "type", "path", "children"})
 public class ResourceDto {
     private long id;
     private String name;
