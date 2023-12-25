@@ -37,27 +37,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-//    @Value("${app.exception-path1}")
-//    private String EXCEPTION_PATH1;
-//
-//    @Value("${app.exception-path2}")
-//    private String EXCEPTION_PATH2;
-//
-//    @Value("${app.exception-path3}")
-//    private String EXCEPTION_PATH3;
-//
-//    @Value("${app.exception-path4}")
-//    private String EXCEPTION_PATH4;
-//
-//    @Value("${app.exception-path5}")
-//    private String EXCEPTION_PATH5;
-//
-//    @Value("${app.exception-path6}")
-//    private String EXCEPTION_PATH6;
-
     @Value("${app.exception-paths}")
     private List<String> EXCEPTION_PATHS;
-
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -92,43 +73,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
-//        // EXCEPTION_PATH는 토큰 검사 안함.
-//        if(request.getRequestURI().contains(EXCEPTION_PATH1)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if(request.getRequestURI().contains(EXCEPTION_PATH2)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if(request.getRequestURI().contains(EXCEPTION_PATH3)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if(request.getRequestURI().contains(EXCEPTION_PATH4)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if(request.getRequestURI().contains(EXCEPTION_PATH5)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if(request.getRequestURI().contains(EXCEPTION_PATH6)){
-//            log.trace("이 페이지는 검사 안함 : {}", request.getRequestURI());
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
 
         String accessToken = request.getHeader(accessHeader);
         String refreshToken = request.getHeader(refreshHeader);
