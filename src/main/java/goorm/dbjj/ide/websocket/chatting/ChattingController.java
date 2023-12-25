@@ -56,7 +56,7 @@ public class ChattingController {
         String userNickname = getUserNickname(headerAccessor);
         String projectId = getProjectId(headerAccessor);
 
-        log.trace("웹소켓 [채팅] [메세지] 출력 chatsDtoChattingContentRequestDto = {}, projectId = {}, nickName = {}", chatsDtoChattingContentRequestDto, projectId, userNickname);
+        log.trace("웹소켓 [채팅] [메세지] 출력 chatsDtoChattingContentRequestDto = {}, projectId = {}, nickName = {}", chatsDtoChattingContentRequestDto.toString(), projectId, userNickname);
 
         return chattingService.talk(chatsDtoChattingContentRequestDto, userNickname, projectId);
     }
