@@ -229,8 +229,8 @@ public class JwtFilter extends OncePerRequestFilter {
     // 응답 처리를 위한 메서드
     private void sendErrorResponse(HttpServletResponse response, int status, String message, String path) throws IOException {
         String jsonResponse = String.format(
-                "{\"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"path\": \"%s\"}",
-                LocalDateTime.now(), status, message, path
+                "{\"status\": %d, \"path\": \"%s\", \"message\": \"%s\", \"timestamp\": \"%s\"}",
+                status, path, message, LocalDateTime.now()
         );
         response.setStatus(status);
         response.setContentType("application/json");
