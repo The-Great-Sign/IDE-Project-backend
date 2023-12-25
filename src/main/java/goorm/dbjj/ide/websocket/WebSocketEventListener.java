@@ -42,7 +42,7 @@ public class WebSocketEventListener {
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
         if(simpSessionAttributes == null){
             log.trace("웹소켓 [비정상적인 DICONNECT]");
-            throw new BaseException("세션 아이디가 존재하지 않습니다.");
+            throw new BaseException("웹소켓 세션 아이디가 존재하지 않습니다.");
         }
 
         String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
