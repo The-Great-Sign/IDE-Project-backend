@@ -51,7 +51,7 @@ public class ProjectFileController {
 
     @PostMapping("/api/files")
     public ApiResponse<FileResponseDto> saveFile(
-            @RequestBody FileSaveRequestDto fileSaveRequestDto,
+            @Valid @RequestBody FileSaveRequestDto fileSaveRequestDto,
             @AuthenticationPrincipal User user
     ) {
         log.trace("ProjectFileController.saveFile 실행");
