@@ -56,6 +56,11 @@ public class OutputSendingServiceImpl implements OutputSendingService {
         }
     }
 
+    /**
+     * 임시방편으로 pwd시 /app (도커 볼륨)이 붙는 문제를 해결합니다.
+     * @param content
+     * @return
+     */
     private String contentWrapper(String content) {
         if(content.startsWith("/app")) {
             String newContent = content.substring(4);
