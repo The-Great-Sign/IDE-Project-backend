@@ -113,7 +113,7 @@ public class FileWatcher {
 
         String logicalDirectoryAddress = extractLogicalAddress(file.getPath(), projectId);
 
-        FileMetadata fileMetadata = fileMetadataRepository.findByProjectIdAndPath(projectId, logicalDirectoryAddress)
+        FileMetadata fileMetadata = fileMetadataRepository.findByProject_IdAndPath(projectId, logicalDirectoryAddress)
                 .orElseThrow(() -> new BaseException(String.format("파일 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
 
         FileWatchEvent fileWatchEvent = new FileWatchEvent(

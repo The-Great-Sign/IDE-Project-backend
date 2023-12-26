@@ -167,7 +167,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
      * Destination 주소와 구독한 ProjectId가 동일한 지 확인하는 함수
      */
     private void EqualsSubscribeDestinationProjectId(StompHeaderAccessor headerAccessor, WebSocketUser webSocketUser) {
-        log.trace("웹 소켓 Destination 주소가 같은지 판별");
+        log.trace("웹소켓 Destination 주소가 같은지 판별");
         // 1. 사용자가 구독신청한 subscribeProjectId 반환
         String[] split = headerAccessor.getDestination().toString().split("/");
         String subscribeProjectId = split[1].equals("user") ? split[4] : split[3];

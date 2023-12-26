@@ -10,5 +10,5 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long
 
     List<FileMetadata> findByProject(Project project);
 
-    Optional<FileMetadata> findByProjectIdAndPath(String projectId, String path);
+    Optional<FileMetadata> findByProject_IdAndPath(String projectId, String path);
 }

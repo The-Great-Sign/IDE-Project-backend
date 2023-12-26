@@ -33,7 +33,7 @@ public class TerminalController {
             @DestinationVariable("projectId") String projectId,
             @Payload TerminalExecuteRequestDto terminalExecuteRequestDto
     ){
-        log.trace("웹소켓 [터미널] [실행], projectId = {}, terminalExecuteRequestDto ={}", projectId, terminalExecuteRequestDto);
+        log.trace("웹소켓 [터미널] [실행], projectId = {}, terminalExecuteRequestDto ={}", projectId, terminalExecuteRequestDto.toString());
         Long userId = getUserId(headerAccessor);
         terminalService.executeTerminal(terminalExecuteRequestDto,projectId,userId);
     }
@@ -43,7 +43,7 @@ public class TerminalController {
      * 터미널 결과 연결하는 부분 호출하기
      * */
     public void terminalExecutionResult(String projectId, Long userId, ExecutionOutputDto executionOutputDto){
-        log.trace("웹소켓 [터미널] [결과] 전송, projectId = {}, ExecutionOutputDto ={}", projectId,executionOutputDto);
+        log.trace("웹소켓 [터미널] [결과] 전송, projectId = {}, ExecutionOutputDto ={}", projectId,executionOutputDto.toString());
 
         String sessionId = webSocketUserSessionMapper.findSessionIdByProjectAndUserInfoDto(userId, projectId);
 
