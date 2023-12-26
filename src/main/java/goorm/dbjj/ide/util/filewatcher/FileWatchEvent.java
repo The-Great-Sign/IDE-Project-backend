@@ -12,6 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class FileWatchEvent {
 
+    private Long fileId;
     private FileWatchEventType event;
     private ResourceType type;
     private String path;
