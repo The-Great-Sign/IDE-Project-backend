@@ -199,7 +199,6 @@ public class IdManagedProjectFileService {
         }
 
         storageManager.deleteFile(pathGenerator.getPath(fileMetadata));
-        fileMetadataRepository.delete(fileMetadata);
     }
 
     public FileResponseDto loadFile(Long fileId) throws CustomIOException {
