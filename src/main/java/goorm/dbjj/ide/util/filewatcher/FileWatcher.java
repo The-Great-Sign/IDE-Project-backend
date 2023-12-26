@@ -1,5 +1,8 @@
 package goorm.dbjj.ide.util.filewatcher;
 
+import goorm.dbjj.ide.api.exception.BaseException;
+import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadata;
+import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadataRepository;
 import goorm.dbjj.ide.storageManager.model.ResourceType;
 import goorm.dbjj.ide.websocket.filedirectory.WebSocketFileDirectoryController;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import static goorm.dbjj.ide.util.filewatcher.FileWatchEventType.*;
 public class FileWatcher {
 
     private final WebSocketFileDirectoryController webSocketFileDirectoryController;
+    private final FileMetadataRepository fileMetadataRepository;
 
     private final String EXCEPT_FILE = ".*\\.swp";
 
@@ -107,10 +111,16 @@ public class FileWatcher {
 
         ResourceType resourceType = file.isDirectory() ? ResourceType.DIRECTORY : ResourceType.FILE;
 
+        String logicalDirectoryAddress = extractLogicalAddress(file.getPath(), projectId);
+
+        FileMetadata fileMetadata = fileMetadataRepository.findByProjectIdAndPath(projectId, logicalDirectoryAddress)
+                .orElseThrow(() -> new BaseException(String.format("파일 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
+
         FileWatchEvent fileWatchEvent = new FileWatchEvent(
+                fileMetadata.getId(),
                 eventType,
                 resourceType,
-                extractLogicalAddress(file.getPath(), projectId)
+                logicalDirectoryAddress
         );
 
         log.debug("fileWatchEvent : {}", fileWatchEvent);

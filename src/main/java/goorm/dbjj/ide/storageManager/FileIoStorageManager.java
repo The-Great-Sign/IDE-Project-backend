@@ -87,6 +87,12 @@ public class FileIoStorageManager implements StorageManager {
     }
 
     @Override
+    public boolean exists(String path) throws CustomIOException {
+        File file = new File(path);
+        return file.exists();
+    }
+
+    @Override
     public Resource loadDirectory(String path) throws CustomIOException { // 경로, resourceType + fileName,
         File file = new File(path);
 
