@@ -51,11 +51,13 @@ public class FileWatcher {
 
             @Override
             public void onDirectoryCreate(File directory) {
+                log.trace("FileWatcher.onDirectoryCreate() called");
                 sendToUser(CREATE, directory);
             }
 
             @Override
             public void onDirectoryDelete(File directory) {
+                log.trace("FileWatcher.onDirectoryDelete() called");
                 sendToUser(DELETE, directory);
             }
 
@@ -76,6 +78,7 @@ public class FileWatcher {
                     return;
                 }
 
+                log.trace("FileWatcher.onFileCreate() called");
                 sendToUser(CREATE, file);
             }
 
@@ -85,6 +88,7 @@ public class FileWatcher {
                     return;
                 }
 
+                log.trace("FileWatcher.onFileDelete() called");
                 sendToUser(DELETE, file);
             }
 
@@ -113,6 +117,7 @@ public class FileWatcher {
 
         String logicalDirectoryAddress = extractLogicalAddress(file.getPath(), projectId);
 
+        log.trace("projectId : {}, logicalDirectoryAddress : {}", projectId, logicalDirectoryAddress);
         FileMetadata fileMetadata = fileMetadataRepository.findByProject_IdAndPath(projectId, logicalDirectoryAddress)
                 .orElseThrow(() -> new BaseException(String.format("파일 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
 

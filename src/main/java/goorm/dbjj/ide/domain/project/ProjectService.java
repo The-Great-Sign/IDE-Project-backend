@@ -170,14 +170,16 @@ public class ProjectService {
             throw new BaseException("프로젝트에 참여하지 않은 유저입니다.");
         }
 
-        //컨테이너 상태 조회
-        ContainerInfo containerInfo = containerStore.find(project.getId());
 
-        if (containerInfo == null) { //컨테이너가 실행중이 아니라면
+        // 컨테이너 마킹
+        boolean mark = containerStore.mark(project.getId());
+
+        //만약 첫번째 접근자라면
+        if(mark) {
             containerService.runContainer(project);
             return ContainerStatus.PENDING;
-        } else { // 컨테이너가 실행중이라면 그 상태를 반환
-            return containerInfo.getStatus();
+        } else { //이후 접근자라면
+            return containerStore.find(project.getId()).getStatus();
         }
     }
 

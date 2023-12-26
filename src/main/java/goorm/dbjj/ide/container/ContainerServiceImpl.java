@@ -103,7 +103,7 @@ public class ContainerServiceImpl implements ContainerService {
             throw new BaseException("컨테이너 이미지가 존재하지 않습니다.");
         }
 
-        if (containerStore.find(project.getId()) == null) {
+        if (containerStore.find(project.getId()).getContainerId() == null) {
             String containerId = containerUtil.runContainer(project.getContainerImageId());
             containerStore.save(project.getId(), containerId);
         } else {
