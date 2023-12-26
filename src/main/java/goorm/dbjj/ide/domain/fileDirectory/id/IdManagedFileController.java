@@ -26,31 +26,31 @@ public class IdManagedFileController {
 
     private final IdManagedProjectFileService projectFileService;
     @PostMapping("/files")
-    public ApiResponse<Long> createFile(
+    public ApiResponse<String> createFile(
             @Validated @RequestBody IdManagedFileCreateRequestDto dto,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
         log.trace("IdManagedFileController.createFile() called : path = {}");
-        Long createdId = projectFileService.createFile(
+        projectFileService.createFile(
                 dto.getProjectId(),
                 dto.getPath()
         );
 
-        return ApiResponse.ok(createdId, "파일 생성 성공");
+        return ApiResponse.ok( "파일 생성 성공");
     }
 
     @PostMapping("/directories")
-    public ApiResponse<Long> createDirectory(
+    public ApiResponse<String> createDirectory(
             @Validated @RequestBody IdManagedDirectoryCreateRequestDto dto,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
         log.trace("IdManagedFileController.createDirectory() called : path = {}", dto.getPath());
-        Long createdId = projectFileService.createDirectory(
+        projectFileService.createDirectory(
                 dto.getProjectId(),
                 dto.getPath()
         );
 
-        return ApiResponse.ok(createdId, "디렉토리 생성 성공");
+        return ApiResponse.ok("디렉토리 생성 성공");
     }
 
     @PutMapping("/files")
