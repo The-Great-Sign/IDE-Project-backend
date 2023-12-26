@@ -30,6 +30,7 @@ public class IdManagedFileController {
             @Validated @RequestBody IdManagedFileCreateRequestDto dto,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.createFile() called");
         Long createdId = projectFileService.createFile(
                 dto.getProjectId(),
                 dto.getPath()
@@ -43,7 +44,7 @@ public class IdManagedFileController {
             @Validated @RequestBody IdManagedDirectoryCreateRequestDto dto,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
-
+        log.trace("IdManagedFileController.createDirectory() called");
         Long createdId = projectFileService.createDirectory(
                 dto.getProjectId(),
                 dto.getPath()
@@ -57,6 +58,7 @@ public class IdManagedFileController {
             @Validated @RequestBody IdManagedFileUpdateRequestDto dto,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.changeFile() called");
         projectFileService.changeFile(
                 dto.getFileId(),
                 dto.getPath(),
@@ -71,6 +73,7 @@ public class IdManagedFileController {
             @PathVariable Long fileId,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.deleteFile() called");
         projectFileService.deleteFile(
                 fileId
         );
@@ -83,6 +86,7 @@ public class IdManagedFileController {
             @PathVariable Long directoryId,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.deleteDirectory() called");
         projectFileService.deleteDirectory(
                 directoryId
         );
@@ -95,6 +99,7 @@ public class IdManagedFileController {
             @PathVariable Long fileId,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.getFile() called");
         FileResponseDto dto = projectFileService.loadFile(fileId);
         return ApiResponse.ok(dto);
     }
@@ -104,6 +109,7 @@ public class IdManagedFileController {
             @PathVariable String projectId,
             @AuthenticationPrincipal User user
     ) throws CustomIOException {
+        log.trace("IdManagedFileController.loadProjectDirectory() called");
         List<ResourceDto> resourceDtos = projectFileService.loadDirectory(projectId);
         return ApiResponse.ok(resourceDtos);
     }
