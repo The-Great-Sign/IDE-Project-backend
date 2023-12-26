@@ -41,4 +41,11 @@ public interface ContainerStore {
      * @return
      */
     int size();
+
+    /**
+     * 동시성 문제를 해결하기 위해 컨테이너에 대해 누군가가 작업을 시작했음을 표시합니다.
+     * @param projectId
+     * @return true: 최초 마킹, false : 이미 마킹되어 있음
+     */
+    boolean mark(String projectId);
 }
