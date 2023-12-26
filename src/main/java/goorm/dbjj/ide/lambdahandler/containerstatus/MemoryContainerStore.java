@@ -64,4 +64,14 @@ public class MemoryContainerStore implements ContainerStore {
     public int size() {
         return containerMap.size();
     }
+
+    @Override
+    public boolean mark(String projectId) {
+        if(containerMap.get(projectId) == null) {
+            containerMap.put(projectId, new ContainerInfo(null));
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
