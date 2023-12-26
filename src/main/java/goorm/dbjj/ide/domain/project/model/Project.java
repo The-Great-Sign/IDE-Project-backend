@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.domain.project.model;
 
 import goorm.dbjj.ide.container.ProgrammingLanguage;
+import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadata;
 import goorm.dbjj.ide.domain.user.dto.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,6 +48,9 @@ public class Project {
     //User가 삭제될 때 ProjectUser도 삭제되도록 설정
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     private List<ProjectUser> projectUsers;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
+    private List<FileMetadata> fileMetadataList;
 
     // === 생성 팩토리 메서드 === //
     public static Project createProject(String name, String description, ProgrammingLanguage programmingLanguage, String password, User creator) {
