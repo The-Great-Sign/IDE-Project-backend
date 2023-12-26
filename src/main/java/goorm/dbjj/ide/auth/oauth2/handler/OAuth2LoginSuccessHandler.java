@@ -49,14 +49,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             loginSuccess(response, oAuth2User);
 
         } catch (Exception e){ // OAuth2 인증 후 처리에서 문제 발생.
-            log.debug("로그인 실패", e);
+            log.debug("소셜 로그인 실패 : ", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "로그인 처리 중 오류가 발생했습니다.");
         }
     }
 
     /**
      *  로그인 성공 시 access, refresh 토큰 생성
-      */
+     */
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
 
         TokenInfo tokenInfo = jwtIssuer.createToken(oAuth2User.getEmail(),"ROLE_USER");
@@ -75,8 +75,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .orElseThrow(() -> new EntityNotFoundException("유저 정보가 없습니다."));
 
         //토큰과 함께 프론트엔드로 전달
-        String token = "Bearer "+tokenInfo.getAccessToken();
-        response.sendRedirect("http://localhost:3000?token="+token+"&refresh_token="+tokenInfo.getRefreshToken());
+        String accessToken = "Bearer "+tokenInfo.getAccessToken();
+        String refreshToken = "Bearer "+tokenInfo.getRefreshToken();
+        response.sendRedirect("http://localhost:3000?token="+accessToken+"&refresh_token="+refreshToken);
     }
 
     private void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
