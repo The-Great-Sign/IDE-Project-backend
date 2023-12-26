@@ -3,6 +3,8 @@ package goorm.dbjj.ide.util.filewatcher;
 import goorm.dbjj.ide.api.exception.BaseException;
 import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadata;
 import goorm.dbjj.ide.domain.fileDirectory.id.FileMetadataRepository;
+import goorm.dbjj.ide.domain.project.ProjectRepository;
+import goorm.dbjj.ide.domain.project.model.Project;
 import goorm.dbjj.ide.storageManager.model.ResourceType;
 import goorm.dbjj.ide.websocket.filedirectory.WebSocketFileDirectoryController;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class FileWatcher {
 
     private final WebSocketFileDirectoryController webSocketFileDirectoryController;
     private final FileMetadataRepository fileMetadataRepository;
+    private final ProjectRepository projectRepository;
 
     private final String EXCEPT_FILE = ".*\\.swp";
 
@@ -86,7 +89,6 @@ public class FileWatcher {
                     return;
                 }
 
-
                 sendToUser(CREATE, file);
             }
 
@@ -97,7 +99,6 @@ public class FileWatcher {
                     log.trace("swp file detected");
                     return;
                 }
-
 
                 sendToUser(DELETE, file);
             }
@@ -123,15 +124,31 @@ public class FileWatcher {
     private void sendToUser(FileWatchEventType eventType, File file) {
         String projectId = extractProjectId(file.getPath());
 
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException(String.format("감지된 파일의 프로젝트를 찾을 수 없습니다. ProjectId : %s", projectId)));
+
+
         ResourceType resourceType = file.isDirectory() ? ResourceType.DIRECTORY : ResourceType.FILE;
 
         String logicalDirectoryAddress = extractLogicalAddress(file.getPath(), projectId);
 
         log.trace("projectId : {}, logicalDirectoryAddress : {}", projectId, logicalDirectoryAddress);
-        FileMetadata fileMetadata = fileMetadataRepository.findByProject_IdAndPath(projectId, logicalDirectoryAddress)
-                .orElseThrow(() -> new BaseException(String.format("파일 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
 
 
+        FileMetadata fileMetadata = null;
+
+        // 생성 감지시 DB에도 생성합니다.
+        if (eventType.equals(CREATE)) {
+            fileMetadata = fileMetadataRepository.save(new FileMetadata(project, logicalDirectoryAddress, resourceType));
+        }
+
+        // 삭제 감지시 DB에서 삭제합니다.
+        if (eventType.equals(DELETE)) {
+            fileMetadata = fileMetadataRepository.findByProjectAndPath(project, logicalDirectoryAddress)
+                    .orElseThrow(() -> new BaseException(String.format("감지된 파일의 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
+
+            fileMetadataRepository.delete(fileMetadata);
+        }
 
         FileWatchEvent fileWatchEvent = new FileWatchEvent(
                 fileMetadata.getId(),
@@ -141,8 +158,6 @@ public class FileWatcher {
         );
 
         log.debug("fileWatchEvent : {}", fileWatchEvent);
-
-        fileMetadataRepository.delete(fileMetadata);
 
         webSocketFileDirectoryController.broadcastFileAndDirectoryDetails(
                 projectId,

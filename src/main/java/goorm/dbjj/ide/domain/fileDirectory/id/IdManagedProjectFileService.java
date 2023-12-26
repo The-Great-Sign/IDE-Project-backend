@@ -48,7 +48,7 @@ public class IdManagedProjectFileService {
     //파일을 생성한다.
     //파일이 이미 존재하는가? -> 직접 검증
     //파일을 생성할 수 있는 위치인가? -> saveFile에서 검증
-    public Long createFile(String projectId, String path) throws CustomIOException {
+    public void createFile(String projectId, String path) throws CustomIOException {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("해당 프로젝트가 존재하지 않습니다."));
@@ -59,10 +59,6 @@ public class IdManagedProjectFileService {
 
 
         storageManager.saveFile(pathGenerator.getPath(projectId, path), "");
-
-        FileMetadata savedFileMetadata = fileMetadataRepository.save(new FileMetadata(project, path, ResourceType.FILE));
-
-        return savedFileMetadata.getId();
     }
 
 
@@ -76,7 +72,7 @@ public class IdManagedProjectFileService {
      * @param path
      * @return
      */
-    public Long createDirectory(String projectId, String path) throws CustomIOException {
+    public void createDirectory(String projectId, String path) throws CustomIOException {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new BaseException("해당 프로젝트가 존재하지 않습니다."));
@@ -85,13 +81,7 @@ public class IdManagedProjectFileService {
             throw new BaseException("해당 위치에 파일이 이미 존재합니다.");
         }
 
-        storageManager.createDirectory(pathGenerator.getPath(projectId, path));
-
-        FileMetadata savedFileMetadata = fileMetadataRepository.save(
-                new FileMetadata(project, path, ResourceType.DIRECTORY)
-        );
-
-        return savedFileMetadata.getId();
+        storageManager.createDirectory(pathGenerator.getPath(project.getId(), path));
     }
 
     public List<ResourceDto> loadDirectory(String projectId) throws CustomIOException {
