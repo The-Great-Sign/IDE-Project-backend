@@ -61,7 +61,6 @@ public class IdManagedFileController {
         log.trace("IdManagedFileController.changeFile() called : fileId = {}", dto.getFileId());
         projectFileService.changeFile(
                 dto.getFileId(),
-                dto.getPath(),
                 dto.getContent()
         );
 

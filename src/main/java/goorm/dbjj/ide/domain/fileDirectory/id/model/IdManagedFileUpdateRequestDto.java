@@ -13,9 +13,9 @@ public class IdManagedFileUpdateRequestDto {
     private Long fileId;
 
     //it should start with "/"
-    @Pattern(regexp = "^/.*", message = "Path는 /로 시작해야 합니다.")
-    @NotNull(message = "Path에 null이 들어오면 안됩니다.")
-    private String path;
+//    @Pattern(regexp = "^/.*", message = "Path는 /로 시작해야 합니다.")
+//    @NotNull(message = "Path에 null이 들어오면 안됩니다.")
+//    private String path;
 
     @NotNull(message = "content에 null이 들어오면 안됩니다.")
     private String content;
