@@ -107,37 +107,27 @@ public class IdManagedProjectFileService {
      * @param path
      * @param content
      */
-    public void changeFile(Long fileId, String path, String content) throws CustomIOException {
+    public void changeFile(Long fileId, String content) throws CustomIOException {
 
         FileMetadata fileMetadata = fileMetadataRepository.findById(fileId)
                 .orElseThrow(() -> new BaseException("해당 파일이 존재하지 않습니다.:FileMetadata"));
 
         File originFile = new File(pathGenerator.getPath(fileMetadata));
         if (!originFile.exists()) {
-            throw new BaseException("삭제하려는 파일이 존재하지 않습니다.:File ");
+            throw new BaseException("삭제하려는 파일이 존재하지 않습니다.");
         }
 
         if (fileMetadata.getType().equals(ResourceType.DIRECTORY)) {
             throw new BaseException("디렉토리를 변경하려고 합니다.");
         }
 
-        File tmp = new File(pathGenerator.getPath(fileMetadata.getProjectId(), path));
-
-        if (tmp.exists() && !fileMetadata.getPath().equals(path)) {
-            throw new BaseException("해당 위치에 파일이 이미 존재합니다.");
-        }
-
-
-        storageManager.deleteFile(pathGenerator.getPath(fileMetadata));
         storageManager.saveFile(
                 pathGenerator.getPath(
                         fileMetadata.getProjectId(),
-                        path
+                        fileMetadata.getPath()
                 ),
                 content
         );
-
-        fileMetadata.changePath(path);
     }
 
     /**
