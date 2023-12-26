@@ -173,7 +173,6 @@ public class IdManagedProjectFileService {
         }
 
         storageManager.deleteFile(pathGenerator.getPath(fileMetadata));
-        fileMetadataRepository.delete(fileMetadata);
     }
 
     /**
