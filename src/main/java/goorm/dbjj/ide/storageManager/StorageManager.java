@@ -15,4 +15,6 @@ public interface StorageManager {
     Resource loadDirectory(String path) throws CustomIOException;
 
     void createDirectory(String path) throws CustomIOException;
+
+    boolean exists(String path) throws CustomIOException;
 }
