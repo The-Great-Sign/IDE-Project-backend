@@ -39,6 +39,12 @@ public class FileWatcher {
 
         observer.addListener(new FileAlterationListenerAdaptor() {
 
+            @Override
+            public void onStart(FileAlterationObserver observer) {
+                log.trace("FileWatcher is watching . . .");
+                super.onStart(observer);
+            }
+
             /**
              * 변경 케이스의 경우 이후에 생각해보면 좋을 것 같습니다.
              * 단순 삭제 생성과 다르게 로직이 복잡합니다.
@@ -51,13 +57,13 @@ public class FileWatcher {
 
             @Override
             public void onDirectoryCreate(File directory) {
-                log.trace("FileWatcher.onDirectoryCreate() called");
+                log.trace("FileWatcher.onDirectoryCreate() called : directoryName {}", directory.getName());
                 sendToUser(CREATE, directory);
             }
 
             @Override
             public void onDirectoryDelete(File directory) {
-                log.trace("FileWatcher.onDirectoryDelete() called");
+                log.trace("FileWatcher.onDirectoryDelete() called : directoryName {}", directory.getName());
                 sendToUser(DELETE, directory);
             }
 
@@ -74,21 +80,25 @@ public class FileWatcher {
              */
             @Override
             public void onFileCreate(File file) {
+                log.trace("FileWatcher.onFileCreate() called : {}", file.getName());
                 if (file.getName().matches(EXCEPT_FILE)) {
+                    log.trace("swp file detected");
                     return;
                 }
 
-                log.trace("FileWatcher.onFileCreate() called");
+
                 sendToUser(CREATE, file);
             }
 
             @Override
             public void onFileDelete(File file) {
+                log.trace("FileWatcher.onFileDelete() called : {}", file.getName());
                 if (file.getName().matches(EXCEPT_FILE)) {
+                    log.trace("swp file detected");
                     return;
                 }
 
-                log.trace("FileWatcher.onFileDelete() called");
+
                 sendToUser(DELETE, file);
             }
 
