@@ -25,8 +25,6 @@ public class ChattingService {
             String projectId,
             String userNickname
     ) {
-        log.trace("ChatsService.enter execute");
-
         String content = userNickname + "님이 참여하였습니다.";
 
         try {
@@ -50,9 +48,8 @@ public class ChattingService {
     public ChattingResponseDto talk(
             ChattingContentRequestDto chattingContentRequestDto,
             String userNickname,
-            String projectId) {
-        log.trace("ChatsService.talk execute");
-
+            String projectId
+    ) {
         // db에 채팅 기록 저장하기
         chattingRepository.save(new Chat(chattingContentRequestDto));
 
@@ -71,7 +68,6 @@ public class ChattingService {
             String userNickname,
             String projectId
     ){
-        log.trace("ChatsService.exit execute");
         String content = userNickname + "님이 퇴장하였습니다.";
 
         return ChattingResponseDto.builder()

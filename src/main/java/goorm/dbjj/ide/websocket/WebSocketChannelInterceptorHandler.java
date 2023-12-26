@@ -38,9 +38,7 @@ public class WebSocketChannelInterceptorHandler {
 
         // URL 마지막 부분에 존재하는 프로젝트ID 가져오기
 
-        log.trace("웹소켓 [프로젝트] ID = {}", projectId);
-
-        checkUserAccessToProject(projectId, user);
+//        checkUserAccessToProject(projectId, user);
 
 /*            // 동시접속 막는 로직 : 프로젝트가 참여한 유저인지 검증 로직
             webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId);*/
