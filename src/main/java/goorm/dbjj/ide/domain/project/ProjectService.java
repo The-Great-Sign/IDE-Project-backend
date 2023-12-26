@@ -18,7 +18,9 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,16 +200,19 @@ public class ProjectService {
     public Page<ProjectDto> findMyCreatedProject(User user, Pageable pageable) {
         User mergedUser = em.merge(user);
 
-        return projectRepository.findByCreator(mergedUser, pageable)
-                .map(ProjectDto::of);
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "createdAt");
+        PageRequest req = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(order));
+
+        return projectRepository.findByCreator(mergedUser, req).map(ProjectDto::of);
     }
 
     public Page<ProjectDto> findMyJoinedProject(User user, Pageable pageable) {
         User mergedUser = em.merge(user);
 
-        return projectUserRepository.findByUser(mergedUser, pageable)
-                .map(ProjectUser::getProject)
-                .map(ProjectDto::of);
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "createdAt");
+        PageRequest req = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(order));
+
+        return projectRepository.findByParticipatingUserAndNotCreator(mergedUser, req).map(ProjectDto::of);
     }
 
     public ProjectDto findProjectById(String projectId) {
