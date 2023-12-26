@@ -3,10 +3,7 @@ package goorm.dbjj.ide.domain.chatgpt;
 import goorm.dbjj.ide.api.ApiResponse;
 import goorm.dbjj.ide.domain.chatgpt.model.ChatGptResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,9 +12,14 @@ public class ChatGptController {
 
     private final ChatGptService chatGptService;
 
+    public static class AskRequest {
+        private String question;
+    }
     @PostMapping("/ask")
-    public ApiResponse<String> ask(String question) {
-        ChatGptResponse resp = chatGptService.ask(question);
+    public ApiResponse<String> ask(
+            @RequestBody AskRequest request
+    ) {
+        ChatGptResponse resp = chatGptService.ask(request.question);
         return ApiResponse.ok(resp.getChoices()[0].getMessage().getContent());
     }
 
