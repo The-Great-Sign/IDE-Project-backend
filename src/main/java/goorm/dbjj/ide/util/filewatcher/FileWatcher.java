@@ -131,6 +131,8 @@ public class FileWatcher {
         FileMetadata fileMetadata = fileMetadataRepository.findByProject_IdAndPath(projectId, logicalDirectoryAddress)
                 .orElseThrow(() -> new BaseException(String.format("파일 메타데이터를 찾을 수 없습니다. ProjectId : %s, Path : %s", projectId, logicalDirectoryAddress)));
 
+
+
         FileWatchEvent fileWatchEvent = new FileWatchEvent(
                 fileMetadata.getId(),
                 eventType,
@@ -139,6 +141,8 @@ public class FileWatcher {
         );
 
         log.debug("fileWatchEvent : {}", fileWatchEvent);
+
+        fileMetadataRepository.delete(fileMetadata);
 
         webSocketFileDirectoryController.broadcastFileAndDirectoryDetails(
                 projectId,
