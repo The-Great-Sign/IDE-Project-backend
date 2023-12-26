@@ -2,6 +2,7 @@ package goorm.dbjj.ide.domain.chatgpt;
 
 import goorm.dbjj.ide.api.ApiResponse;
 import goorm.dbjj.ide.domain.chatgpt.model.ChatGptResponse;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +13,12 @@ public class ChatGptController {
 
     private final ChatGptService chatGptService;
 
+
+    @Data
     public static class AskRequest {
         private String question;
     }
+
     @PostMapping("/ask")
     public ApiResponse<String> ask(
             @RequestBody AskRequest request
