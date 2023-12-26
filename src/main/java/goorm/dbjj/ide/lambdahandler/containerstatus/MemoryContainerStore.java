@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.lambdahandler.containerstatus;
 
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 컨테이너 중복 실행 여부 등을 판단하기 위해 사용됩니다.
  */
 @Component
+@Slf4j
 public class MemoryContainerStore implements ContainerStore {
 
     /**
@@ -69,8 +71,10 @@ public class MemoryContainerStore implements ContainerStore {
     public boolean mark(String projectId) {
         if(containerMap.get(projectId) == null) {
             containerMap.put(projectId, new ContainerInfo(null));
+            log.debug("컨테이너 마킹 : {}", projectId);
             return true;
         } else {
+            log.debug("이미 마킹되어있습니다.");
             return false;
         }
     }
