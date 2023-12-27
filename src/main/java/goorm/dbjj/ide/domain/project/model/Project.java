@@ -72,4 +72,8 @@ public class Project {
     public void setAccessPointId(String accessPointId) {
         this.accessPointId = accessPointId;
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }
