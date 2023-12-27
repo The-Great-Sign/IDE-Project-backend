@@ -26,6 +26,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final UserRepository userRepository;
     private static final String GOOGLE = "google";
+    private static final String KAKAO = "kakao";
     private static final OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService(); // 사용자 정보 객체
 
     @Override
@@ -70,6 +71,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private SocialType getSocialType(String registrationId) {
         if(GOOGLE.equals(registrationId)){
             return SocialType.GOOGLE;
+        }
+        if(KAKAO.equals(registrationId)){
+            return SocialType.KAKAO;
         }
         throw new IllegalStateException("지원하지 않는 소셜 타입입니다: "+registrationId);
     }

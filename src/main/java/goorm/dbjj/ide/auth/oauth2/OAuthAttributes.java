@@ -1,6 +1,7 @@
 package goorm.dbjj.ide.auth.oauth2;
 
 import goorm.dbjj.ide.auth.oauth2.info.GoogleOAuth2UserInfo;
+import goorm.dbjj.ide.auth.oauth2.info.KakaoOAuth2UserInfo;
 import goorm.dbjj.ide.auth.oauth2.info.OAuth2UserInfo;
 import goorm.dbjj.ide.domain.user.dto.Role;
 import goorm.dbjj.ide.domain.user.dto.SocialType;
@@ -27,10 +28,6 @@ public class OAuthAttributes {
 
     /**
      * socialType에 맞는 메서드 호출 -> OAuthAttributes 객체 반환.
-     * @param socialType Google
-     * @param userNameAttributeName OAuth2 로그인 시 키(pk)
-     * @param attributes 유저 정보
-     * @return
      */
     public static OAuthAttributes of(
             SocialType socialType,
@@ -39,6 +36,9 @@ public class OAuthAttributes {
     ){
         if(socialType == SocialType.GOOGLE){
             return ofGoogle(userNameAttributeName, attributes);
+        }
+        if(socialType == SocialType.KAKAO){
+            return ofKakao(userNameAttributeName, attributes);
         }
 
         // 지원하지 않는 SocialType이 들어온 경우 예외를 발생시킵니다.
@@ -49,6 +49,13 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .nameAttributeKey(userNameAttributeName)
                 .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
+                .build();
+    }
+
+    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new KakaoOAuth2UserInfo(attributes))
                 .build();
     }
 
