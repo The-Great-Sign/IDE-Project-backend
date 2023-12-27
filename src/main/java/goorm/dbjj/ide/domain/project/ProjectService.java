@@ -100,7 +100,7 @@ public class ProjectService {
 
         // 만약 이미 프로젝트에 참여하고 있다면 예외 반환
         if (projectUserRepository.existsByProjectAndUser(project, user)) {
-            throw new BaseException("이미 프로젝트에 참여하고 있습니다.");
+            return;
         }
 
         // 프로젝트에 참여하고 있지 않다면, 비밀번호를 체크하고 참여
