@@ -77,14 +77,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         //토큰과 함께 프론트엔드로 전달
         String accessToken = "Bearer "+tokenInfo.getAccessToken();
         String refreshToken = "Bearer "+tokenInfo.getRefreshToken();
-        response.sendRedirect("http://localhost:3000?token="+accessToken+"&refresh_token="+refreshToken);
+        response.sendRedirect("https://the-greate-ide.vercel.app?token="+accessToken+"&refresh_token="+refreshToken);
     }
 
     private void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
         response.setStatus(HttpServletResponse.SC_OK);
 
         response.setHeader(accessHeader, BEARER + accessToken);
-        response.setHeader(refreshHeader, BEARER+refreshToken);
+        response.setHeader(refreshHeader, BEARER + refreshToken);
         log.trace("Access Token, Refresh Token 헤더 설정 완료");
     }
 
