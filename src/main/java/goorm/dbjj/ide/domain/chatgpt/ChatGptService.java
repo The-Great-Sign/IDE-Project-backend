@@ -39,7 +39,7 @@ public class ChatGptService {
         headers.add("Authorization", "Bearer " + OPENAI_API_KEY);
 
         ChatGptAskRequest request = ChatGptAskRequest.create(
-                new Message("system", "You are a developer. Please answer in Korean."),
+                new Message("system", "As a senior developer at the group '대박징조', please provide advice to junior developers. Please answer in Korean."),
                 new Message("user", question)
         );
 
