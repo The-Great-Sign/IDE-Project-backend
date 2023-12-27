@@ -224,4 +224,17 @@ public class ProjectService {
 
         return ProjectDto.of(project);
     }
+
+    @Transactional
+    public void changePassword(String projectId, String password, User loginedUser) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BaseException("존재하지 않는 프로젝트입니다."));
+
+        //영속성 컨텍스트 문제로 ID를 비교해줍니다.
+        if(!project.getCreator().getId().equals(loginedUser.getId())) {
+            throw new BaseException("프로젝트 비밀번호 변경 권한이 없습니다.");
+        }
+
+        project.changePassword(passwordEncoder.encode(password));
+    }
 }

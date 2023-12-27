@@ -8,7 +8,10 @@ import goorm.dbjj.ide.domain.project.model.ProjectJoinRequestDto;
 import goorm.dbjj.ide.domain.user.dto.User;
 import goorm.dbjj.ide.lambdahandler.containerstatus.model.ContainerStatus;
 import goorm.dbjj.ide.storageManager.exception.CustomIOException;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -174,4 +177,33 @@ public class ProjectController {
 
         return ApiResponse.ok(projectService.findProjectById(projectId));
     }
+
+
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    static class ChangeProjectPasswordRequestDto {
+        private String password;
+    }
+
+    /**
+     * 프로젝트 비밀번호를 변경합니다.
+     * @param projectId
+     * @param dto: 변경할 비밀번호를 담고 있습니다.
+     * @return
+     */
+    @PatchMapping("/{projectId}/new-password")
+    public ApiResponse<Void> changePassword(
+            @PathVariable String projectId,
+            @RequestBody ChangeProjectPasswordRequestDto dto,
+            @AuthenticationPrincipal User user
+    ) {
+        log.trace("ProjectController.changePassword called");
+        log.debug("프로젝트 비밀번호 변경 요청 : ProjectId = {}",projectId);
+
+        projectService.changePassword(projectId, dto.getPassword(), user);
+        return ApiResponse.ok();
+    }
+
 }
