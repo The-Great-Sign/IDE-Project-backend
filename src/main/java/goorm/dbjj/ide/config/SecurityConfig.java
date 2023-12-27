@@ -65,6 +65,7 @@ public class SecurityConfig {
         return cors -> {
             CorsConfiguration configuration = new CorsConfiguration();
             configuration.addAllowedOrigin("http://localhost:3000");
+            configuration.addAllowedOrigin("https://the-greate-ide.vercel.app");
             configuration.addAllowedOrigin("http://localhost:3001");
             configuration.addAllowedOrigin("http://localhost:3002");
             configuration.addAllowedOrigin("http://localhost:3003");
