@@ -18,7 +18,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // 소켓 연결을 구성
     
-//    private final WebSocketHandShackInterceptor webSocketHandShack;
     private final WebSocketChannelInterceptor webSocketChannelInterceptor;
     private final CustomHandShakeHandler customHandShakeHandler;
     /**

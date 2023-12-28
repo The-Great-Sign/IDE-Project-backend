@@ -52,7 +52,6 @@ public class WebSocketEventListener {
 
         // webSocketProjectUserCountMapper 해당 projectId의 인원 감소 로직
         webSocketProjectUserCountMapper.decreaseCurrentUsersWithProjectId(removeWebSocketUser.getProjectId());
-
         //인원이 0명인 경우 에러 처리
         if (webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == null || webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == 0L) {
             // webSocketProjectUserCountMapper의 유저

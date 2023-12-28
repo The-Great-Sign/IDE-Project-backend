@@ -4,7 +4,6 @@ import goorm.dbjj.ide.websocket.dto.UserInfoDto;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketUser {
     private final UserInfoDto userInfoDto;
     private final String projectId;
-    private final Set<String> subscribes;
+    private final ConcurrentHashMap.KeySetView<String, Boolean> subscribes;
 
     /**
      * 생성자

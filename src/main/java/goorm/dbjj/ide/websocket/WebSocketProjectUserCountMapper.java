@@ -3,7 +3,6 @@ package goorm.dbjj.ide.websocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class WebSocketProjectUserCountMapper {
-    private final Map<String, Long> projectCurrentUserMapper;
+    private final ConcurrentHashMap<String, Long> projectCurrentUserMapper;
     
     public WebSocketProjectUserCountMapper() {
         this.projectCurrentUserMapper = new ConcurrentHashMap<>();
@@ -26,6 +25,7 @@ public class WebSocketProjectUserCountMapper {
      * */
     public void increaseCurrentUsersWithProjectId(String projectId){
         projectCurrentUserMapper.compute(projectId, (key, value) -> (value == null) ? 1L : value + 1);
+        log.trace("웹소켓 현재 [프로젝트ID] = {} [인원] = {}", projectId, projectCurrentUserMapper.get(projectId));
     }
 
     /**
@@ -34,6 +34,7 @@ public class WebSocketProjectUserCountMapper {
      * */
     public void decreaseCurrentUsersWithProjectId(String projectId){
         projectCurrentUserMapper.computeIfPresent(projectId, (key, value) -> (value > 1) ? --value : 0L);
+        log.trace("웹소켓 현재 [projectId] = {} [인원] = {}", projectId, projectCurrentUserMapper.get(projectId));
     }
 
     /**
@@ -42,8 +43,7 @@ public class WebSocketProjectUserCountMapper {
      * @return currentUsers
      * */
     public Long getCurrentUsersByProjectId(String projectId){
-        Long currentUsers = projectCurrentUserMapper.get(projectId);
-        return currentUsers;
+        return projectCurrentUserMapper.get(projectId);
     }
 
     /**
