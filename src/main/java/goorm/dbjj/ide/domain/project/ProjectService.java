@@ -104,11 +104,11 @@ public class ProjectService {
         }
 
         // 프로젝트에 참여하고 있지 않다면, 비밀번호를 체크하고 참여
-        if (passwordEncoder.matches(requestPassword, project.getPassword())) {
+//        if (passwordEncoder.matches(requestPassword, project.getPassword())) {
             projectUserRepository.save(new ProjectUser(project, user));
-        } else {
-            throw new BaseException("비밀번호가 일치하지 않습니다.");
-        }
+//        } else {
+//            throw new BaseException("비밀번호가 일치하지 않습니다.");
+//        }
     }
 
     @Transactional
