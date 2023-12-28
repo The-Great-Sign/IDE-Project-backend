@@ -38,10 +38,10 @@ public class WebSocketChannelInterceptorHandler {
 
         // URL 마지막 부분에 존재하는 프로젝트ID 가져오기
 
-//        checkUserAccessToProject(projectId, user);
+        checkUserAccessToProject(projectId, user);
 
-/*            // 동시접속 막는 로직 : 프로젝트가 참여한 유저인지 검증 로직
-            webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId);*/
+        // 동시접속 막는 로직 : 프로젝트가 참여한 유저인지 검증 로직
+        webSocketUserSessionMapper.existsByProjectAndUser(userInfoDto, projectId);
 
         // 세션등록
         webSocketUserSessionMapper.put(sessionId, new WebSocketUser(userInfoDto, projectId));
