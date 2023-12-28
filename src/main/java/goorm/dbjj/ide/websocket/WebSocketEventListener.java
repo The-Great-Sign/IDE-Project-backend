@@ -40,30 +40,27 @@ public class WebSocketEventListener {
         // simpSessionAttributes에 존재하는 uuid 가져오기
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         ConcurrentHashMap<String, String> simpSessionAttributes = (ConcurrentHashMap<String, String>) headerAccessor.getMessageHeaders().get("simpSessionAttributes");
-        if(simpSessionAttributes == null){
-            log.trace("웹소켓 [비정상적인 DICONNECT]");
-            throw new BaseException("웹소켓 세션 아이디가 존재하지 않습니다.");
-        }
+        if(simpSessionAttributes != null){
+            String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
 
-        String sessionId = simpSessionAttributes.get("WebSocketUserSessionId");
+            // WebSocketUserSessionMapper 에 해당하는 유저 sessionId 없애기
+            WebSocketUser removeWebSocketUser = webSocketUserSessionMapper.remove(sessionId);
 
-        // WebSocketUserSessionMapper 에 해당하는 유저 sessionId 없애기
-        WebSocketUser removeWebSocketUser = webSocketUserSessionMapper.remove(sessionId);
+            // webSocketProjectUserCountMapper 해당 projectId의 인원 감소 로직
+            webSocketProjectUserCountMapper.decreaseCurrentUsersWithProjectId(removeWebSocketUser.getProjectId());
+            //인원이 0명인 경우 에러 처리
+            if (webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == null || webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == 0L) {
+                // webSocketProjectUserCountMapper의 유저
+                webSocketProjectUserCountMapper.removeCurrentUsersByProjectId(removeWebSocketUser.getProjectId());
 
-        // webSocketProjectUserCountMapper 해당 projectId의 인원 감소 로직
-        webSocketProjectUserCountMapper.decreaseCurrentUsersWithProjectId(removeWebSocketUser.getProjectId());
-        //인원이 0명인 경우 에러 처리
-        if (webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == null || webSocketProjectUserCountMapper.getCurrentUsersByProjectId(removeWebSocketUser.getProjectId()) == 0L) {
-            // webSocketProjectUserCountMapper의 유저
-            webSocketProjectUserCountMapper.removeCurrentUsersByProjectId(removeWebSocketUser.getProjectId());
+                // 특정 프로젝트에 현재 인원 0 명일 경우 프로젝트 종료 로직
+                Project project = projectRepository.findById(removeWebSocketUser.getProjectId()).orElseThrow(() -> new BaseException("웹소켓에 현재 프로젝트가 존재하지 않습니다"));
 
-            // 특정 프로젝트에 현재 인원 0 명일 경우 프로젝트 종료 로직
-            Project project = projectRepository.findById(removeWebSocketUser.getProjectId()).orElseThrow(() -> new BaseException("웹소켓에 현재 프로젝트가 존재하지 않습니다"));
-
-            log.trace("웹소켓 [종료] 프로젝트ID {{}} 현재인원 0명으로 프로젝트를 종료합니다.", removeWebSocketUser.getProjectId());
-            containerService.stopContainer(project);
-        } else {
-            chattingController.exit(removeWebSocketUser.getProjectId(), removeWebSocketUser.getUserInfoDto().getNickname());
+                log.trace("웹소켓 [종료] 프로젝트ID {{}} 현재인원 0명으로 프로젝트를 종료합니다.", removeWebSocketUser.getProjectId());
+                containerService.stopContainer(project);
+            } else {
+                chattingController.exit(removeWebSocketUser.getProjectId(), removeWebSocketUser.getUserInfoDto().getNickname());
+            }
         }
     }
 }
