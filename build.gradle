@@ -42,8 +42,32 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // AWS SDK for Java 2.x 기본 라이브러리
+    implementation 'software.amazon.awssdk:bom:2.17.0'
+
+    // 필요한 AWS 서비스 모듈 추가
+    implementation 'software.amazon.awssdk:ecs:2.17.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    // oauth 2.0
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // efs
+    implementation 'software.amazon.awssdk:efs:2.17.0'
+
+    //Apache Common IO
+    implementation 'commons-io:commons-io:2.15.1'
 }
 
 tasks.named('test') {

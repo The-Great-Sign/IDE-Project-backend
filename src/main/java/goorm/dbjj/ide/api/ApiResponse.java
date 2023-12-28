@@ -24,6 +24,10 @@ public class ApiResponse<T> {
         this.results = results;
     }
 
+    public static <T> ApiResponse<T> ok() {
+        return new ApiResponse<>(true,"요청에 성공했습니다.", null);
+    }
+
     public static <T> ApiResponse<T> ok(T results) {
         return new ApiResponse<>(true,"요청에 성공했습니다.", results);
     }
