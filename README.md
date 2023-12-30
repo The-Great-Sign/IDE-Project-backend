@@ -128,4 +128,28 @@ IDE의 프로젝트에 참여해있는 사용자간에 텍스트를 주고 받�
 ### ✨ ChatGPT를 통한 코드 리뷰 및 질문
 현재 작성중인 소스코드에 대한 코드 리뷰를 간편하게 받을 수 있으며, 질문이 있는 경우 내장되어있는 ChatGPT 기능을 통해 결과를 받아 볼 수 있습니다.
 
+## 데모 영상 
+
+### ✨ 프로젝트 생성
+![](https://i.imgur.com/PiEwntJ.gif)
+
+### ✨ 프로젝트 입장
+![](https://i.imgur.com/u8PjkEN.gif)
+
+### ✨동시 편집
+![](https://i.imgur.com/4VSu0vS.gif)
+
+### ✨ 파일트리
+![](https://i.imgur.com/ZvOswWB.gif)
+
+### ✨ 채팅
+![](https://i.imgur.com/Hu4KZQv.gif)
+
+### ✨ 터미널
+![](https://i.imgur.com/jeUx55A.gif)
+
+### 챗지피티
+![](https://i.imgur.com/6D1kcfn.gif)
+
+
 </div>
